@@ -67,9 +67,9 @@ class PedidosController extends Controller
                 'CAPTURA' => $request->captura,
                 'ESTATUS' => 1]);
     
-            return redirect()->route('pedidos.index')->with('success', 'CAPTURA actualizada correctamente.');
+            return redirect()->route('pedidos.index')->with('success', 'Registro actualizado exitosamente.');
         } else {
-            return redirect()->route('pedidos.index')->with('error', 'No se encontró un pedido con la SERIE proporcionada.');
+            return redirect()->route('pedidos.index')->with('error', 'No existe el registro con el número de captura proporcionado.');
         }
     }
     

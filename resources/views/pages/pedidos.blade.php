@@ -64,6 +64,8 @@
                                                 @if ($pedido->ESTATUS == 1)
                                                     <span
                                                         class="badge rounded-pill badge-md bg-gradient-success">Validado</span>
+                                                @elseif ($pedido->ESTATUS == 3)
+                                                        <span class="badge rounded-pill badge-md bg-gradient-info">Paqueteria</span>        
                                                 @else
                                                     <span
                                                         class="badge rounded-pill badge-md bg-gradient-warning">Pendiente</span>

@@ -15,7 +15,7 @@ class DataService
             ->orderBy('DHORA', 'desc')
             ->first();
 
-        return $lastRecord ? $lastRecord->DFECHA . ' ' . $lastRecord->DHORA : '2025-01-31 00:00:00';
+        return $lastRecord ? $lastRecord->DFECHA . ' ' . $lastRecord->DHORA : '2025-02-01 00:00:00';
     }
 
     public function getFilteredData($lastDateTime)
