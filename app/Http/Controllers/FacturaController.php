@@ -7,10 +7,33 @@ use App\Models\Factura;
 
 class FacturaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $facturas = Factura::orderBy('id', 'desc')->paginate(100);
-        return view('pages.facturas', compact('facturas'));
+        // Filtrar las facturas específicamente para Oaxaca si es necesario
+        $facturas = Factura::where('DITIPMV', 'FE')  // Puedes agregar otros filtros si es necesario
+            ->orderBy('id', 'desc')
+            ->paginate(100);
+        return view('pages.facturas-cdmx', compact('facturas'));
+    }
+
+    public function facturasOaxaca(Request $request)
+    {
+        // Filtrar las facturas específicamente para Oaxaca si es necesario
+        $facturas = Factura::where('DITIPMV', 'FO')  // Puedes agregar otros filtros si es necesario
+            ->orderBy('id', 'desc')
+            ->paginate(100);
+        
+        return view('pages.facturas-oaxaca', compact('facturas'));
+    }
+
+    public function facturasXalapa(Request $request)
+    {
+        // Filtrar las facturas específicamente para Oaxaca si es necesario
+        $facturas = Factura::where('DITIPMV', 'FV')  // Puedes agregar otros filtros si es necesario
+            ->orderBy('id', 'desc')
+            ->paginate(100);
+        
+        return view('pages.facturas-xalapa', compact('facturas'));
     }
 
     public function create()
@@ -43,34 +66,77 @@ class FacturaController extends Controller
         } else {
             // Registrar que no se encontró el registro
             logger('No se encontró el registro con el número de captura: ' . $validatedData['captura']);
-    
+            
             return redirect()->route('facturas.index')->with('error', 'No existe el registro con el número de captura proporcionado.');
         }
     
         return redirect()->route('facturas.index')->with('success', 'Registro actualizado o creado exitosamente.');
     }
-    
-    public function updateCaptura(Request $request)
+
+    public function storeXalapa(Request $request)
     {
         // Validar la solicitud
         $validatedData = $request->validate([
             'captura' => 'required|string', // "captura" es obligatorio y de tipo string
         ]);
-        // Buscar el pedido donde el campo SERIE coincida con CAPTURA
-        $pedido = Factura::where('DNUM', $validatedData)->first();
-        logger('Pedido:', ['data' =>  $pedido]);
-        if ($pedido) {
-            // Actualizar el campo CAPTURA con el valor proporcionado
-            $pedido->update([
-                'CAPTURA' => strtoupper($request->captura),
-                'ESTATUS' => 1]);
     
-            return redirect()->route('facturas.index')->with('success', 'CAPTURA actualizada correctamente.');
+        // Buscar el registro por el campo captura
+        $empacado = Factura::where('SERIE', $validatedData['captura'])->first();
+        logger('Busqueda: ' .$empacado);
+        if ($empacado) {
+            // Verificar si se encontró el registro
+            logger('Registro encontrado: ' . $empacado->id);
+    
+            // Si el registro existe, se actualiza
+            $empacado->update([
+                'CAPTURA' => $validatedData['captura'],
+                'ESTATUS' => '1',
+            ]);
+    
+            // Verificar si la actualización se realizó correctamente
+            logger('Registro actualizado: ' . $empacado->captura);
         } else {
-            return redirect()->route('facturas.index')->with('error', 'No se encontró un pedido con la SERIE proporcionada.');
+            // Registrar que no se encontró el registro
+            logger('No se encontró el registro con el número de captura: ' . $validatedData['captura']);
+            
+            return redirect()->route('facturas-xalapa.index')->with('error', 'No existe el registro con el número de captura proporcionado.');
         }
+    
+        return redirect()->route('facturas-xalapa.index')->with('success', 'Registro actualizado o creado exitosamente.');
     }
 
+    public function storeOaxaca(Request $request)
+    {
+        // Validar la solicitud
+        $validatedData = $request->validate([
+            'captura' => 'required|string', // "captura" es obligatorio y de tipo string
+        ]);
+    
+        // Buscar el registro por el campo captura
+        $empacado = Factura::where('SERIE', $validatedData['captura'])->first();
+        logger('Busqueda: ' .$empacado);
+        if ($empacado) {
+            // Verificar si se encontró el registro
+            logger('Registro encontrado: ' . $empacado->id);
+    
+            // Si el registro existe, se actualiza
+            $empacado->update([
+                'CAPTURA' => $validatedData['captura'],
+                'ESTATUS' => '1',
+            ]);
+    
+            // Verificar si la actualización se realizó correctamente
+            logger('Registro actualizado: ' . $empacado->captura);
+        } else {
+            // Registrar que no se encontró el registro
+            logger('No se encontró el registro con el número de captura: ' . $validatedData['captura']);
+            
+            return redirect()->route('facturas-xalapa.index')->with('error', 'No existe el registro con el número de captura proporcionado.');
+        }
+    
+        return redirect()->route('facturas-xalapa.index')->with('success', 'Registro actualizado o creado exitosamente.');
+    }
+    
     public function show($id)
     {
         $factura = Factura::find($id);
