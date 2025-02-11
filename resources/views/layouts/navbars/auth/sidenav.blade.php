@@ -45,16 +45,37 @@
                 </a>
             </li>
             <li class="nav-item mt-3">
-                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Modulos</h6>
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Facturas</h6>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ str_contains(request()->url(), 'facturas') == true ? 'active' : '' }}" href="{{ route('page', ['page' => 'facturas']) }}">
+                <a class="nav-link {{ str_contains(request()->url(), 'factura-cdmx') == true ? 'active' : '' }}" href="{{ route('page', ['page' => 'factura-cdmx']) }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
+                        <i class="ni ni-building text-warning text-sm opacity-10"></i>
                     </div>
-                    <span class="nav-link-text ms-1">Control Factura</span>
+                    <span class="nav-link-text ms-1">CDMX</span>
                 </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ str_contains(request()->url(), 'factura-oaxaca') == true ? 'active' : '' }}" href="{{ route('page', ['page' => 'factura-oaxaca']) }}">
+                    <div
+                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="ni ni-building text-warning text-sm opacity-10"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Oaxaca</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ str_contains(request()->url(), 'facturas-xalapa') == true ? 'active' : '' }}" href="{{ route('page', ['page' => 'factura-xalapa']) }}">
+                    <div
+                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="ni ni-building text-warning text-sm opacity-10"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Xalapa</span>
+                </a>
+            </li>
+            <li class="nav-item mt-3">
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Pedidos</h6>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{  str_contains(request()->url(), 'pedidos') == true ? 'active' : '' }}" href="{{ route('page', ['page' => 'pedidos']) }}">

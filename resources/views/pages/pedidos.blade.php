@@ -20,14 +20,21 @@
                         <button id="updateButton" class="btn btn-info btn-md">Actualizar Datos</button>
                     </div>
                     <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
-                        <form action="{{ route('pedidos.updateCaptura') }}" method="POST">
+                        <form action="{{ route('pedidos.store') }}" method="POST">
                             @csrf
-                            @method('PATCH') <!-- Laravel requiere este método para actualizaciones -->
-                            <div class="form-group">
-                                <input type="text" name="captura" class="form-control form-control-md mr-2"
-                                    placeholder="Validar Codigo de Barras">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <input type="text" name="captura" class="form-control form-control-md mr-2"
+                                            placeholder="Validar Codigo de Barras" >
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-success btn-md w-100">Validar</button>
+                                    </div>
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-success btn-md">Validar</button>
                         </form>
                     </div>
                     <div class="card-header pb-0">

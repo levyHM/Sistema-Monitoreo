@@ -25,27 +25,29 @@ class PedidosController extends Controller
     // Guardar un nuevo pedido en la base de datos
     public function store(Request $request)
     {
-        // Validación de datos
+        // Validar que CAPTURA esté presente en la solicitud
         $request->validate([
-            'PEFECHA' => 'required|date',
-            'PENUM' => 'required|string',
-            'PEALMACEN' => 'required|string',
-            'PEPAR0' => 'nullable|string',
-            'PEPAR1' => 'nullable|string',
-            'SUCURSAL' => 'required|string',
+            'captura' => 'required|string',
         ]);
 
-        // Crear nuevo pedido
-        Pedido::create([
-            'PEFECHA' => $request->PEFECHA,
-            'PENUM' => $request->PENUM,
-            'PEALMACEN' => $request->PEALMACEN,
-            'PEPAR0' => $request->PEPAR0,
-            'PEPAR1' => $request->PEPAR1,
-            'SUCURSAL' => $request->SUCURSAL,
-        ]);
+        // Extraer solo la parte antes del primer '%'
+        $capturaValue = explode('%', $request->captura)[0];
 
-        return redirect()->route('pedidos.index')->with('success', 'Pedido creado exitosamente.');
+        // Buscar el pedido donde el campo SERIE coincida con CAPTURA
+        $pedido = Pedido::where('SERIE', $capturaValue)->first();
+        Log::info('Pedido:', ['data' =>  $pedido]);
+        if ($pedido) {
+            // Actualizar el campo CAPTURA con el valor proporcionado
+            $pedido->update([
+                'CAPTURA' => substr($request->captura, 0, 20),
+                'ESTATUS' => 1
+            ]);
+
+            return redirect()->route('pedidos.index')->with('success', 'Los datos se actualizaron correctamente.');
+
+        } else {
+            return redirect()->route('pedidos.index')->with('error', 'No se encontró un registro con el número de captura proporcionado.');
+        }
     }
 
     public function updateCaptura(Request $request)
@@ -57,7 +59,7 @@ class PedidosController extends Controller
 
         // Extraer solo la parte antes del primer '%'
         $capturaValue = explode('%', $request->captura)[0];
-    
+
         // Buscar el pedido donde el campo SERIE coincida con CAPTURA
         $pedido = Pedido::where('SERIE', $capturaValue)->first();
         Log::info('Pedido:', ['data' =>  $pedido]);
@@ -65,14 +67,15 @@ class PedidosController extends Controller
             // Actualizar el campo CAPTURA con el valor proporcionado
             $pedido->update([
                 'CAPTURA' => $request->captura,
-                'ESTATUS' => 1]);
-    
+                'ESTATUS' => 1
+            ]);
+
             return redirect()->route('pedidos.index')->with('success', 'Registro actualizado exitosamente.');
         } else {
             return redirect()->route('pedidos.index')->with('error', 'No existe el registro con el número de captura proporcionado.');
         }
     }
-    
+
 
 
     // Mostrar un pedido específico

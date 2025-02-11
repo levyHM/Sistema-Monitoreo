@@ -25,7 +25,7 @@ class DataService
             SELECT fdoc_0.DITIPMV, fdoc_0.DNUM, fdoc_0.DFECHA, fcli_0.CLICOD, fdoc_0.DPAR1, fdoc_0.DHORA 
             FROM db152jigafra.fcli fcli_0, db152jigafra.fdoc fdoc_0 
             WHERE fdoc_0.CLISEQ = fcli_0.CLISEQ 
-            AND fdoc_0.DITIPMV = 'FE' 
+            AND fdoc_0.DITIPMV in ('FE','FO','FV')
             AND fdoc_0.DHORA > ?
         ", [$lastDateTime]);
         
