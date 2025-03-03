@@ -3,12 +3,12 @@
 @section('content')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-@include('layouts.navbars.auth.topnav', ['title' => 'Facturas'])
+@include('layouts.navbars.auth.topnav', ['title' => 'Facturas CDMX'])
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
             <div class="card mb-4">
-                <h1 class="text-center">Control de Factura</h1>
+                <h1 class="text-center">Control de Factura CDMX</h1>
                 @if (session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
@@ -16,6 +16,11 @@
                 @if (session('error'))
                 <div class="alert alert-danger">{{ session('error') }}</div>
                 @endif
+
+                @if (session('warning'))
+                <div class="alert alert-warning">{{ session('warning') }}</div>
+                @endif
+
                 <div class="text-center mt-4">
                     <button id="updateButton" class="btn btn-info btn-md">Actualizar Datos</button>
                 </div>
@@ -38,7 +43,7 @@
                     </form>
                 </div>
                 <div class="card-header pb-0">
-                    <h6>Datos Control de Factura</h6>
+                    <h6>Datos Control de Factura CDMX</h6>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
@@ -57,7 +62,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($facturas->where('DITIPMV', 'FE') as $factura)
+                                @foreach ($facturas as $factura)
                                 <tr>
                                     <td>{{ $factura->id }}</td>
                                     <td>{{ $factura->DITIPMV }}</td>
@@ -65,7 +70,20 @@
                                     <td>{{ $factura->DFECHA }}</td>
                                     <td>{{ $factura->CLICOD }}</td>
                                     <td>{{ $factura->DPAR1 }}</td>
-                                    <td>{{ $factura->DHORA }}</td>
+                                    {{-- Determinar el rango de horario (Diurno / Nocturno) --}}
+                                    @php
+                                        $hora = date('H:i:s', strtotime($factura->DHORA)); // Convertir a formato 24h
+                                        if ($hora >= '08:00:00' && $hora <= '20:59:59') {
+                                            $claseHora = 'bg-gradient-info'; // Diurno
+                                        } else {
+                                            $claseHora = 'bg-gradient-secondary'; // Nocturno
+
+                                        }
+                                    @endphp
+
+                                    <td>
+                                        <span class="badge {{ $claseHora }}">{{ $factura->DHORA }} </span>
+                                    </td>
                                     <td>{{ $factura->CAPTURA }}</td>
                                     <td class="align-middle text-center text-sm">
                                         @if ($factura->ESTATUS == 1)
@@ -109,5 +127,29 @@
                 }
             });
         });
+        document.addEventListener("DOMContentLoaded", function() {
+        const input = document.getElementById("capturaInput");
+
+        // Restaurar el valor guardado después de actualizar
+        if (localStorage.getItem("capturaValue")) {
+            input.value = localStorage.getItem("capturaValue");
+        }
+
+        // Enfocar automáticamente el input
+        input.focus();
+
+        // Guardar el valor cada vez que el usuario escriba
+        input.addEventListener("input", function() {
+            localStorage.setItem("capturaValue", input.value);
+        });
+
+        // Limpiar el valor guardado al enviar el formulario
+        document.querySelector("form").addEventListener("submit", function() {
+            localStorage.removeItem("capturaValue"); 
+            setTimeout(() => {
+                input.focus(); // Mantiene el foco después de enviar
+            }, 100);
+        });
+    });
 </script>
 @endsection

@@ -22,7 +22,7 @@ class DataServicePedidos
     {
         return DB::connection('mysql2')->select("SELECT DISTINCT fpenc_0.PESEQ, fpenc_0.PEFECHA, fpenc_0.PEDATE2, fpenc_0.PENUM, fpenc_0.PEALMACEN, fpenc_0.PEPAR0, fpenc_0.PEPAR1
 FROM db152jigafra.fpenc fpenc_0
-WHERE (PEALMACEN='001' and fpenc_0.PEPAR1 NOT IN ('', '1') and fpenc_0.PESEQ>?)", [$lastDateTime]);
+WHERE (fpenc_0.PEPAR1 NOT IN ('', '1') and fpenc_0.PESEQ>?)", [$lastDateTime]);
     }
 
     public function copyOrUpdateData()
@@ -31,27 +31,39 @@ WHERE (PEALMACEN='001' and fpenc_0.PEPAR1 NOT IN ('', '1') and fpenc_0.PESEQ>?)"
         $lastDateTime = $this->getLastDateFromFirstDatabase();
         // Filtrar los datos desde la base de datos secundaria
         $data = $this->getFilteredData($lastDateTime);
-    
+
         // Log para depuración
         Log::info('Filtered Data:', ['data' => $lastDateTime]);
-    
+
         // Lista de valores específicos de PEPAR1 para los cuales ESTATUS debe ser 3
         $specificValues = [
-            '1Z33', '1Z31', '1Z29', '1Z28', '1Z27', '1Z25', '1Z23', '1Z09',
-            '1Z38', '1Z32', '1Z44', '1Z41', '1Z21', '1Z35'
+            '1Z33',
+            '1Z31',
+            '1Z29',
+            '1Z28',
+            '1Z27',
+            '1Z25',
+            '1Z23',
+            '1Z09',
+            '1Z38',
+            '1Z32',
+            '1Z44',
+            '1Z41',
+            '1Z21',
+            '1Z35'
         ];
-    
+
         // Iterar sobre los registros obtenidos y realizar la operación de actualización o inserción
         foreach ($data as $row) {
             // Extraer los primeros dos caracteres de PENUM
             $penumPrefix = substr($row->PENUM, 0, 2);
-    
+
             // Si los primeros dos caracteres son "PO" o "PV", se mantiene, de lo contrario, se usa "P"
             $penumValue = ($penumPrefix == 'PO' || $penumPrefix == 'PV') ? $penumPrefix : 'P';
-    
+
             // Determinar el valor de ESTATUS
             $estatusValue = in_array($row->PEPAR1, $specificValues) ? '3' : '0';
-    
+
             DB::connection('mysql')->table('pedidos')->updateOrInsert(
                 [
                     // Este es el conjunto de condiciones de búsqueda
@@ -72,5 +84,4 @@ WHERE (PEALMACEN='001' and fpenc_0.PEPAR1 NOT IN ('', '1') and fpenc_0.PESEQ>?)"
             );
         }
     }
-    
 }

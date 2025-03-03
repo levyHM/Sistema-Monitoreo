@@ -12,8 +12,26 @@ class PedidosController extends Controller
     // Mostrar todos los pedidos con paginación
     public function index()
     {
-        $pedidos = Pedido::orderBy('ID', 'desc')->paginate(100);
-        return view('pages.pedidos', compact('pedidos'));
+        $pedidos = Pedido::where('SUCURSAL', 'P')  // Puedes agregar otros filtros si es necesario
+            ->orderBy('id', 'desc')
+            ->paginate(100);
+        return view('pages.pedidos-cdmx', compact('pedidos'));
+    }
+
+    public function pedidosOaxaca()
+    {
+        $pedidos = Pedido::where('SUCURSAL', 'PO')  // Puedes agregar otros filtros si es necesario
+            ->orderBy('id', 'desc')
+            ->paginate(100);
+        return view('pages.pedidos-oaxaca', compact('pedidos'));
+    }
+
+    public function pedidosXalapa()
+    {
+        $pedidos = Pedido::where('SUCURSAL', 'PV')  // Puedes agregar otros filtros si es necesario
+            ->orderBy('id', 'desc')
+            ->paginate(100);
+        return view('pages.pedidos-xalapa', compact('pedidos'));
     }
 
     // Mostrar el formulario para crear un nuevo pedido
@@ -21,11 +39,10 @@ class PedidosController extends Controller
     {
         return view('pedidos.create');
     }
-
     // Guardar un nuevo pedido en la base de datos
     public function store(Request $request)
     {
-        // Validar que CAPTURA esté presente en la solicitud
+        // Validar la entrada, asegurando que 'captura' esté presente
         $request->validate([
             'captura' => 'required|string',
         ]);
@@ -35,19 +52,24 @@ class PedidosController extends Controller
 
         // Buscar el pedido donde el campo SERIE coincida con CAPTURA
         $pedido = Pedido::where('SERIE', $capturaValue)->first();
-        Log::info('Pedido:', ['data' =>  $pedido]);
+        Log::info('Pedido encontrado:', ['data' => $pedido]);
+
         if ($pedido) {
-            // Actualizar el campo CAPTURA con el valor proporcionado
+            // Actualizar el campo CAPTURA y cambiar el ESTATUS
             $pedido->update([
                 'CAPTURA' => substr($request->captura, 0, 20),
                 'ESTATUS' => 1
             ]);
 
-            return redirect()->route('pedidos.index')->with('success', 'Los datos se actualizaron correctamente.');
-
+            return $this->redirectBackWithMessage('success', 'Los datos se actualizaron correctamente.');
         } else {
-            return redirect()->route('pedidos.index')->with('error', 'No se encontró un registro con el número de captura proporcionado.');
+            return $this->redirectBackWithMessage('error', 'No se encontró un registro con el número de captura proporcionado.');
         }
+    }
+    // Método auxiliar para manejar la redirección dinámica
+    private function redirectBackWithMessage($type, $message)
+    {
+        return redirect()->back()->with($type, $message);
     }
 
     public function updateCaptura(Request $request)

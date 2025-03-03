@@ -3,12 +3,12 @@
 @section('content')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-@include('layouts.navbars.auth.topnav', ['title' => 'Facturas'])
+@include('layouts.navbars.auth.topnav', ['title' => 'Facturas Xalapa'])
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
             <div class="card mb-4">
-                <h1 class="text-center">Control de Factura</h1>
+                <h1 class="text-center">Control de Factura Xalapa</h1>
                 @if (session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
@@ -16,11 +16,16 @@
                 @if (session('error'))
                 <div class="alert alert-danger">{{ session('error') }}</div>
                 @endif
+
+                @if (session('warning'))
+                <div class="alert alert-warning">{{ session('warning') }}</div>
+                @endif
+
                 <div class="text-center mt-4">
                     <button id="updateButton" class="btn btn-info btn-md">Actualizar Datos</button>
                 </div>
                 <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
-                    <form action="{{ route('facturas-xalapa.store') }}" method="POST">
+                    <form action="{{ route('facturas.store') }}" method="POST">
                         @csrf
                         <div class="row">
                             <div class="col-md-10">
@@ -38,7 +43,7 @@
                     </form>
                 </div>
                 <div class="card-header pb-0">
-                    <h6>Datos Control de Factura</h6>
+                    <h6>Datos Control de Factura Xalapa</h6>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
@@ -65,8 +70,20 @@
                                     <td>{{ $factura->DFECHA }}</td>
                                     <td>{{ $factura->CLICOD }}</td>
                                     <td>{{ $factura->DPAR1 }}</td>
-                                    <td>{{ $factura->DHORA }}</td>
-                                    <td>{{ $factura->CAPTURA }}</td>
+                                    {{-- Determinar el rango de horario (Diurno / Nocturno) --}}
+                                    @php
+                                        $hora = date('H:i:s', strtotime($factura->DHORA)); // Convertir a formato 24h
+                                        if ($hora >= '08:00:00' && $hora <= '20:59:59') {
+                                            $claseHora = 'bg-gradient-info'; // Diurno
+                                        } else {
+                                            $claseHora = 'bg-gradient-secondary'; // Nocturno
+
+                                        }
+                                    @endphp
+
+                                    <td>
+                                        <span class="badge {{ $claseHora }}">{{ $factura->DHORA }} </span>
+                                    </td>                                    <td>{{ $factura->CAPTURA }}</td>
                                     <td class="align-middle text-center text-sm">
                                         @if ($factura->ESTATUS == 1)
                                         <span class="badge rounded-pill badge-md bg-gradient-success">Validado</span>
@@ -107,6 +124,16 @@
                         '  <div class="alert alert-danger" role="alert"><strong>Error</strong>Error en la Base datos</div>'
                     );
                 }
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.querySelector("form");
+            const input = document.querySelector("input[name='captura']");
+
+            form.addEventListener("submit", function(event) {
+                setTimeout(() => {
+                    input.focus();
+                }, 100); // Asegura que el foco se mantenga después de enviar
             });
         });
 </script>
