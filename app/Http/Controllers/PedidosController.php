@@ -12,8 +12,26 @@ class PedidosController extends Controller
     // Mostrar todos los pedidos con paginación
     public function index()
     {
-        $pedidos = Pedido::orderBy('ID', 'desc')->paginate(100);
-        return view('pages.pedidos', compact('pedidos'));
+        $pedidos = Pedido::where('SUCURSAL', 'P')  // Puedes agregar otros filtros si es necesario
+            ->orderBy('id', 'desc')
+            ->paginate(100);
+        return view('pages.pedidos-cdmx', compact('pedidos'));
+    }
+
+    public function pedidosOaxaca()
+    {
+        $pedidos = Pedido::where('SUCURSAL', 'PO')  // Puedes agregar otros filtros si es necesario
+            ->orderBy('id', 'desc')
+            ->paginate(100);
+        return view('pages.pedidos-oaxaca', compact('pedidos'));
+    }
+
+    public function pedidosXalapa()
+    {
+        $pedidos = Pedido::where('SUCURSAL', 'PV')  // Puedes agregar otros filtros si es necesario
+            ->orderBy('id', 'desc')
+            ->paginate(100);
+        return view('pages.pedidos-xalapa', compact('pedidos'));
     }
 
     // Mostrar el formulario para crear un nuevo pedido
@@ -21,31 +39,37 @@ class PedidosController extends Controller
     {
         return view('pedidos.create');
     }
-
     // Guardar un nuevo pedido en la base de datos
     public function store(Request $request)
     {
-        // Validación de datos
+        // Validar la entrada, asegurando que 'captura' esté presente
         $request->validate([
-            'PEFECHA' => 'required|date',
-            'PENUM' => 'required|string',
-            'PEALMACEN' => 'required|string',
-            'PEPAR0' => 'nullable|string',
-            'PEPAR1' => 'nullable|string',
-            'SUCURSAL' => 'required|string',
+            'captura' => 'required|string',
         ]);
 
-        // Crear nuevo pedido
-        Pedido::create([
-            'PEFECHA' => $request->PEFECHA,
-            'PENUM' => $request->PENUM,
-            'PEALMACEN' => $request->PEALMACEN,
-            'PEPAR0' => $request->PEPAR0,
-            'PEPAR1' => $request->PEPAR1,
-            'SUCURSAL' => $request->SUCURSAL,
-        ]);
+        // Extraer solo la parte antes del primer '%'
+        $capturaValue = explode('%', $request->captura)[0];
 
-        return redirect()->route('pedidos.index')->with('success', 'Pedido creado exitosamente.');
+        // Buscar el pedido donde el campo SERIE coincida con CAPTURA
+        $pedido = Pedido::where('SERIE', $capturaValue)->first();
+        Log::info('Pedido encontrado:', ['data' => $pedido]);
+
+        if ($pedido) {
+            // Actualizar el campo CAPTURA y cambiar el ESTATUS
+            $pedido->update([
+                'CAPTURA' => substr($request->captura, 0, 20),
+                'ESTATUS' => 1
+            ]);
+
+            return $this->redirectBackWithMessage('success', 'Los datos se actualizaron correctamente.');
+        } else {
+            return $this->redirectBackWithMessage('error', 'No se encontró un registro con el número de captura proporcionado.');
+        }
+    }
+    // Método auxiliar para manejar la redirección dinámica
+    private function redirectBackWithMessage($type, $message)
+    {
+        return redirect()->back()->with($type, $message);
     }
 
     public function updateCaptura(Request $request)
@@ -57,7 +81,7 @@ class PedidosController extends Controller
 
         // Extraer solo la parte antes del primer '%'
         $capturaValue = explode('%', $request->captura)[0];
-    
+
         // Buscar el pedido donde el campo SERIE coincida con CAPTURA
         $pedido = Pedido::where('SERIE', $capturaValue)->first();
         Log::info('Pedido:', ['data' =>  $pedido]);
@@ -65,14 +89,15 @@ class PedidosController extends Controller
             // Actualizar el campo CAPTURA con el valor proporcionado
             $pedido->update([
                 'CAPTURA' => $request->captura,
-                'ESTATUS' => 1]);
-    
+                'ESTATUS' => 1
+            ]);
+
             return redirect()->route('pedidos.index')->with('success', 'Registro actualizado exitosamente.');
         } else {
             return redirect()->route('pedidos.index')->with('error', 'No existe el registro con el número de captura proporcionado.');
         }
     }
-    
+
 
 
     // Mostrar un pedido específico

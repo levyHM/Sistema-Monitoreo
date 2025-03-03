@@ -3,12 +3,12 @@
 @section('content')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    @include('layouts.navbars.auth.topnav', ['title' => 'Pedidos'])
+    @include('layouts.navbars.auth.topnav', ['title' => 'Pedidos Xalapa'])
     <div class="container-fluid py-4">
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4">
-                    <h1 class="text-center">Control de Pedidos</h1>
+                    <h1 class="text-center">Control de Pedidos Xalapa</h1>
                     @if (session('success'))
                         <div class="alert alert-success">{{ session('success') }}</div>
                     @endif
@@ -20,18 +20,25 @@
                         <button id="updateButton" class="btn btn-info btn-md">Actualizar Datos</button>
                     </div>
                     <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
-                        <form action="{{ route('pedidos.updateCaptura') }}" method="POST">
+                        <form action="{{ route('pedidos.store') }}" method="POST">
                             @csrf
-                            @method('PATCH') <!-- Laravel requiere este método para actualizaciones -->
-                            <div class="form-group">
-                                <input type="text" name="captura" class="form-control form-control-md mr-2"
-                                    placeholder="Validar Codigo de Barras">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <input type="text" name="captura" class="form-control form-control-md mr-2"
+                                            placeholder="Validar Codigo de Barras" >
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-success btn-md w-100">Validar</button>
+                                    </div>
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-success btn-md">Validar</button>
                         </form>
                     </div>
                     <div class="card-header pb-0">
-                        <h6>Datos Control de Pedidos</h6>
+                        <h6>Datos Control de Pedidos Xalapa</h6>
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive p-0">
@@ -104,6 +111,26 @@
                         '  <div class="alert alert-danger" role="alert"><strong>Error</strong>Error en la Base datos</div>'
                     );
                 }
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.querySelector("form");
+            const input = document.querySelector("input[name='captura']");
+
+            form.addEventListener("submit", function(event) {
+                setTimeout(() => {
+                    input.focus();
+                }, 100); // Asegura que el foco se mantenga después de enviar
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.querySelector("form");
+            const input = document.querySelector("input[name='captura']");
+
+            form.addEventListener("submit", function(event) {
+                setTimeout(() => {
+                    input.focus();
+                }, 100); // Asegura que el foco se mantenga después de enviar
             });
         });
     </script>
