@@ -54,7 +54,7 @@ class FacturaController extends Controller
         $facturas = Factura::where('DITIPMV', 'FO')  // Puedes agregar otros filtros si es necesario
             ->orderBy('id', 'desc')
             ->paginate(100);
-
+        
         return view('pages.facturas-oaxaca', compact('facturas'));
     }
 
@@ -64,7 +64,7 @@ class FacturaController extends Controller
         $facturas = Factura::where('DITIPMV', 'FV')  // Puedes agregar otros filtros si es necesario
             ->orderBy('id', 'desc')
             ->paginate(100);
-
+        
         return view('pages.facturas-xalapa', compact('facturas'));
     }
 
@@ -79,31 +79,31 @@ class FacturaController extends Controller
         $validatedData = $request->validate([
             'captura' => 'required|string', // "captura" es obligatorio y de tipo string
         ]);
-
+    
         try {
             // Buscar el registro por el campo "SERIE"
-            $empacado = Factura::where('SERIE', $validatedData['captura'])->first();
+        $empacado = Factura::where('SERIE', $validatedData['captura'])->first();
 
-            if ($empacado) {
+        if ($empacado) {
                 // Verificar si ya tiene el mismo valor para evitar una actualización innecesaria
                 if ($empacado->CAPTURA === $validatedData['captura'] && $empacado->ESTATUS == 1) {
                     logger('Registro duplicado: ' . $empacado->id);
                     //return redirect()->route('facturas.index')->with('warning', 'El registro ya existe y está actualizado.');
                     return $this->redirectBackWithMessage('warning', 'El registro ya existe y está actualizado.');
                 }
-
-                // Si el registro existe, se actualiza
-                $empacado->update([
-                    'CAPTURA' => $validatedData['captura'],
-                    'ESTATUS' => '1',
-                ]);
-
+    
+            // Si el registro existe, se actualiza
+            $empacado->update([
+                'CAPTURA' => $validatedData['captura'],
+                'ESTATUS' => '1',
+            ]);
+    
                 logger('Registro actualizado: ' . $empacado->id);
                 //return redirect()->route('facturas.index')->with('success', 'Registro actualizado exitosamente.');
                 return $this->redirectBackWithMessage('success', 'Registro actualizado exitosamente.');
-            } else {
+        } else {
                 // Si el registro no existe
-                logger('No se encontró el registro con el número de captura: ' . $validatedData['captura']);
+            logger('No se encontró el registro con el número de captura: ' . $validatedData['captura']);
                 //return redirect()->route('facturas.index')->with('error', 'No existe el registro con el número de captura proporcionado.');
                 return $this->redirectBackWithMessage('error', 'No existe el registro con el número de captura proporcionado.');
             }
@@ -118,8 +118,8 @@ class FacturaController extends Controller
         private function redirectBackWithMessage($type, $message)
         {
             return redirect()->back()->with($type, $message);
-        }
-
+    }
+    
     public function show($id)
     {
         $factura = Factura::find($id);
@@ -132,7 +132,7 @@ class FacturaController extends Controller
         return view('facturas.edit', compact('factura'));
     }
 
-
+ 
     public function update(Request $request, $id)
     {
         $empacado = Factura::findOrFail($id);
