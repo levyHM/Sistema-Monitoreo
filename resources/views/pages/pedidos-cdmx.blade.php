@@ -64,11 +64,14 @@
                                     {{-- Determinar el rango de horario (Diurno / Nocturno) --}}
                                     @php
                                     $hora = date('H:i:s', strtotime($pedido->PEDATE2)); // Convertir a formato 24h
-                                    if ($hora >= '08:00:00' && $hora <= '20:59:59' ) { $claseHora='bg-gradient-info' ;// Diurno 
-                                    } else { $claseHora='bg-gradient-secondary' ;  } @endphp
-                                        <td>
+                                    if ($hora >= '08:00:00' && $hora <= '20:59:59' ) {
+                                         $claseHora='bg-gradient-info';
+                                     } else { 
+                                        $claseHora='bg-gradient-secondary' ; 
+                                    } @endphp
+                                    <td>
                                         <span class="badge {{ $claseHora }}">{{ $pedido->PEDATE2 }} </span>
-                                        </td>
+                                    </td>
                                         <td>{{ $pedido->PENUM }}</td>
                                         <td>{{ $pedido->PEALMACEN }}</td>
                                         <td>{{ $pedido->PEPAR0 }}</td>
