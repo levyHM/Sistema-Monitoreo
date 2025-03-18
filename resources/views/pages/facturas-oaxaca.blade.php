@@ -70,7 +70,36 @@
                                     <td>{{ $factura->DFECHA }}</td>
                                     <td>{{ $factura->CLICOD }}</td>
                                     <td>{{ $factura->DPAR1 }}</td>
-                                    <td>{{ $factura->DHORA }}</td>
+                                    {{-- Determinar el rango de horario (Diurno / Nocturno) --}}
+                                    @php
+                                        $hora = date('H:i:s', strtotime($factura->DHORA)); // Convertir a formato 24h
+                                        $ultimosTres = substr(trim($factura->DPAR1), -3); // Obtener los últimos tres caracteres
+                                        \Log::info('Últimos tres caracteres de DPAR1: ' . $ultimosTres. " Hora: ".$hora); // Agregar log
+
+                                        // Inicializar sin clase (para mostrar solo la hora si no se cumple la condición)
+                                        $claseHora = '';
+                               
+                                        if ($hora >= '09:00:00' && $hora <= '17:59:59' ) {
+                                           if ( in_array($ultimosTres, ['O02', 'O06'])) {
+                                                $claseHora = 'badge bg-gradient-info'; // Diurno
+                                            }if (in_array($ultimosTres, ['O08', 'O09', 'O10','O12','O13'])) {
+                                                $claseHora = 'badge bg-gradient-success'; // Nocturno
+                                            }
+                                        }if ($hora >= '09:00:00' && $hora <= '12:59:59' ) {
+                                            if ( !in_array($ultimosTres, ['O02', 'O06','O08', 'O09', 'O10','O12','O13'])) {
+                                                $claseHora = 'badge bg-gradient-dark'; // Diurno
+                                            }
+                                        }else {
+                                            $claseHora = 'badge bg-gradient-warning'; // Diurno
+                                        }
+                                    @endphp
+                                    <td>
+                                        @if ($claseHora)
+                                            <span class="{{ $claseHora }}">{{ $factura->DHORA }}</span>
+                                        @else
+                                            {{ $factura->DHORA }}
+                                        @endif
+                                    </td>
                                     <td>{{ $factura->CAPTURA }}</td>
                                     <td class="align-middle text-center text-sm">
                                         @if ($factura->ESTATUS == 1)

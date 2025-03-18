@@ -39,15 +39,20 @@
                                     <button type="submit" class="btn btn-success btn-md w-100">Validar</button>
                                 </div>
                             </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="validadoCheck" name="estatus" {{ old('estatus') == 1 ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="customCheck1">Pendiente</label>
+                            </div>
                         </div>
                     </form>
                 </div>
+
                 <div class="card-header pb-0">
                     <h6>Datos Control de Factura CDMX</h6>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
+                        <table class="table align-items-center mb-0 ">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -80,7 +85,6 @@
 
                                         }
                                     @endphp
-
                                     <td>
                                         <span class="badge {{ $claseHora }}">{{ $factura->DHORA }} </span>
                                     </td>
@@ -110,46 +114,42 @@
     @include('layouts.footers.auth.footer')
 </div>
 <script>
-    $('#updateButton').click(function() {
+    $(document).ready(function () {
+        function loadFacturas(url) {
             $.ajax({
-                url: '{{ route('copyData') }}',
-                type: 'GET',
-                success: function(response) {
-                    $('body').prepend(
-                        '<div class="alert alert-primary text-center" role="alert"><strong>Exitoso</strong>Copia Exitosa</div>'
-                    );
-                    location.reload(); // Recarga la página para actualizar los datos
+                url: url,
+                type: "GET",
+                success: function (response) {
+                    $(".table tbody").html($(response).find("tbody").html());
+                    $(".pagination").html($(response).find(".pagination").html()); // Actualiza paginación
                 },
-                error: function(xhr) {
-                    $('body').prepend(
-                        '  <div class="alert alert-danger" role="alert"><strong>Error</strong>Error en la Base datos</div>'
-                    );
+                error: function () {
+                    alert("Error al cargar las facturas.");
                 }
             });
-        });
-        document.addEventListener("DOMContentLoaded", function() {
-        const input = document.getElementById("capturaInput");
-
-        // Restaurar el valor guardado después de actualizar
-        if (localStorage.getItem("capturaValue")) {
-            input.value = localStorage.getItem("capturaValue");
         }
 
-        // Enfocar automáticamente el input
-        input.focus();
+        // Capturar cambio en el switch de estatus
+        $("#validadoCheck").change(function () {
+            let status = $(this).prop("checked") ? 0 : 1;
+            let url = "{{ route('facturas.index') }}?estatus=" + status;
 
-        // Guardar el valor cada vez que el usuario escriba
-        input.addEventListener("input", function() {
-            localStorage.setItem("capturaValue", input.value);
+            loadFacturas(url);
         });
 
-        // Limpiar el valor guardado al enviar el formulario
-        document.querySelector("form").addEventListener("submit", function() {
-            localStorage.removeItem("capturaValue"); 
-            setTimeout(() => {
-                input.focus(); // Mantiene el foco después de enviar
-            }, 100);
+        // Capturar clics en la paginación (dinámicamente)
+        $(document).on("click", ".pagination a", function (event) {
+            event.preventDefault();
+            let url = $(this).attr("href");
+            loadFacturas(url);
         });
     });
+
+        // Asegurarse de que el checkbox envíe el valor correcto al hacer submit
+        document.getElementById('validadoCheck').addEventListener('change', function () {
+        this.value = this.checked ? 1 : 0; // Establecer el valor según si está marcado o no
+    });
 </script>
+
+
 @endsection
