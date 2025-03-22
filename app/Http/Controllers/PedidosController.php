@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Pedido; // Asegúrate de que el modelo Pedido esté creado
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class PedidosController extends Controller

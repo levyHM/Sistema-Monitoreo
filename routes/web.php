@@ -13,11 +13,13 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\ResetPassword;
 use App\Http\Controllers\ChangePassword;
+use App\Http\Controllers\DataClientesController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\DataPedidosController;
 use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\PedidosController;
-use App\Http\Controllers\EmpacadoController;
+use App\Http\Controllers\ClienteController;
+
 
 Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
 	Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
@@ -30,7 +32,7 @@ Route::get('/', function () {return redirect('/dashboard');})->middleware('auth'
 	Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
 	Route::get('/dashboard', [HomeController::class, 'index'])->name('home')->middleware('auth');
 Route::group(['middleware' => 'auth'], function () {
-	Route::get('/virtual-reality', [PageController::class, 'vr'])->name('virtual-reality');
+	
 	Route::get('/rtl', [PageController::class, 'rtl'])->name('rtl');
 	Route::get('/profile', [UserProfileController::class, 'show'])->name('profile');
 	Route::post('/profile', [UserProfileController::class, 'update'])->name('profile.update');
@@ -54,7 +56,11 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('pedidos-oaxaca', [PedidosController::class, 'store'])->name('pedidos.store');
 	//Pedido de Oaxaca
 	Route::get('pedidos-xalapa', [PedidosController::class, 'pedidosXalapa'])->name('pedidos-xalapa.index');
-	Route::post('pedidos-oaxaca', [PedidosController::class, 'store'])->name('pedidos.store');  
+	Route::post('pedidos-oaxaca', [PedidosController::class, 'store'])->name('pedidos.store');
+	//Embarque CDMX
+	Route::get('/embarque-cdmx', [PageController::class, 'embarqueCDMX'])->name('embarque-cdmx');
+	Route::get('/clientes/buscar', [ClienteController::class, 'buscarClientes'])->name('buscarClientes');
+	Route::get('/clientes/obtener', [ClienteController::class, 'obtenerCliente'])->name('obtenerCliente');  
 
 	
 	
@@ -62,5 +68,6 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 	Route::get('/page/copy-data', [DataController::class, 'copyData'])->name('copyData'); // Ruta para copiar y actualizar datos
 	Route::get('/page/copy-data-pedidos', [DataPedidosController::class, 'copyData'])->name('copyDataPedidos'); // Ruta para copiar y actualizar datos
+	Route::get('/page/copy-data-clientes', [DataClientesController::class, 'copyData'])->name('copyDataClientes'); // Ruta para copiar y actualizar datos
 
 });

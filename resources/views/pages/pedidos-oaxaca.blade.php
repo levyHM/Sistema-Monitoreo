@@ -65,7 +65,7 @@
                                             @php
                                             $hora = date('H:i:s', strtotime($pedido->PEDATE2)); // Convertir a formato 24h
                                             $ultimosTres = substr(trim($pedido->PEPAR1), -3); // Obtener los últimos tres caracteres
-                                            \Log::info('Últimos tres caracteres de DPAR1: ' . $ultimosTres. " Hora: ".$hora); // Agregar log
+                                            //\Log::info('Últimos tres caracteres de DPAR1: ' . $ultimosTres. " Hora: ".$hora.' -->'.$pedido->PEPAR1.' '.$pedido->PENUM); // Agregar log
 
                                             // Inicializar sin clase (para mostrar solo la hora si no se cumple la condición)
                                             $claseHora = '';
@@ -73,6 +73,7 @@
                                             if ($hora >= '09:00:00' && $hora <= '17:59:59' ) {
                                             if ( in_array($ultimosTres, ['O02', 'O06'])) {
                                                     $claseHora = 'badge bg-gradient-info'; // Azul 
+                                                    \Log::info('IF 9:17 : ' . $ultimosTres.'-->'.$hora.' '.$pedido->PEPAR1.' '.$pedido->PENUM); // Agregar log
                                                 }if (in_array($ultimosTres, ['O08', 'O09', 'O10','O12','O13'])) {
                                                     $claseHora = 'badge bg-gradient-success'; // Verde
                                                 }
@@ -81,7 +82,13 @@
                                                     $claseHora = 'badge bg-gradient-dark'; // Negro
                                                 }
                                             }else {
-                                                $claseHora = 'badge bg-gradient-warning'; // Naranja
+                                                if ( !in_array($ultimosTres, ['O02', 'O06','O08', 'O09', 'O10','O12','O13'])) {
+                                                    $claseHora = 'badge bg-gradient-warning'; // Naranja
+                                                }else {
+                                                    if ($hora < '09:00:00' || $hora > '17:59:59') {
+                                                        $claseHora = 'badge bg-gradient-warning'; // Naranja
+                                                    }
+                                                }
                                             }
                                         @endphp
                                             <td>

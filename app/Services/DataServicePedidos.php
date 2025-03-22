@@ -33,7 +33,7 @@ WHERE (fpenc_0.PEPAR1 NOT IN ('', '1') and fpenc_0.PESEQ>?)", [$lastDateTime]);
         $data = $this->getFilteredData($lastDateTime);
 
         // Log para depuración
-        Log::info('Filtered Data:', ['data' => $lastDateTime]);
+        //Log::info('Filtered Data:', ['data' => $lastDateTime]);
 
         // Lista de valores específicos de PEPAR1 para los cuales ESTATUS debe ser 3
         $specificValues = [
@@ -50,7 +50,14 @@ WHERE (fpenc_0.PEPAR1 NOT IN ('', '1') and fpenc_0.PESEQ>?)", [$lastDateTime]);
             '1Z44',
             '1Z41',
             '1Z21',
-            '1Z35'
+            '1Z35',
+            '1O02',
+            '1O06',
+            '1O08',
+            '1O09',
+            '1O10',
+            '1O12',
+            '1O13'
         ];
 
         // Iterar sobre los registros obtenidos y realizar la operación de actualización o inserción
@@ -63,7 +70,7 @@ WHERE (fpenc_0.PEPAR1 NOT IN ('', '1') and fpenc_0.PESEQ>?)", [$lastDateTime]);
 
             // Determinar el valor de ESTATUS
             $estatusValue = in_array($row->PEPAR1, $specificValues) ? '3' : '0';
-
+            Log::info('estatusValue', ['value' => $estatusValue.' --> '.$row->PENUM.' --> '.$row->PEPAR1]);
             DB::connection('mysql')->table('pedidos')->updateOrInsert(
                 [
                     // Este es el conjunto de condiciones de búsqueda
