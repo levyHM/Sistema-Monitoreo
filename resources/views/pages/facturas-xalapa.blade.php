@@ -115,13 +115,13 @@
                 type: 'GET',
                 success: function(response) {
                     $('body').prepend(
-                        '<div class="alert alert-primary text-center" role="alert"><strong>Exitoso</strong>Copia Exitosa</div>'
+                        '<div class="alert alert-success text-center" role="alert"><strong>Exitoso: </strong>Copia Exitosa</div>'
                     );
                     location.reload(); // Recarga la página para actualizar los datos
                 },
                 error: function(xhr) {
                     $('body').prepend(
-                        '  <div class="alert alert-danger" role="alert"><strong>Error</strong>Error en la Base datos</div>'
+                        '  <div class="alert alert-danger text-center" role="alert"><strong>Error</strong>Error en la Base datos</div>'
                     );
                 }
             });

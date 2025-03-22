@@ -10,15 +10,15 @@
             <div class="card mb-4">
                 <h1 class="text-center">Control de Factura CDMX</h1>
                 @if (session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
+                <div class="alert alert-success text-center">{{ session('success') }}</div>
                 @endif
 
                 @if (session('error'))
-                <div class="alert alert-danger">{{ session('error') }}</div>
+                <div class="alert alert-danger text-center">{{ session('error') }}</div>
                 @endif
 
                 @if (session('warning'))
-                <div class="alert alert-warning">{{ session('warning') }}</div>
+                <div class="alert alert-warning text-center">{{ session('warning') }}</div>
                 @endif
 
                 <div class="text-center mt-4">
@@ -112,44 +112,23 @@
         </div>
     </div>
     @include('layouts.footers.auth.footer')
-</div>
-<script>
-    $(document).ready(function () {
-        function loadFacturas(url) {
+</div><script>
+    $('#updateButton').click(function() {
             $.ajax({
-                url: url,
-                type: "GET",
-                success: function (response) {
-                    $(".table tbody").html($(response).find("tbody").html());
-                    $(".pagination").html($(response).find(".pagination").html()); // Actualiza paginación
+                url: '{{ route('copyData') }}',
+                type: 'GET',
+                success: function(response) {
+                    $('body').prepend(
+                        '<div class="alert alert-success text-center" role="alert"><strong>Exitoso: </strong>Copia Exitosa</div>'
+                    );
+                    location.reload(); // Recarga la página para actualizar los datos
                 },
-                error: function () {
-                    alert("Error al cargar las facturas.");
+                error: function(xhr) {
+                    $('body').prepend(
+                        '  <div class="alert alert-danger text-center" role="alert"><strong>Error: </strong>Error en la Base datos</div>'
+                    );
                 }
             });
-        }
-
-        // Capturar cambio en el switch de estatus
-        $("#validadoCheck").change(function () {
-            let status = $(this).prop("checked") ? 0 : 1;
-            let url = "{{ route('facturas.index') }}?estatus=" + status;
-
-            loadFacturas(url);
         });
-
-        // Capturar clics en la paginación (dinámicamente)
-        $(document).on("click", ".pagination a", function (event) {
-            event.preventDefault();
-            let url = $(this).attr("href");
-            loadFacturas(url);
-        });
-    });
-
-        // Asegurarse de que el checkbox envíe el valor correcto al hacer submit
-        document.getElementById('validadoCheck').addEventListener('change', function () {
-        this.value = this.checked ? 1 : 0; // Establecer el valor según si está marcado o no
-    });
 </script>
-
-
 @endsection
