@@ -39,12 +39,12 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/profile-static', [PageController::class, 'profile'])->name('profile-static'); 
 	Route::get('/sign-in-static', [PageController::class, 'signin'])->name('sign-in-static');
 	Route::get('/sign-up-static', [PageController::class, 'signup'])->name('sign-up-static');
-	 
+	 //Factura de CDMX  
     Route::get('factura-cdmx', [FacturaController::class, 'index'])->name('facturas.index');
-	Route::post('factura-cdmx', [FacturaController::class, 'store'])->name('facturas.store');
-
+	Route::post('factura-cdmx', [FacturaController::class, 'store'])->name('facturas-cdmx.store');
+    //Factura de Oaxaca 
 	Route::get('factura-oaxaca', [FacturaController::class, 'facturasOaxaca'])->name('facturas-oaxaca.index');
-	Route::post('factura-oaxaca', [FacturaController::class, 'store'])->name('facturas.store');
+	Route::post('factura-oaxaca', [FacturaController::class, 'store'])->name('facturas-oaxaca.store');
 
 	Route::get('factura-xalapa', [FacturaController::class, 'facturasXalapa'])->name('facturas-xalapa.index');
 	Route::post('factura-xalapa', [FacturaController::class, 'store'])->name('facturas.store');
@@ -70,4 +70,5 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/page/copy-data-pedidos', [DataPedidosController::class, 'copyData'])->name('copyDataPedidos'); // Ruta para copiar y actualizar datos
 	Route::get('/page/copy-data-clientes', [DataClientesController::class, 'copyData'])->name('copyDataClientes'); // Ruta para copiar y actualizar datos
 
+	
 });

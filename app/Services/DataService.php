@@ -36,6 +36,31 @@ class DataService
         $lastDateTime = $this->getLastDateFromFirstDatabase();
         $data = $this->getFilteredData($lastDateTime);
         Log::info('Filtered Data:', ['data' => $lastDateTime]);
+
+        // Lista de valores específicos de PEPAR1 para los cuales ESTATUS debe ser 3
+        $specificValues = [
+            '1Z33',
+            '1Z31',
+            '1Z29',
+            '1Z28',
+            '1Z27',
+            '1Z25',
+            '1Z23',
+            '1Z09',
+            '1Z38',
+            '1Z32',
+            '1Z44',
+            '1Z41',
+            '1Z21',
+            '1Z35',
+            '1O02',
+            '1O06',
+            '1O08',
+            '1O09',
+            '1O10',
+            '1O12',
+            '1O13'
+        ];
         
         foreach ($data as $row) {
             DB::connection('mysql')->table('facturas')->updateOrInsert(
