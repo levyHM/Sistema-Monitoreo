@@ -1,17 +1,18 @@
 <?php
 
 namespace App\Livewire;
-use Illuminate\Http\Request;
-use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Factura;
+use Livewire\Component;
+use App\Models\Pedido; // Asegúrate de que el modelo Pedido esté creado
+use Illuminate\Http\Request;
 
-class FilterOaxaca extends Component
-{ 
+class FilterPedidosCdmx extends Component
+{
     use WithPagination; // Importante para habilitar paginación en Livewire
     public $estatusPendiente = false;
     public $estatusValidado = false;
 
+    
     protected $paginationTheme = 'bootstrap';
 
     public function mount(Request $request)
@@ -33,27 +34,20 @@ class FilterOaxaca extends Component
         $this->resetPage();
     }
 
-    public function getFacturasProperty()
-    {
-        return Factura::when($this->estatusPendiente, function ($query) {
-                // Si estatusPendiente es verdadero, aplica el filtro ESTATUS = 0 y DITIPMV = 'FE'
-                $query->where('ESTATUS', 0)
-                    ->where('DITIPMV', 'FO');
-            })
-            ->when($this->estatusValidado, function ($query) {
-                // Si estatusValidado es verdadero, aplica el filtro ESTATUS = 1
-                $query->orWhere('ESTATUS', 1);
-            })
-            // El filtro DITIPMV solo se necesita una vez, fuera de las condiciones
-            ->where('DITIPMV', 'FO')  
-            ->orderBy('id', 'desc')
-            ->paginate(100);
-    }
-    
     public function render()
     {
-        return view('livewire.filter-oaxaca', [
-            'facturas' => $this->facturas,
-        ]);
+        $pedidos = Pedido::where('SUCURSAL', 'P')
+            ->orderBy('id', 'desc')
+            ->when($this->estatusValidado, function ($query) {
+                // Si estatusValidado es verdadero, aplica el filtro ESTATUS = 1
+                $query->where('ESTATUS', 1);
+            })
+            ->when($this->estatusPendiente, function ($query) {
+                // Si estatusPendiente es verdadero, aplica el filtro ESTATUS = 0
+                $query->where('ESTATUS', 0);
+            })
+            ->paginate(100);
+
+        return view('livewire.filter-pedidos-cdmx', compact('pedidos'));
     }
 }

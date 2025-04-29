@@ -19,6 +19,7 @@ use App\Http\Controllers\DataPedidosController;
 use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\PedidosController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\EmbarqueController;
 
 
 Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
@@ -60,7 +61,15 @@ Route::group(['middleware' => 'auth'], function () {
 	//Embarque CDMX
 	Route::get('/embarque-cdmx', [PageController::class, 'embarqueCDMX'])->name('embarque-cdmx');
 	Route::get('/clientes/buscar', [ClienteController::class, 'buscarClientes'])->name('buscarClientes');
-	Route::get('/clientes/obtener', [ClienteController::class, 'obtenerCliente'])->name('obtenerCliente');  
+	Route::get('/clientes/obtener', [ClienteController::class, 'obtenerCliente'])->name('obtenerCliente');
+	Route::post('embarques/import', [EmbarqueController::class, 'import'])->name('embarques.import');
+
+	Route::get('/embarques', [EmbarqueController::class, 'index'])->name('embarque-cdmx');
+	Route::put('/embarques/{id}', [EmbarqueController::class, 'update'])->name('embarques.update');
+	Route::post('embarques', [EmbarqueController::class, 'updateEscaner'])->name('embarques.store');
+
+
+
 
 	
 	
