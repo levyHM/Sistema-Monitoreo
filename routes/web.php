@@ -20,6 +20,10 @@ use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\PedidosController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\EmbarqueController;
+use App\Http\Controllers\ConductorController;
+use App\Http\Controllers\CamionetaController;
+use App\Http\Controllers\RutaController;
+use	App\Http\Controllers\DataRutasController;
 
 
 Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
@@ -70,14 +74,26 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 
+	//Administrador conductores
+	Route::resource('conductores', ConductorController::class);
+	//Administrador camionetas
+	Route::resource('camionetas', CamionetaController::class);
+	//Route::get('/rutas', [RutaController::class, 'index'])->name('ruta.index');
+	Route::resource('rutas', RutaController::class);
 
+	//Usuario 
+	Route::get('/user-management', [UserProfileController::class, 'index'])->name('user-management');
 	
-	
+
+    	
 	Route::get('/{page}', [PageController::class, 'index'])->name('page');
 	Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 	Route::get('/page/copy-data', [DataController::class, 'copyData'])->name('copyData'); // Ruta para copiar y actualizar datos
 	Route::get('/page/copy-data-pedidos', [DataPedidosController::class, 'copyData'])->name('copyDataPedidos'); // Ruta para copiar y actualizar datos
 	Route::get('/page/copy-data-clientes', [DataClientesController::class, 'copyData'])->name('copyDataClientes'); // Ruta para copiar y actualizar datos
+	Route::get('rutas/s', [DataRutasController::class, 'copyData'])->name('copyDataRutas'); // Ruta para copiar y actualizar datos
+
+
 
 	
 });

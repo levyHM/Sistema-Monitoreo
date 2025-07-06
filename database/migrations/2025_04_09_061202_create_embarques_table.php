@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('FACTURA');
             $table->integer('CANTIDAD');
             $table->integer('VALIDACION')->nullable();
-            $table->string('CLIENTE');
-            $table->string('SUCURSAL');
+            $table->integer('id_cliente');
+            $table->string('url_img');
             $table->time('HORA_DE_LLEGADA');
             $table->time('HORA_DE_SALIDA');
             $table->text('OBSERVACIONES')->nullable();

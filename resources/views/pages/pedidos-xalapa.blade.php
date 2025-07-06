@@ -1,30 +1,32 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    @include('layouts.navbars.auth.topnav', ['title' => 'Pedidos Xalapa'])
-    <div class="container-fluid py-4">
-        <div class="row">
-            <div class="col-12">
-                <div class="card mb-4">
-                    <h1 class="text-center">Control de Pedidos Xalapa</h1>
-                    @if (session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                    @endif
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+@include('layouts.navbars.auth.topnav', ['title' => 'Pedidos Xalapa'])
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <h1 class="text-center">Control de Pedidos Xalapa</h1>
+                @if (session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
 
-                    @if (session('error'))
-                        <div class="alert alert-danger">{{ session('error') }}</div>
-                    @endif
-
-                    <livewire:filter-pedidos-xalapa>
-                </div>
+                @if (session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+                @endif
+                @if (session('warning'))
+                <div class="alert alert-warning text-center">{{ session('warning') }}</div>
+                @endif
+                <livewire:filter-pedidos-xalapa>
             </div>
         </div>
-        @include('layouts.footers.auth.footer')
     </div>
-    <script>
-        $('#updateButton').click(function() {
+    @include('layouts.footers.auth.footer')
+</div>
+<script>
+    $('#updateButton').click(function() {
             $.ajax({
                 url: '{{ route('copyDataPedidos') }}',
                 type: 'GET',
@@ -61,5 +63,5 @@
                 }, 100); // Asegura que el foco se mantenga después de enviar
             });
         });
-    </script>
+</script>
 @endsection

@@ -14,19 +14,19 @@ class Embarque extends Model
 
     // Define los campos que pueden ser asignados masivamente
     protected $fillable = [
-        'ID_OPERADOR', 
-        'ID_RUTA', 
-        'ID_CAMIONETA', 
-        'FECHA', 
+        'id_conductor',
+        'ID_RUTA',
+        'ID_CAMIONETA',
+        'FECHA',
         'ESCANER',
-        'FACTURA',  
-        'CANTIDAD', 
-        'VALIDACION', 
-        'CLIENTE', 
-        'SUCURSAL', 
-        'HORA_DE_LLEGADA', 
-        'HORA_DE_SALIDA', 
-        'OBSERVACIONES', 
+        'FACTURA',
+        'CANTIDAD',
+        'VALIDACION',
+        'id_cliente',
+        'url_img',
+        'HORA_DE_LLEGADA',
+        'HORA_DE_SALIDA',
+        'OBSERVACIONES',
         'ESTATUS'
     ];
 
@@ -35,8 +35,8 @@ class Embarque extends Model
 
     // Si tu campo de fecha no usa el formato 'Y-m-d H:i:s' por defecto, puedes especificarlo
     protected $dates = [
-        'FECHA', 
-        'HORA_DE_LLEGADA', 
+        'FECHA',
+        'HORA_DE_LLEGADA',
         'HORA_DE_SALIDA'
     ];
 
@@ -54,4 +54,20 @@ class Embarque extends Model
         });
     }
     */
+    // Relación con el modelo FacturaParte
+    public function facturaPartes()
+    {
+        // La columna 'embarques_id' es la clave foránea en factura_partes
+        return $this->hasMany(FacturaParte::class, 'embarques_id');
+    }
+
+    public function clientes()
+    {
+        return $this->hasMany(Cliente::class, 'id');
+    }
+
+    public function conductor()
+    {
+        return $this->belongsTo(Conductor::class, 'id_conductor', 'id');
+    }
 }

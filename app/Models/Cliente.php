@@ -26,4 +26,10 @@ class Cliente extends Model
 
     // Opcional: Si tu tabla tiene timestamps, puedes mantener la configuración predeterminada
     public $timestamps = true; // Esto es true por defecto en Laravel
+
+    public function embarques()
+    {
+        return $this->hasMany(Embarque::class, 'id_cliente');
+    }
+
 }

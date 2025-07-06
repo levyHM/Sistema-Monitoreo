@@ -22,85 +22,160 @@
                 </a>
             </li>
             <li class="nav-item mt-3">
-                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Facturas</h6>
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6" data-bs-toggle="collapse"
+                    data-bs-target="#account-Facturas">
+                    Facturas
+                </h6>
             </li>
-            <li class="nav-item">
-                <a class="nav-link {{ str_contains(request()->url(), 'factura-cdmx') == true ? 'active' : '' }}"
-                    href="{{ route('page', ['page' => 'factura-cdmx']) }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-building text-warning text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">CDMX</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ str_contains(request()->url(), 'factura-oaxaca') == true ? 'active' : '' }}"
-                    href="{{ route('page', ['page' => 'factura-oaxaca']) }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-building text-warning text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Oaxaca</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ str_contains(request()->url(), 'facturas-xalapa') == true ? 'active' : '' }}"
-                    href="{{ route('page', ['page' => 'factura-xalapa']) }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-building text-warning text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Xalapa</span>
-                </a>
-            </li>
+            <div class="collapse {{ str_contains(request()->url(), 'factura-') ? 'show' : '' }}" id="account-Facturas">
+                <li class="nav-item">
+                    <a class="nav-link {{ str_contains(request()->url(), 'factura-cdmx') == true ? 'active' : '' }}"
+                        href="{{ route('page', ['page' => 'factura-cdmx']) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-building text-warning text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">CDMX</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ str_contains(request()->url(), 'factura-oaxaca') == true ? 'active' : '' }}"
+                        href="{{ route('page', ['page' => 'factura-oaxaca']) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-building text-warning text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Clientes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ str_contains(request()->url(), 'facturas-xalapa') == true ? 'active' : '' }}"
+                        href="{{ route('page', ['page' => 'factura-xalapa']) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-building text-warning text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Xalapa</span>
+                    </a>
+                </li>
+            </div>
             <li class="nav-item mt-3">
-                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Pedidos</h6>
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6" data-bs-toggle="collapse"
+                    data-bs-target="#account-Pedidos">
+                    Pedidos
+                </h6>
             </li>
-            <li class="nav-item">
-                <a class="nav-link {{  str_contains(request()->url(), 'pedidos-cdmx') == true ? 'active' : '' }}"
-                    href="{{ route('page', ['page' => 'pedidos-cdmx']) }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-app text-info text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">CDMX</span>
-                </a>
-            </li>
+            <div class="collapse {{ str_contains(request()->url(), 'pedidos-') ? 'show' : '' }}" id="account-Pedidos">
+                <li class="nav-item">
+                    <a class="nav-link {{  str_contains(request()->url(), 'pedidos-cdmx') == true ? 'active' : '' }}"
+                        href="{{ route('page', ['page' => 'pedidos-cdmx']) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-app text-info text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">CDMX</span>
+                    </a>
+                </li>
 
-            <li class="nav-item">
-                <a class="nav-link {{ Route::currentRouteName() == 'virtual-reality' ? 'active' : '' }}"
-                    href="{{ route('page', ['page' => 'pedidos-oaxaca']) }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-app text-info text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Oaxaca</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ Route::currentRouteName() == 'virtual-reality' ? 'active' : '' }}"
-                    href="{{ route('page', ['page' => 'pedidos-xalapa']) }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-app text-info text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Xalapa</span>
-                </a>
-            </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ Route::currentRouteName() == 'virtual-reality' ? 'active' : '' }}"
+                        href="{{ route('page', ['page' => 'pedidos-oaxaca']) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-app text-info text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Oaxaca</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ Route::currentRouteName() == 'virtual-reality' ? 'active' : '' }}"
+                        href="{{ route('page', ['page' => 'pedidos-xalapa']) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-app text-info text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Xalapa</span>
+                    </a>
+                </li>
+            </div>
             <li class="nav-item mt-3">
-                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Control Embarques</h6>
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6" data-bs-toggle="collapse"
+                    data-bs-target="#account-collapse">
+                    Control Embarques
+                </h6>
+                <div class="collapse" id="account-collapse">
+                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="nav-item">
+                            <a class="nav-link {{ Route::currentRouteName() == 'embarque-cdmx' ? 'active' : '' }}"
+                                href="{{ route('embarque-cdmx') }}">
+                                <div
+                                    class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
+                                </div>
+                                <span class="nav-link-text ms-1">CDMX</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ Route::currentRouteName() == 'embarque-cdmx' ? 'active' : '' }}"
+                                href="{{ route('embarque-cdmx') }}">
+                                <div
+                                    class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
+                                </div>
+                                <span class="nav-link-text ms-1">CDMX</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ Route::currentRouteName() == 'embarque-cdmx' ? 'active' : '' }}"
+                                href="{{ route('embarque-cdmx') }}">
+                                <div
+                                    class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
+                                </div>
+                                <span class="nav-link-text ms-1">CDMX</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
-            <li class="nav-item">
-                <a class="nav-link {{ Route::currentRouteName() == 'embarque-cdmx' ? 'active' : '' }}"
-                    href="{{ route('embarque-cdmx') }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">CDMX</span>
-                </a>
+            <li class="nav-item mt-3 d-flex align-items-center">
+                <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6" data-bs-toggle="collapse"
+                    data-bs-target="#account-administrador-embarques">
+                    Administrador Embarques
+                </h6>
             </li>
+            <div class="collapse {{ str_contains(request()->url(), 'conductores-') ? 'show' : '' }}" id="account-administrador-embarques">
+                <li class="nav-item">
+                    <a class="nav-link {{ str_contains(request()->url(), 'factura-cdmx') == true ? 'active' : '' }}"
+                        href="{{ route('page', ['page' => 'conductores']) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-building text-warning text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Conductores</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ str_contains(request()->url(), 'camionetas-') == true ? 'active' : '' }}"
+                        href="{{ route('page', ['page' => 'camionetas']) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-building text-warning text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Camionetas</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ str_contains(request()->url(), 'rutas-') == true ? 'active' : '' }}"
+                        href="{{ route('page', ['page' => 'rutas']) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-building text-warning text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Rutas</span>
+                    </a>
+                </li>
+            </div>
             <li class="nav-item mt-3 d-flex align-items-center">
                 <div class="ps-4">
                     <i class="fab fa-laravel" style="color: #00953a"></i>
@@ -155,7 +230,7 @@
                     <span class="nav-link-text ms-1">Sign In</span>
                 </a>
             </li>
-           <!-- <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a class="nav-link " href="{{ route('sign-up-static') }}">
                     <div
                         class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">

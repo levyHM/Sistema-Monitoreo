@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-
+use App\Models\User; // asegúrate de importar el modelo
 class UserProfileController extends Controller
 {
     public function show()
@@ -38,5 +38,11 @@ class UserProfileController extends Controller
             'about' => $request->get('about')
         ]);
         return back()->with('succes', 'Profile succesfully updated');
+    }
+        public function index()
+    {
+        $users = User::orderBy('created_at', 'desc')->paginate(10); // ajusta el número de usuarios por página
+
+        return view('pages.user-management', compact('users'));
     }
 }
