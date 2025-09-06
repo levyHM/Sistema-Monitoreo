@@ -8,10 +8,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+    use HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -24,11 +26,13 @@ class User extends Authenticatable
         'lastname',
         'email',
         'password',
+        'catalogo_sucursales_id',
         'address',
         'city',
         'country',
         'postal',
-        'about'
+        'about',
+        'signature'
     ];
 
     /**
@@ -61,15 +65,9 @@ class User extends Authenticatable
         $this->attributes['password'] = bcrypt($value);
     }
 
-
-
-    public function role()
+     public function sucursal()
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsTo(CatalogoSucursal::class, 'catalogo_sucursales_id');
     }
 
-    public function hasRole(string $roleName): bool
-    {
-        return optional($this->role)->name === $roleName;
-    }
 }

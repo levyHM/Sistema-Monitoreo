@@ -21,8 +21,10 @@
                 <div class="alert alert-warning">{{ session('warning') }}</div>
                 @endif
 
+                <!-- Contenedor para mostrar mensajes de Livewire -->
+                <div id="resultado" class="mt-3"></div>
                 <livewire:filter-pedidos-cdmx />
-              
+
             </div>
         </div>
     </div>

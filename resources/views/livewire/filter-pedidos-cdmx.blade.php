@@ -22,7 +22,8 @@
     </div>
     <div class="d-flex justify-content-center mt-4">
         <label class="me-3">
-            <input type="checkbox" wire:model.lazy="estatusPendiente" {{ $estatusPendiente ? 'checked' : '' }}> Pendiente
+            <input type="checkbox" wire:model.lazy="estatusPendiente" {{ $estatusPendiente ? 'checked' : '' }}>
+            Pendiente
         </label>
         <label class="me-3">
             <input type="checkbox" wire:model.lazy="estatusValidado" {{ $estatusValidado ? 'checked' : '' }}> Validado
@@ -69,6 +70,10 @@
                                 <span class="badge rounded-pill badge-md bg-gradient-success">Validado</span>
                                 @elseif ($pedido->ESTATUS == 3)
                                 <span class="badge rounded-pill badge-md bg-gradient-info">Paqueteria</span>
+                                @elseif ($pedido->ESTATUS == 5)
+                                <span class="badge rounded-pill badge-md bg-gradient-secondary">Sugerido</span>
+                                @elseif ($pedido->ESTATUS == 6)
+                                <span class="badge rounded-pill badge-md bg-gradient-secondary">Sugerido</span>
                                 @else
                                 <span class="badge rounded-pill badge-md bg-gradient-warning">Pendiente</span>
                                 @endif

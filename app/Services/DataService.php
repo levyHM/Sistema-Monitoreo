@@ -28,56 +28,39 @@ class DataService
             AND fdoc_0.DITIPMV in ('FE','FO','FV')
             AND fdoc_0.DHORA > ?
         ", [$lastDateTime]);
-        
     }
 
     public function copyOrUpdateData()
     {
+        Log::info('Inicio copyOrUpdateData');
         $lastDateTime = $this->getLastDateFromFirstDatabase();
         $data = $this->getFilteredData($lastDateTime);
         Log::info('Filtered Data:', ['data' => $lastDateTime]);
 
-        // Lista de valores específicos de PEPAR1 para los cuales ESTATUS debe ser 3
-        $specificValues = [
-            '1Z33',
-            '1Z31',
-            '1Z29',
-            '1Z28',
-            '1Z27',
-            '1Z25',
-            '1Z23',
-            '1Z09',
-            '1Z38',
-            '1Z32',
-            '1Z44',
-            '1Z41',
-            '1Z21',
-            '1Z35',
-            '1O02',
-            '1O06',
-            '1O08',
-            '1O09',
-            '1O10',
-            '1O12',
-            '1O13'
-        ];
-        
         foreach ($data as $row) {
-            DB::connection('mysql')->table('facturas')->updateOrInsert(
-                [
-                    'DITIPMV' => $row->DITIPMV,
-                    'DNUM' => $row->DNUM,
-                ],
-                [
-                    'DFECHA' => $row->DFECHA,
-                    'CLICOD' => $row->CLICOD,
-                    'DPAR1' => $row->DPAR1,
-                    'DHORA' => $row->DHORA,
-                    'SERIE' => $row->DNUM.$row->CLICOD,
-                    'ESTATUS' => '0',
-                ]
-            );
+            // Verificar si DNUM ya existe
+            $exists = DB::connection('mysql')->table('facturas')
+                ->where('DNUM', $row->DNUM)
+                ->exists();
+
+            if ($exists) {
+                continue; // Si ya existe, omitir esta iteración
+            }
+
+            // Insertar nuevo registro
+            DB::connection('mysql')->table('facturas')->insert([
+                'DITIPMV' => $row->DITIPMV,
+                'DNUM' => $row->DNUM,
+                'DFECHA' => $row->DFECHA,
+                'CLICOD' => $row->CLICOD,
+                'DPAR1' => $row->DPAR1,
+                'DHORA' => $row->DHORA,
+                'SERIE' => $row->DNUM . $row->CLICOD,
+                'ESTATUS' => '0',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            Log::info('Registro insertado exitosamente', ['DNUM' => $row->DNUM]);
         }
     }
-
 }

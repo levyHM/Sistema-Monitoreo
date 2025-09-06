@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+	return view('welcome');
 });
 
 use App\Http\Controllers\HomeController;
@@ -24,39 +24,46 @@ use App\Http\Controllers\ConductorController;
 use App\Http\Controllers\CamionetaController;
 use App\Http\Controllers\RutaController;
 use	App\Http\Controllers\DataRutasController;
+use App\Http\Controllers\PDFController;
+use App\Http\Controllers\ReciboController;
+use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\FaltanteController;
+use App\Http\Controllers\UserPermissionController;
 
 
-Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');
-	Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
-	Route::post('/register', [RegisterController::class, 'store'])->middleware('guest')->name('register.perform');
-	Route::get('/login', [LoginController::class, 'show'])->middleware('guest')->name('login');
-	Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login.perform');
-	Route::get('/reset-password', [ResetPassword::class, 'show'])->middleware('guest')->name('reset-password');
-	Route::post('/reset-password', [ResetPassword::class, 'send'])->middleware('guest')->name('reset.perform');
-	Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
-	Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
-	Route::get('/dashboard', [HomeController::class, 'index'])->name('home')->middleware('auth');
+Route::get('/', function () {
+	return redirect('/dashboard');
+})->middleware('auth');
+//Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
+//Route::post('/register', [RegisterController::class, 'store'])->middleware('guest')->name('register.perform');
+Route::get('/login', [LoginController::class, 'show'])->middleware('guest')->name('login');
+Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login.perform');
+Route::get('/reset-password', [ResetPassword::class, 'show'])->middleware('guest')->name('reset-password');
+Route::post('/reset-password', [ResetPassword::class, 'send'])->middleware('guest')->name('reset.perform');
+Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
+Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
+Route::get('/dashboard', [HomeController::class, 'index'])->name('home')->middleware('auth');
 Route::group(['middleware' => 'auth'], function () {
-	
+
 	Route::get('/rtl', [PageController::class, 'rtl'])->name('rtl');
 	Route::get('/profile', [UserProfileController::class, 'show'])->name('profile');
 	Route::post('/profile', [UserProfileController::class, 'update'])->name('profile.update');
-	Route::get('/profile-static', [PageController::class, 'profile'])->name('profile-static'); 
+	Route::get('/profile-static', [PageController::class, 'profile'])->name('profile-static');
 	Route::get('/sign-in-static', [PageController::class, 'signin'])->name('sign-in-static');
 	Route::get('/sign-up-static', [PageController::class, 'signup'])->name('sign-up-static');
-	 //Factura de CDMX  
-    Route::get('factura-cdmx', [FacturaController::class, 'index'])->name('facturas.index');
+	//Factura de CDMX  
+	Route::get('factura-cdmx', [FacturaController::class, 'index'])->name('facturas.index');
 	Route::post('factura-cdmx', [FacturaController::class, 'store'])->name('facturas-cdmx.store');
-    //Factura de Oaxaca 
+	//Factura de Oaxaca 
 	Route::get('factura-oaxaca', [FacturaController::class, 'facturasOaxaca'])->name('facturas-oaxaca.index');
 	Route::post('factura-oaxaca', [FacturaController::class, 'store'])->name('facturas-oaxaca.store');
 
 	Route::get('factura-xalapa', [FacturaController::class, 'facturasXalapa'])->name('facturas-xalapa.index');
 	Route::post('factura-xalapa', [FacturaController::class, 'store'])->name('facturas.store');
-    //Pedido de CDMX 
+	//Pedido de CDMX 
 	Route::get('pedidos-cdmx', [PedidosController::class, 'index'])->name('pedidos.index');
 	Route::post('pedidos-cdmx', [PedidosController::class, 'store'])->name('pedidos.store');
-    //Pedido de Oaxaca  
+	//Pedido de Oaxaca  
 	Route::get('pedidos-oaxaca', [PedidosController::class, 'pedidosOaxaca'])->name('pedidos-oaxaca.index');
 	Route::post('pedidos-oaxaca', [PedidosController::class, 'store'])->name('pedidos.store');
 	//Pedido de Oaxaca
@@ -83,9 +90,53 @@ Route::group(['middleware' => 'auth'], function () {
 
 	//Usuario 
 	Route::get('/user-management', [UserProfileController::class, 'index'])->name('user-management');
-	
+	Route::delete('/user-management/{user}', [UserProfileController::class, 'destroy'])->name('user-management.destroy');
 
-    	
+	Route::post('/register', [RegisterController::class, 'store'])->name('register.id');
+	Route::get('/register', [RegisterController::class, 'create'])->name('register');
+
+
+	//generar PDF
+	Route::get('/recibos/pdf/{id}', [PDFController::class, 'generarRecibo'])->name('pdf.recibos');
+	Route::get('faltantes/cdmx/pdf/{id}', [PDFController::class, 'generarFaltante'])->name('pdf.faltantes');
+
+
+	//recibos
+	Route::resource('/recibos', ReciboController::class);
+	Route::put('recibos/{recibo}/cancelar-devolucion', [ReciboController::class, 'cancelarDevolucion'])->name('recibos.cancelarDevolucion');
+	Route::post('/firmas/{recibo}/firmar', [ReciboController::class, 'firmarRecibo'])->name('firmas.firmar')->middleware('auth');
+
+
+	Route::prefix('faltantes/cdmx')->name('faltantes.cdmx.')->group(function () {
+		Route::get('/', [FaltanteController::class, 'index'])->name('index');
+		Route::get('/create', [FaltanteController::class, 'create'])->name('create');
+		Route::post('/', [FaltanteController::class, 'store'])->name('store');
+		Route::get('/{recibo}/edit', [FaltanteController::class, 'edit'])->name('edit');
+		Route::put('/{recibo}', [FaltanteController::class, 'update'])->name('update');
+		Route::get('/{recibo}', [FaltanteController::class, 'show'])->name('show');
+		Route::put('/{recibo}/cancelar-devolucion', [FaltanteController::class, 'cancelar'])->name('faltantes.cancelar');
+		//Route::delete('/{id}', [FaltanteController::class, 'destroy'])->name('destroy');
+
+	});
+
+	// Buscar productos
+	Route::get('productos/buscar', [ProductoController::class, 'buscar'])->name('productos.buscar');
+
+	//roles y permisos
+	Route::prefix('usuarios')->name('usuarios.')->group(function () {
+		Route::get('/', [UserProfileController::class, 'index'])->name('index');
+		Route::get('/{user}/edit', [UserProfileController::class, 'edit'])->name('edit');
+		Route::put('/{user}', [UserProfileController::class, 'update'])->name('update');
+		Route::get('/create', [UserProfileController::class, 'create'])->name('create');
+		Route::post('/', [UserProfileController::class, 'store'])->name('store');
+	});
+	//firma
+
+
+
+
+
+
 	Route::get('/{page}', [PageController::class, 'index'])->name('page');
 	Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 	Route::get('/page/copy-data', [DataController::class, 'copyData'])->name('copyData'); // Ruta para copiar y actualizar datos
@@ -95,5 +146,5 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 
-	
+
 });

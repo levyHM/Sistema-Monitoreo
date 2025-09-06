@@ -93,13 +93,15 @@
                             <td>{{ $pedido->CAPTURA }}</td>
                             <td class="align-middle text-center text-sm">
                                 @if ($pedido->ESTATUS == 1)
-                                    <span
-                                        class="badge rounded-pill badge-md bg-gradient-success">Validado</span>
+                                <span class="badge rounded-pill badge-md bg-gradient-success">Validado</span>
                                 @elseif ($pedido->ESTATUS == 3)
-                                        <span class="badge rounded-pill badge-md bg-gradient-info">Paqueteria</span>        
+                                <span class="badge rounded-pill badge-md bg-gradient-info">Paqueteria</span>
+                                @elseif ($pedido->ESTATUS == 5)
+                                <span class="badge rounded-pill badge-md bg-gradient-secondary">Sugerido</span>
+                                @elseif ($pedido->ESTATUS == 6)
+                                <span class="badge rounded-pill badge-md bg-gradient-secondary">Sugerido</span>
                                 @else
-                                    <span
-                                        class="badge rounded-pill badge-md bg-gradient-warning">Pendiente</span>
+                                <span class="badge rounded-pill badge-md bg-gradient-warning">Pendiente</span>
                                 @endif
                             </td>
                         </tr>

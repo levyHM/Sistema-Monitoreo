@@ -14,13 +14,15 @@ class DataServicePedidos
             ->orderBy('PESEQ', 'desc') // Ordenar por PESEQ en orden descendente
             ->first();
 
+        Log::info('Último registro obtenido de la base de datos:', ['lastRecord' => $lastRecord]);
+
         // Si no hay registros, devolver 0
         return $lastRecord ? $lastRecord->PESEQ : '0';
     }
 
     public function getFilteredData($lastDateTime)
     {
-        return DB::connection('mysql2')->select("SELECT DISTINCT fpenc_0.PESEQ, fpenc_0.PEFECHA, fpenc_0.PEDATE2, fpenc_0.PENUM, fpenc_0.PEALMACEN, fpenc_0.PEPAR0, fpenc_0.PEPAR1
+        return DB::connection('mysql2')->select("SELECT DISTINCT fpenc_0.PESEQ, fpenc_0.PEFECHA, fpenc_0.PEDATE2, fpenc_0.PENUM, fpenc_0.PENUMELLOS,fpenc_0.PEALMACEN, fpenc_0.PEPAR0, fpenc_0.PEPAR1
 FROM db152jigafra.fpenc fpenc_0
 WHERE (fpenc_0.PEPAR1 NOT IN ('', '1') and fpenc_0.PESEQ>?)", [$lastDateTime]);
     }
@@ -58,40 +60,49 @@ WHERE (fpenc_0.PEPAR1 NOT IN ('', '1') and fpenc_0.PESEQ>?)", [$lastDateTime]);
             '1O12',
             '1O13'
         ];
-
-        // Iterar sobre los registros obtenidos y realizar la operación de actualización o inserción
         foreach ($data as $row) {
-            // Extraer los primeros dos caracteres de PENUM
             $penumPrefix = substr($row->PENUM, 0, 2);
             $penumValue = ($penumPrefix == 'PO' || $penumPrefix == 'PV') ? $penumPrefix : 'P';
 
-            // Determinar el valor de ESTATUS
-            $estatusValue = in_array($row->PEPAR1, $specificValues) ? '3' : '0';
-
-            // Validar existencia antes de actualizar o insertar
-            $exists = DB::connection('mysql')->table('pedidos')
-                ->where('PESEQ', $row->PESEQ)
-                ->where('PENUM', $row->PENUM)
-                ->exists();
-
-            if (!$exists) {
-                DB::connection('mysql')->table('pedidos')->insert([
-                    'PESEQ' => $row->PESEQ,
-                    'PEFECHA' => $row->PEFECHA,
-                    'PEDATE2' => $row->PEDATE2,
-                    'PENUM' => $row->PENUM,
-                    'PEALMACEN' => $row->PEALMACEN,
-                    'PEPAR0' => $row->PEPAR0,
-                    'PEPAR1' => $row->PEPAR1,
-                    'SUCURSAL' => $penumValue,
-                    'SERIE' => $row->PENUM . substr($row->PEPAR1, 1),
-                    'ESTATUS' => $estatusValue,
-                ]);
+        // Determinar ESTATUS con prioridad: TV -> 5, SUGERIDO -> 6, luego lista específica -> 3, y por último 0
+        Log::info('DATA', ['DATA' => $row]);
+            if ($row->PENUMELLOS == 'SUGERIDO') {
+                $estatusValue = 5;
+                Log::info('Registro SUGERIDO:', ['SUGERIDO' => $row->PENUMELLOS]);
+            } elseif (in_array($row->PEPAR1, $specificValues)) {
+                $estatusValue = 3;
+                 Log::info('Registro 3:', ['3' => $row->PEALMACEN]);
             } else {
-                Log::info('Registro duplicado omitido:', [
-                    'PESEQ' => $row->PESEQ,
-                    'PENUM' => $row->PENUM
-                ]);
+                $estatusValue = 0;
+                 Log::info('Registro 0:', ['0' => $row->PEALMACEN]);
+            }
+
+            $newRecord = [
+                'PESEQ'    => $row->PESEQ,
+                'PEFECHA'  => $row->PEFECHA,
+                'PEDATE2'  => $row->PEDATE2,
+                'PENUM'    => $row->PENUM,
+                'PEALMACEN' => $row->PEALMACEN,
+                'PEPAR0'   => $row->PEPAR0,
+                'PEPAR1'   => $row->PEPAR1,
+                'SUCURSAL' => $penumValue,
+                'SERIE'    => $row->PENUM . substr($row->PEPAR1, 1),
+                'ESTATUS'  => $estatusValue,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+
+            // Buscar si ya existe el registro con PESEQ y PENUM
+            $existing = DB::connection('mysql')->table('pedidos')
+                ->where('PENUM', $row->PENUM)
+                ->first();
+            if (!$existing) {
+                // Insertar solo si no existe
+                DB::connection('mysql')->table('pedidos')->insert($newRecord);
+               // Log::info('Registro insertado:', ['Insertado' => $row]);
+            } else {
+                // Comparar los campos clave antes de actualizar
+               // Log::info('Registro ya existente sin cambios:', ['existente' => $row]);
             }
         }
     }

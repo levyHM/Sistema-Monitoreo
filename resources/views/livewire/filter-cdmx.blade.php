@@ -3,23 +3,23 @@
         <button id="updateButton" class="btn btn-info btn-md">Actualizar Datos</button>
     </div>
     <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
-        <form action="{{ route('facturas-cdmx.store') }}" method="POST">
-            @csrf
-            <input type="hidden" name="estatusPendiente" value="0">
-            <input type="hidden" name="estatusValidado" value="0">
-            <div class="row">
-                <div class="col-md-10">
-                    <div class="form-group">
-                        <input type="text" name="captura" class="form-control form-control-md mr-2" placeholder="Validar Codigo de Barras" value="{{ old('captura') }}">
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-success btn-md w-100">Validar</button>
-                    </div>
-                </div>
+<form wire:submit.prevent="validarCodigo">
+    <div class="row">
+        <div class="col-md-10">
+            <div class="form-group">
+                <input type="text" wire:model="captura" 
+                       class="form-control form-control-md mr-2"
+                       placeholder="Validar Código de Barras" autofocus>
             </div>
-        </form>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <button type="submit" class="btn btn-success btn-md w-100">Validar</button>
+            </div>
+        </div>
+    </div>
+</form>
+<div id="resultado" class="mt-3"></div>
     </div>
     <div class="d-flex justify-content-center mt-4">
         <label class="me-3">
@@ -91,3 +91,17 @@
         </ul>
     </nav>
 </div>
+
+
+<script>
+document.addEventListener('livewire:load', function () {
+    window.addEventListener('codigo-validado', event => {
+        const resultado = document.getElementById('resultado');
+        const tipo = event.detail.tipo === 'error' ? 'alert-danger'
+                  : event.detail.tipo === 'warning' ? 'alert-warning'
+                  : 'alert-success';
+
+        resultado.innerHTML = `<div class="alert ${tipo} text-center">${event.detail.mensaje}</div>`;
+    });
+});
+</script>

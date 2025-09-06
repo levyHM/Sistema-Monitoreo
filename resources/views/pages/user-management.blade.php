@@ -6,17 +6,26 @@
     <div class="col-12">
         <div class="card mb-4">
             <div class="card-header pb-0">
-                <h6>Users</h6>
+                <h6>Usuarios</h6>
+            </div>
+            <div class="text-center mt-4">
+                <a href="{{ route('usuarios.create') }}" class="btn btn-info btn-md">Registrar Usuario</a>
             </div>
             <div class="card-body px-0 pt-0 pb-2">
                 <div class="table-responsive p-0">
                     <table class="table align-items-center mb-0">
                         <thead>
                             <tr>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Role</th>
-                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Create Date</th>
-                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name
+                                </th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                    Role</th>
+                                <th
+                                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                    Create Date</th>
+                                <th
+                                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                    Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -36,15 +45,18 @@
                                     <p class="text-sm font-weight-bold mb-0">{{ $user->email ?? 'N/A' }}</p>
                                 </td>
                                 <td class="align-middle text-center text-sm">
-                                    <p class="text-sm font-weight-bold mb-0">{{ $user->created_at ? $user->created_at->format('d/m/Y') : '' }}</p>
+                                    <p class="text-sm font-weight-bold mb-0">{{ $user->created_at ?
+                                        $user->created_at->format('d/m/Y') : '' }}</p>
                                 </td>
                                 <td class="align-middle text-end">
                                     <div class="d-flex px-3 py-1 justify-content-center align-items-center">
-                                        <a href="" class="text-sm font-weight-bold mb-0 cursor-pointer">Edit</a>
-                                        <form action="" method="POST" class="d-inline">
+                                        <a href="{{ route('usuarios.edit', $user->id) }}"
+                                            class="text-sm font-weight-bold mb-0 cursor-pointer">Edit</a>
+                                        <form action="{{ route('user-management.destroy', $user->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-sm font-weight-bold mb-0 ps-2 cursor-pointer btn btn-link p-0 m-0 align-baseline">Delete</button>
+                                            <button type="submit"
+                                                class="text-sm font-weight-bold mb-0 ps-2 cursor-pointer btn btn-link p-0 m-0 align-baseline">Delete</button>
                                         </form>
                                     </div>
                                 </td>

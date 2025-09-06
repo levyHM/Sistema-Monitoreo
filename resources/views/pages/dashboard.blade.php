@@ -2,166 +2,43 @@
 
 @section('content')
 @include('layouts.navbars.auth.topnav', ['title' => 'Dashboard'])
+
 <div class="container-fluid py-4">
     <div class="row">
-        <div class="row mt-4">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <div class="card-header text-center pt-4 pb-3">
-                            <span class="badge rounded-pill bg-light text-dark">Factura CDMX</span>
-                        </div>
-                        <div class="card-body text-lg-left text-center pt-0">
-                            <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
-                                <a href="{{ url('factura-cdmx') }}" class="d-block">
-                                    <img src="img/factura.png" class="img-fluid border-radius-lg"
-                                        style="width: 100px; height: 100px;">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {{-- Factura Oaxaca --}}
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <div class="card-header text-center pt-4 pb-3">
-                            <span class="badge rounded-pill bg-light text-dark">Factura Oaxaca</span>
-                        </div>
-                        <div class="card-body text-lg-left text-center pt-0">
-                            <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
-                                <a href="{{ url('factura-oaxaca') }}" class="d-block">
-                                    <img src="img/factura.png" class="img-fluid border-radius-lg"
-                                        style="width: 100px; height: 100px;">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {{-- Factura Xalapa --}}
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <div class="card-header text-center pt-4 pb-3">
-                            <span class="badge rounded-pill bg-light text-dark">Factura Xalapa</span>
-                        </div>
-                        <div class="card-body text-lg-left text-center pt-0">
-                            <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
-                                <a href="{{ url('factura-xalapa') }}" class="d-block">
-                                    <img src="img/factura.png" class="img-fluid border-radius-lg"
-                                        style="width: 100px; height: 100px;">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {{-- ROW de Pedidos --}}
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        {{-- Pedido CMDX --}}
-                        <div class="card-header text-center pt-4 pb-3">
-                            <span class="badge rounded-pill bg-light text-dark">Pedido CDMX</span>
-                        </div>
-                        <div class="card-body text-lg-left text-center pt-0">
-                            <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
-                                <a href="{{ url('pedidos-cdmx') }}" class="d-block">
-                                    <img src="img/pedido.png" class="img-fluid border-radius-lg"
-                                        style="width: 100px; height: 100px;">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {{-- Pedido Oaxaca --}}
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <div class="card-header text-center pt-4 pb-3">
-                            <span class="badge rounded-pill bg-light text-dark">Pedido Oaxaca</span>
-                        </div>
-                        <div class="card-body text-lg-left text-center pt-0">
-                            <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
-                                <a href="{{ url('pedidos-oaxaca') }}" class="d-block">
-                                    <img src="img/pedido.png" class="img-fluid border-radius-lg"
-                                        style="width: 100px; height: 100px;">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {{-- Pedido Xalapa --}}
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <div class="card-header text-center pt-4 pb-3">
-                            <span class="badge rounded-pill bg-light text-dark">Pedido Xalapa</span>
-                        </div>
-                        <div class="card-body text-lg-left text-center pt-0">
-                            <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
-                                <a href="{{ url('pedidos-xalapa') }}" class="d-block">
-                                    <img src="img/pedido.png" class="img-fluid border-radius-lg"
-                                        style="width: 100px; height: 100px;">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {{-- ROW Embarques --}}
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        {{-- Pedido CMDX --}}
-                        <div class="card-header text-center pt-4 pb-3">
-                            <span class="badge rounded-pill bg-light text-dark">Embarque CDMX</span>
-                        </div>
-                        <div class="card-body text-lg-left text-center pt-0">
-                            <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
-                                <a href="javascript:;" class="d-block">
-                                    <img src="img/embarque.png" class="img-fluid border-radius-lg"
-                                        style="width: 100px; height: 100px;">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {{-- Pedido Oaxaca --}}
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <div class="card-header text-center pt-4 pb-3">
-                            <span class="badge rounded-pill bg-light text-dark">Embarque Oaxaca</span>
-                        </div>
-                        <div class="card-body text-lg-left text-center pt-0">
-                            <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
-                                <a href="javascript:;" class="d-block">
-                                    <img src="img/embarque.png" class="img-fluid border-radius-lg"
-                                        style="width: 100px; height: 100px;">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {{-- Pedido Xalapa --}}
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <div class="card-header text-center pt-4 pb-3">
-                            <span class="badge rounded-pill bg-light text-dark">Embarque Xalapa</span>
-                        </div>
-                        <div class="card-body text-lg-left text-center pt-0">
-                            <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
-                                <a href="javascript:;" class="d-block">
-                                    <img src="img/embarque.png" class="img-fluid border-radius-lg"
-                                        style="width: 100px; height: 100px;">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+        <div class="col-12">
+            <div class="card shadow-lg p-4" style="border-radius: 15px;">
+                <div class="text-center">
+                    <div style="font-size: 3.5rem;">👋</div>
+                    <h1 class="fw-bold mb-1" id="saludo"></h1>
+                    <h3 class="text-primary fw-semibold">{{ Auth::user()->firstname. ' ' . Auth::user()->lastname ?? 'Usuario' }}</h3>
+                    <h4 id="hora-actual" class="text-muted mt-3"></h4>
                 </div>
             </div>
         </div>
-        @include('layouts.footers.auth.footer')
     </div>
-    @endsection
+</div>
 
-    @push('js')
-    <script src="./assets/js/plugins/chartjs.min.js"></script>
+@include('layouts.footers.auth.footer')
+@endsection
 
-    @endpush
+@push('js')
+<script>
+    function actualizarHora() {
+        const opciones = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+        document.getElementById('hora-actual').textContent = new Date().toLocaleTimeString('es-MX', opciones);
+    }
+
+    function saludoDinamico() {
+        const hora = new Date().getHours();
+        let saludo = '';
+        if (hora < 12) saludo = 'Buenos días';
+        else if (hora < 19) saludo = 'Buenas tardes';
+        else saludo = 'Buenas noches';
+        document.getElementById('saludo').textContent = saludo;
+    }
+
+    setInterval(actualizarHora, 1000);
+    actualizarHora();
+    saludoDinamico();
+</script>
+@endpush
