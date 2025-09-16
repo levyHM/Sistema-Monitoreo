@@ -25,12 +25,10 @@
                 @endif
 
                 {{-- Botón para crear --}}
-                @can('crear')
-                @if(auth()->user()->hasRole('Recepción'))
+                @can('Devoluciones.crear')
                 <div class="text-center mt-4">
                     <a href="{{ route('recibos.create') }}" class="btn btn-success">Crear nuevo recibo</a>
                 </div>
-                @endif
                 @endcan
 
                 {{-- Tabla --}}
@@ -83,13 +81,13 @@
                                             }}</span>
                                     </td>
                                     <td class="align-middle text-center">
-                                        @can('visualizar')
+                                        @can('Devoluciones.visualizar')
                                         <a href="{{ route('recibos.show', $recibo->idrecibos) }}" class="me-2"
                                             title="Ver recibo">👁️</a>
                                         @endcan
                                         <a href="{{ route('pdf.recibos', $recibo->idrecibos) }}" class="me-2"
                                             title="Descargar PDF">🧾</a>
-                                        @can('eliminar')
+                                        @can('Devoluciones.eliminar')
                                         <a href="#" class="text-danger me-2" data-bs-toggle="modal"
                                             data-bs-target="#cancelarDevolucionModal{{ $recibo->idrecibos }}"
                                             title="Cancelar devolución">
@@ -98,7 +96,6 @@
                                         @endcan
                                     </td>
                                 </tr>
-
                                 {{-- Modal único por recibo --}}
                                 <div class="modal fade" id="cancelarDevolucionModal{{ $recibo->idrecibos }}"
                                     tabindex="-1" aria-labelledby="cancelarDevolucionLabel{{ $recibo->idrecibos }}"

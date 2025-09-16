@@ -34,8 +34,6 @@ class ReciboController extends Controller
 
     public function store(Request $request)
     {
-        Log::info('Creando nuevo recibo...');
-        Log::info('Request recibido:', $request->all());
         $request->validate([
             'tipo_recibo' => 'required|in:D,F',
             'sucursal' => 'required|in:F,PO',
@@ -173,16 +171,16 @@ class ReciboController extends Controller
         $conceptoDevolucion = $recibo->conceptosEstado()->first();
         if ($conceptoDevolucion) {
             $conceptoDevolucion->update([
-            'devolucion' => $request->input('devolucion') ? 1 : 0,
+                'devolucion' => $request->input('devolucion') ? 1 : 0,
             ]);
             Log::info('Concepto de devolución actualizado para recibo ID: ' . $recibo->idrecibos);
         } else {
             // Si no existe, crear uno nuevo
             Concepto::create([
-            'devolucion' => $request->input('devolucion') ? 1 : 0,
-            'faltante' => 0,
-            'sobrante' => 0,
-            'recibos_idrecibos' => $recibo->idrecibos,
+                'devolucion' => $request->input('devolucion') ? 1 : 0,
+                'faltante' => 0,
+                'sobrante' => 0,
+                'recibos_idrecibos' => $recibo->idrecibos,
             ]);
             Log::info('Concepto de devolución creado para recibo ID: ' . $recibo->idrecibos);
         }
@@ -264,38 +262,50 @@ class ReciboController extends Controller
         return redirect()->route('recibos.index')->with('success', 'Recibo eliminado.');
     }
 
-        public function firmarRecibo(Request $request, $reciboId)
-        {
-            $user = auth()->user();
+    public function firmarRecibo(Request $request, $reciboId)
+    {
+        $user = auth()->user();
+        Log::info("Intentando firmar recibo ID: {$reciboId} por usuario ID: {$user->id}");
 
-            Log::info("Intentando firmar recibo ID: {$reciboId} por usuario ID: {$user->id}");
+        // Validar que se envíe el área (ID entero)
+        $request->validate([
+            'catalogo_firma_idcatalogo_firma' => 'required|integer',
+        ]);
 
-            // Validar que el usuario tenga permiso para firmar
-            if (!$user->can('firmar')) {
-                Log::warning("Usuario ID: {$user->id} no tiene permiso para firmar el recibo ID: {$reciboId}");
-                return redirect()->back()->with('error', 'No tienes permiso para firmar.');
-            }
+        $areaId = $request->input('catalogo_firma_idcatalogo_firma');
 
-            // Validar que el área (catalogo_firma_idcatalogo_firma) venga en la petición
-            $request->validate([
-                'catalogo_firma_idcatalogo_firma' => 'required|integer',
+        // Mapear permisos según área (IDs ya definidos en tu sistema)
+        $mapaPermisos = [
+            2 => 'firmas.Soluciones',
+            3 => 'firmas.Almacen',
+            4 => 'firmas.Compras',
+            5 => 'firmas.Proveedor',
+            // Recepción ya está formada, y si no requiere firma o permiso, se omite
+        ];
+
+        $permiso = $mapaPermisos[$areaId] ?? null;
+
+        // Validar permiso específico
+        if (!$permiso || !$user->can($permiso)) {
+            Log::warning("Usuario ID: {$user->id} no tiene permiso {$permiso} para firmar el recibo ID: {$reciboId}");
+            return redirect()->back()->with('error', 'No tienes permiso para firmar esta área.');
+        }
+
+        try {
+            // Registrar la firma
+            Firma::create([
+                'id_user' => $user->id,
+                'catalogo_firma_idcatalogo_firma' => $areaId,
+                'observaciones' => '',
+                'estatus' => 1,
+                'recibos_idrecibos' => $reciboId,
             ]);
 
-
-            try {
-                // Crear la firma
-                Firma::create([
-                    'id_user' => $user->id,
-                    'catalogo_firma_idcatalogo_firma' => $request->input('catalogo_firma_idcatalogo_firma'),
-                    'observaciones' => '',
-                    'estatus' => 1,
-                    'recibos_idrecibos' => $reciboId,
-                ]);
-                Log::info("Firma registrada correctamente para recibo ID: {$reciboId}, usuario ID: {$user->id}");
-                return redirect()->back()->with('success', 'Firma registrada correctamente.');
-            } catch (\Exception $e) {
-                Log::error('Error al firmar recibo: ' . $e->getMessage());
-                return redirect()->back()->with('error', 'Ocurrió un error al registrar la firma.');
-            }
+            Log::info("Firma registrada correctamente en área {$areaId} para recibo ID: {$reciboId}, usuario ID: {$user->id}");
+            return redirect()->back()->with('success', 'Firma registrada correctamente.');
+        } catch (\Exception $e) {
+            Log::error("Error al firmar recibo ID {$reciboId}: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Ocurrió un error al registrar la firma.');
         }
+    }
 }

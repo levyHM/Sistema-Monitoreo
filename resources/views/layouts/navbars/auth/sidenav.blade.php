@@ -8,7 +8,7 @@
             <span class="ms-1 font-weight-bold">Control Monitoreo</span>
         </a>
     </div>
-    
+
     <hr class="horizontal dark mt-0">
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
         <ul class="navbar-nav">
@@ -23,7 +23,7 @@
                 </a>
             </li>
 
-            @can('factura')
+            @can('dashboard.facturas')
             <li class="nav-item mt-3">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6" data-bs-toggle="collapse"
                     data-bs-target="#account-Facturas">
@@ -31,7 +31,7 @@
                 </h6>
             </li>
             <div class="collapse {{ str_contains(request()->url(), 'factura-') ? 'show' : '' }}" id="account-Facturas">
-                @can('cdmx')
+                @can('sucursales.cdmx')
                 <li class="nav-item">
                     <a class="nav-link {{ str_contains(request()->url(), 'factura-cdmx') ? 'active' : '' }}"
                         href="{{ route('page', ['page' => 'factura-cdmx']) }}">
@@ -43,7 +43,7 @@
                     </a>
                 </li>
                 @endcan
-                @can('oaxaca')
+                @can('sucursales.oaxaca')
                 <li class="nav-item">
                     <a class="nav-link {{ str_contains(request()->url(), 'factura-oaxaca') ? 'active' : '' }}"
                         href="{{ route('page', ['page' => 'factura-oaxaca']) }}">
@@ -55,7 +55,7 @@
                     </a>
                 </li>
                 @endcan
-                @can('xalapa')
+                @can('sucursales.xalapa')
                 <li class="nav-item">
                     <a class="nav-link {{ str_contains(request()->url(), 'factura-xalapa') ? 'active' : '' }}"
                         href="{{ route('page', ['page' => 'factura-xalapa']) }}">
@@ -69,7 +69,7 @@
                 @endcan
             </div>
             @endcan
-            @can('pedidos')
+            @can('dashboard.pedidos')
             <li class="nav-item mt-3">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6" data-bs-toggle="collapse"
                     data-bs-target="#account-Pedidos">
@@ -77,7 +77,7 @@
                 </h6>
             </li>
             <div class="collapse {{ str_contains(request()->url(), 'pedidos-') ? 'show' : '' }}" id="account-Pedidos">
-                @can('cdmx')
+                @can('sucursales.cdmx')
                 <li class="nav-item">
                     <a class="nav-link {{ str_contains(request()->url(), 'pedidos-cdmx') ? 'active' : '' }}"
                         href="{{ route('page', ['page' => 'pedidos-cdmx']) }}">
@@ -89,7 +89,7 @@
                     </a>
                 </li>
                 @endcan
-                @can('oaxaca')
+                @can('sucursales.oaxaca')
                 <li class="nav-item">
                     <a class="nav-link {{ str_contains(request()->url(), 'pedidos-oaxaca') ? 'active' : '' }}"
                         href="{{ route('page', ['page' => 'pedidos-oaxaca']) }}">
@@ -101,7 +101,7 @@
                     </a>
                 </li>
                 @endcan
-                @can('xalapa')
+                @can('sucursales.xalapa')
                 <li class="nav-item">
                     <a class="nav-link {{ str_contains(request()->url(), 'pedidos-xalapa') ? 'active' : '' }}"
                         href="{{ route('page', ['page' => 'pedidos-xalapa']) }}">
@@ -116,7 +116,7 @@
             </div>
             @endcan
 
-            @can('embarques')
+            @can('dashboard.embarques')
             <li class="nav-item mt-3">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6" data-bs-toggle="collapse"
                     data-bs-target="#account-collapse">
@@ -124,7 +124,7 @@
                 </h6>
             </li>
             <div class="collapse" id="account-collapse">
-                @can('cdmx')
+                @can('sucursales.cdmx')
                 <li class="nav-item">
                     <a class="nav-link {{ Route::currentRouteName() == 'embarque-cdmx' ? 'active' : '' }}"
                         href="{{ route('embarque-cdmx') }}">
@@ -136,7 +136,7 @@
                     </a>
                 </li>
                 @endcan
-                @can('xalapa')
+                @can('sucursales.xalapa')
                 <li class="nav-item">
                     <a class="nav-link {{ Route::currentRouteName() == 'embarque-xalapa' ? 'active' : '' }}" href="">
                         <div
@@ -147,7 +147,7 @@
                     </a>
                 </li>
                 @endcan
-                @can('oaxaca')
+                @can('sucursales.oaxaca')
                 <li class="nav-item">
                     <a class="nav-link {{ Route::currentRouteName() == 'embarque-oaxaca' ? 'active' : '' }}" href="">
                         <div
@@ -160,7 +160,7 @@
                 @endcan
             </div>
             @endcan
-            @can('embarques admin')
+            @can('dashboard.embarques admin')
             <li class="nav-item mt-3 d-flex align-items-center">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6" data-bs-toggle="collapse"
                     data-bs-target="#account-administrador-embarques">
@@ -209,7 +209,7 @@
             </li>
             <div class="collapse {{ str_contains(request()->url(), 'recibos-') ? 'show' : '' }}"
                 id="account-administrador-recibos">
-                @can('recibos')
+                @can('dashboard.recibos')
                 <li class="nav-item">
                     <a class="nav-link {{ str_contains(request()->url(), 'recibos') ? 'active' : '' }}"
                         href="{{ route('page', ['page' => 'recibos']) }}">
@@ -230,9 +230,18 @@
                         <span class="nav-link-text ms-1">Faltante/Sobrante</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ str_contains(request()->url(), 'reporte-faltante') ? 'active' : '' }}"
+                        href="{{ route('page', ['page' => 'reporte-faltante']) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-archive-2 text-primary text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Reporte Faltantes</span>
+                    </a>
+                </li>
                 @endcan
             </div>
-
             <li class="nav-item mt-3 d-flex align-items-center">
                 <div class="ps-4">
                     <i class="fab fa-laravel" style="color: #00953a"></i>
@@ -249,7 +258,7 @@
                     <span class="nav-link-text ms-1">Perfil</span>
                 </a>
             </li>
-            @can('usuarios')
+            @can('dashboard.usuarios')
             <li class="nav-item">
                 <a class="nav-link {{ str_contains(request()->url(), 'user-management') ? 'active' : '' }}"
                     href="{{ route('page', ['page' => 'user-management']) }}">

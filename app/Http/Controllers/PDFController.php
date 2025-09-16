@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Recibo;
+use App\Models\ReporteFaltante;
+
 use Barryvdh\DomPDF\Facade\Pdf;;
 
 use Illuminate\Support\Facades\Log;
@@ -114,5 +116,28 @@ class PDFController extends Controller
         $pdf = Pdf::loadView('pdf.faltantes', $datos);
 
         return $pdf->download('faltante-' . $id . '.pdf');
+    }
+
+    public function generarReporteFaltantePDF($id)
+    {
+        // Cargar reporte con cliente y productos relacionados
+        $reporte = ReporteFaltante::with(['catalogoFaltante','reportesFalta.catalogoProducto'])->findOrFail($id);
+
+        // Calcular total
+        $total = $reporte->reportesFalta->sum(function ($item) {
+            return ($item->catalogoProducto->aiprecio ?? 0) * ($item->cantidad ?? 0);
+        });
+
+        // Datos a pasar a la vista
+        $datos = [
+            'reporte' => $reporte,
+            'total' => $total,
+        ];
+
+        // Generar PDF
+        $pdf = Pdf::loadView('pdf.reporte_faltante', $datos)
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('reporte-faltante-' . $reporte->idreporte_faltante . '.pdf');
     }
 }

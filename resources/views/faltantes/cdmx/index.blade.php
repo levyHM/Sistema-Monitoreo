@@ -25,13 +25,11 @@
                 @endif
 
                 {{-- Botón para crear --}}
-                @can('crear')
-                @if(auth()->user()->hasRole('Recepción'))
+                @can('Faltante.crear')
                 <div class="text-center mt-4">
                     <a href="{{ route('faltantes.cdmx.create') }}" class="btn btn-success">Crear nuevo
                         faltante/sobrante</a>
                 </div>
-                @endif
                 @endcan
 
                 {{-- Tabla --}}
@@ -84,13 +82,13 @@
                                             }}</span>
                                     </td>
                                     <td class="align-middle text-center">
-                                        @can('visualizar')
+                                        @can('Faltante.visualizar')
                                         <a href="{{ route('faltantes.cdmx.show', $recibo->idrecibos) }}" class="me-2"
                                             title="Ver recibo">👁️</a>
                                         @endcan
                                         <a href="{{ route('pdf.faltantes', $recibo->idrecibos) }}" class="me-2"
                                             title="Descargar PDF">🧾</a>
-                                        @can('eliminar')
+                                        @can('Faltante.eliminar')
                                         <a href="#" class="text-danger me-2" data-bs-toggle="modal"
                                             data-bs-target="#cancelarDevolucionModal{{ $recibo->idrecibos }}"
                                             title="Cancelar devolución">

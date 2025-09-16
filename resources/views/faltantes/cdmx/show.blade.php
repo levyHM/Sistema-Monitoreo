@@ -95,76 +95,68 @@
                 @endif
 
                 {{-- Firmas --}}
+                {{-- Firmas --}}
                 <div class="row text-center">
                     @php
                     $areas = [
-                    1 => 'Recibo',
+                    1 => 'Recepción',
                     2 => 'Soluciones',
                     3 => 'Almacen',
                     4 => 'Compras',
-                    5 => 'Proveedor'
+                    5 => 'Proveedor',
+                    ];
+
+                    $permisosFirma = [
+                    2 => 'firmas.Soluciones',
+                    3 => 'firmas.Almacen',
+                    4 => 'firmas.Compras',
+                    5 => 'firmas.Proveedor',
                     ];
                     @endphp
 
-                    <div class="table-responsive">
-                        <table class="table border-0 text-center w-100">
-                            <tr>
-                                @foreach ($areas as $idArea => $nombreArea)
-                                @php
-                                $firma = $recibo->firmas->firstWhere('catalogo_firma_idcatalogo_firma', $idArea);
-                                $yaFirmado = $firma !== null;
-                                $esMiRol = auth()->user()->hasRole($nombreArea) && auth()->user()->can('firmar');
-                                @endphp
-                                <td class="align-top p-3">
-                                    <div class="d-flex flex-column align-items-center">
-                                        {{-- Imagen de firma --}}
-                                        @if($firma && $firma->usuario && $firma->usuario->signature)
-                                        <img src="{{ asset('storage/' . $firma->usuario->signature) }}" alt="Firma"
-                                            class="img-fluid rounded-circle mb-2"
-                                            style="max-width:80px; max-height:80px;">
-                                        @endif
+                    @foreach ($areas as $idArea => $nombreArea)
+                    @php
+                    $firma = $recibo->firmas->firstWhere('catalogo_firma_idcatalogo_firma', $idArea);
+                    $yaFirmado = $firma !== null;
+                    $permiso = $permisosFirma[$idArea] ?? null;
+                    @endphp
 
-                                        {{-- Nombre del firmante --}}
-                                        <div class="fw-bold mb-1">
-                                            {{ $firma && $firma->usuario ? $firma->usuario->firstname . ' ' .
-                                            $firma->usuario->lastname : 'Pendiente' }}
-                                        </div>
+                    <div class="col-6 col-md-2 mb-4 d-flex flex-column align-items-center">
+                        {{-- Mostrar firma si existe --}}
+                        @if($firma && $firma->usuario && $firma->usuario->signature)
+                        <img src="{{ asset('storage/' . $firma->usuario->signature) }}" alt="Firma"
+                            class="img-fluid rounded-circle mb-2" style="max-width: 80px; max-height: 80px;">
+                        @endif
 
-                                        {{-- Área --}}
-                                        <div class="mb-2">{{ $nombreArea }}</div>
+                        {{-- Nombre del firmante --}}
+                        <div class="fw-bold mb-1">
+                            {{ $firma && $firma->usuario ? $firma->usuario->firstname . ' ' . $firma->usuario->lastname
+                            : 'Pendiente' }}
+                        </div>
 
-                                        {{-- Botón firmar --}}
-                                        @if($esMiRol)
-                                        <form method="POST"
-                                            action="{{ route('firmas.firmar', ['recibo' => $recibo->idrecibos]) }}">
-                                            @csrf
-                                            <input type="hidden" name="catalogo_firma_idcatalogo_firma"
-                                                value="{{ $idArea }}">
-                                            <button type="submit"
-                                                class="btn btn-sm {{ $yaFirmado ? 'btn-primary' : 'btn-warning' }}" {{
-                                                $yaFirmado ? 'disabled' : '' }}>
-                                                Firmar
-                                            </button>
-                                        </form>
-                                        @else
-                                        <button class="btn btn-sm {{ $yaFirmado ? 'btn-warning' : 'btn-secondary' }}"
-                                            disabled>
-                                            Firmar
-                                        </button>
-                                        @endif
-                                    </div>
-                                </td>
-                                @endforeach
-                            </tr>
-                        </table>
+                        {{-- Área --}}
+                        <div class="mb-2">{{ $nombreArea }}</div>
+
+                        {{-- Botón firmar --}}
+                        @if($permiso && auth()->user()->can($permiso) && !$yaFirmado)
+                        <form method="POST" action="{{ route('firmas.firmar', ['recibo' => $recibo->idrecibos]) }}">
+                            @csrf
+                            <input type="hidden" name="catalogo_firma_idcatalogo_firma" value="{{ $idArea }}">
+                            <button type="submit" class="btn btn-warning btn-sm">Firmar</button>
+                        </form>
+                        @else
+                        <button class="btn btn-secondary btn-sm" disabled>
+                            {{ $yaFirmado ? 'Firmado' : 'Firmar' }}
+                        </button>
+                        @endif
                     </div>
+                    @endforeach
                 </div>
-
 
                 {{-- Botón Volver --}}
                 <div class="text-end">
                     <a href="{{ route('faltantes.cdmx.index') }}" class="btn btn-success">⬅️ Volver</a>
-                    @can('editar')
+                    @can('Faltante.editar')
                     <a href="{{ route('faltantes.cdmx.edit', $recibo->idrecibos) }}" class="btn btn-info">✏️ Editar</a>
                     @endcan
                 </div>

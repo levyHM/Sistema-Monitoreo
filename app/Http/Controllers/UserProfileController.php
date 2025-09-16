@@ -58,56 +58,54 @@ class UserProfileController extends Controller
             ->with('success', 'Usuario creado correctamente.');
     }
 
-
-
-    public function update(Request $request, User $user)
+    public function update(Request $request, $id)
     {
-        $attributes = $request->validate([
-            'username' => ['required', 'max:255', 'min:2'],
-            'firstname' => ['max:100'],
-            'lastname' => ['max:100'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'address' => ['max:100'],
-            'city' => ['max:100'],
-            'country' => ['max:100'],
-            'postal' => ['max:100'],
-            'about' => ['max:255'],
-            'roles' => ['nullable', 'array'],
-            'roles.*' => ['string', 'exists:roles,name'],
-            'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['string', 'exists:permissions,name'],
-            'signature' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'catalogo_sucursales_id' => ['required', 'exists:catalogo_sucursales,id'],
+        $user = User::findOrFail($id);
 
+        // Validación básica
+        $request->validate([
+            'username' => 'required|string|max:255',
+            'email' => 'required|email',
+            // otros campos...
         ]);
-        // Si se subió archivo de firma
+
+        // Actualizar datos del usuario
+        $user->update($request->only([
+            'username',
+            'email',
+            'firstname',
+            'lastname',
+            'address',
+            'city',
+            'country',
+            'postal',
+            'about',
+            'catalogo_sucursales_id'
+        ]));
+
+        // Firma (si se subió)
         if ($request->hasFile('signature')) {
-            $file = $request->file('signature');
-
-            // Guardar archivo en carpeta pública 'evidencias'
-            $file = $file->store('signature/' . $user->id, 'public');
-
-            // Guardar ruta relativa en $attributes para actualizar usuario
-            // Nota: Guardamos solo 'signature/archivo.ext' para usar con disco 'public'
-            $attributes['signature'] = $file;
-            // Imprimir atributos para depuración
-            Log::info('Atributos actualizados para usuario', $attributes);
-
-            // Agregar logs
-
+            $path = $request->file('signature')->store('signature/' . $user->id, 'public');
+            $user->signature = $path;
+            $user->save();
         }
-        // Actualizar datos personales
-        $user->update($attributes);
 
-        // Actualizar roles
+        // Roles
         $user->syncRoles($request->input('roles', []));
 
-        // Actualizar permisos
-        $user->syncPermissions($request->input('permissions', []));
+        // Permisos
+        $permisosSolicitados = $request->input('permissions', []);
 
-        return redirect()->route('usuarios.edit', $user->id)
-            ->with('success', 'Usuario actualizado correctamente.');
+        // Filtrar y asignar permisos válidos
+        $permisosFinales = collect($permisosSolicitados)->filter(function ($permiso) {
+            return Permission::where('name', $permiso)->exists();
+        });
+
+        $user->syncPermissions($permisosFinales);
+
+        return redirect()->back()->with('success', 'Usuario actualizado correctamente.');
     }
+
 
 
     public function index(Request $request)
@@ -121,43 +119,29 @@ class UserProfileController extends Controller
     }
 
 
-    public function edit(User $user)
+
+    public function edit($id)
     {
-        $users = User::orderBy('created_at', 'desc')->paginate(10);
-
-        $roles = Role::all();
-        $permissions = Permission::all();
-
-        // Roles
-        $rolesGenerales = $roles->filter(fn($r) => !in_array($r->name, ['dashboard', 'sucursales']));
-        $rolesDashboard = $roles->filter(fn($r) => $r->name === 'dashboard');
-        $rolesSucursales = $roles->filter(fn($r) => $r->name === 'sucursales');
-
-        // Permisos
-        $firmaPermisos = ['crear', 'editar', 'visualizar', 'eliminar', 'firmar'];
-        $dashboardPermisos = ['factura', 'pedidos', 'embarques', 'embarques admin', 'recibos', 'usuarios'];
-        $sucursalPermisos = ['cdmx', 'xalapa', 'oaxaca'];
-
-        $permisosFirma = $permissions->filter(fn($p) => in_array($p->name, $firmaPermisos));
-        $permisosDashboard = $permissions->filter(fn($p) => in_array($p->name, $dashboardPermisos));
-        $permisosSucursales = $permissions->filter(fn($p) => in_array($p->name, $sucursalPermisos));
-
-
+        $user = User::findOrFail($id);
+        $rolesGrouped = Role::all()->groupBy('group'); // si usas agrupación
+        $permissionsGrouped = Permission::all()->groupBy(function ($perm) {
+            return explode('.', $perm->name)[0]; // agrupa por módulo
+        });
 
         $userRoles = $user->roles->pluck('name')->toArray();
-        $userPermissions = $user->permissions->pluck('name')->toArray();
+        $userPermissions = $user->getDirectPermissions()->pluck('name')->toArray();
+
+        $rolePermissionsMap = Role::with('permissions')->get()->mapWithKeys(function ($role) {
+            return [$role->name => $role->permissions->pluck('name')->toArray()];
+        });
 
         return view('usuarios.edit', compact(
             'user',
-            'users',
-            'rolesGenerales',
-            'rolesDashboard',
-            'rolesSucursales',
-            'permisosFirma',
-            'permisosDashboard',
-            'permisosSucursales',
+            'rolesGrouped',
+            'permissionsGrouped',
             'userRoles',
-            'userPermissions'
+            'userPermissions',
+            'rolePermissionsMap'
         ));
     }
 

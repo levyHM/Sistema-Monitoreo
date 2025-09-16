@@ -28,7 +28,12 @@ use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ReciboController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\FaltanteController;
-use App\Http\Controllers\UserPermissionController;
+use App\Http\Controllers\ReporteFaltanteController;
+use App\Http\Controllers\CatalogoFaltanteController;
+use App\Http\Controllers\CatalogoProductoController;
+use App\Http\Controllers\RolesPermissionsController;
+
+
 
 
 Route::get('/', function () {
@@ -79,6 +84,20 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::put('/embarques/{id}', [EmbarqueController::class, 'update'])->name('embarques.update');
 	Route::post('embarques', [EmbarqueController::class, 'updateEscaner'])->name('embarques.store');
 
+	//Reportes de faltantes
+	Route::prefix('reporte-faltante')->group(function () {
+		Route::get('/', [ReporteFaltanteController::class, 'index'])->name('reporte.faltante');
+		Route::get('/create', [ReporteFaltanteController::class, 'create'])->name('reporte.faltante.create');
+		Route::post('/', [ReporteFaltanteController::class, 'store'])->name('reporte.faltante.store');
+		Route::get('/{id}/show', [ReporteFaltanteController::class, 'show'])->name('reporte.faltante.show');
+		Route::put('/{id}', [ReporteFaltanteController::class, 'update'])->name('reporte.faltante.update');
+		Route::put('/{id}/cancelar', [ReporteFaltanteController::class, 'cambiarEstatus'])->name('reporte.faltante.cancelar');
+		Route::get('/{id}/edit', [ReporteFaltanteController::class, 'edit'])->name('reporte.faltante.edit');
+		Route::put('/{id}/autorizacion', [ReporteFaltanteController::class, 'autorizacionFirma'])->name('reporte.faltante.autorizacion');
+	});
+
+	Route::get('/clientes/buscar', [CatalogoFaltanteController::class, 'buscar'])->name('clientes.buscar');
+
 
 
 	//Administrador conductores
@@ -99,6 +118,7 @@ Route::group(['middleware' => 'auth'], function () {
 	//generar PDF
 	Route::get('/recibos/pdf/{id}', [PDFController::class, 'generarRecibo'])->name('pdf.recibos');
 	Route::get('faltantes/cdmx/pdf/{id}', [PDFController::class, 'generarFaltante'])->name('pdf.faltantes');
+	Route::get('reporte-faltante/pdf/{id}', [PDFController::class, 'generarReporteFaltantePDF'])->name('pdf.reporte_faltante');
 
 
 	//recibos
@@ -121,6 +141,8 @@ Route::group(['middleware' => 'auth'], function () {
 
 	// Buscar productos
 	Route::get('productos/buscar', [ProductoController::class, 'buscar'])->name('productos.buscar');
+	Route::get('/facturas/buscar', [CatalogoProductoController::class, 'buscarFactura'])->name('facturas.buscar');
+
 
 	//roles y permisos
 	Route::prefix('usuarios')->name('usuarios.')->group(function () {
@@ -130,11 +152,15 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/create', [UserProfileController::class, 'create'])->name('create');
 		Route::post('/', [UserProfileController::class, 'store'])->name('store');
 	});
-	//firma
 
-
-
-
+Route::prefix('roles')->name('roles.')->group(function () {
+    Route::get('/', [RolesPermissionsController::class, 'index'])->name('index');
+    Route::get('/create', [RolesPermissionsController::class, 'create'])->name('create');
+    Route::post('/', [RolesPermissionsController::class, 'store'])->name('store');
+    Route::get('/{id}/edit', [RolesPermissionsController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [RolesPermissionsController::class, 'update'])->name('update');
+    Route::delete('/{id}', [RolesPermissionsController::class, 'destroy'])->name('destroy');
+});
 
 
 	Route::get('/{page}', [PageController::class, 'index'])->name('page');

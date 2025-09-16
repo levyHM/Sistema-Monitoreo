@@ -93,14 +93,22 @@
                 @endif
 
                 {{-- Firmas --}}
+                {{-- Firmas --}}
                 <div class="row text-center">
                     @php
                     $areas = [
-                    1 => 'Recibo',
+                    1 => 'Recepción',
                     2 => 'Soluciones',
                     3 => 'Almacen',
                     4 => 'Compras',
-                    5 => 'Proveedor'
+                    5 => 'Proveedor',
+                    ];
+
+                    $permisosFirma = [
+                    2 => 'firmas.Soluciones',
+                    3 => 'firmas.Almacen',
+                    4 => 'firmas.Compras',
+                    5 => 'firmas.Proveedor',
                     ];
                     @endphp
 
@@ -108,11 +116,11 @@
                     @php
                     $firma = $recibo->firmas->firstWhere('catalogo_firma_idcatalogo_firma', $idArea);
                     $yaFirmado = $firma !== null;
-                    $esMiRol = auth()->user()->hasRole($nombreArea) && auth()->user()->can('firmar');
+                    $permiso = $permisosFirma[$idArea] ?? null;
                     @endphp
 
                     <div class="col-6 col-md-2 mb-4 d-flex flex-column align-items-center">
-                        {{-- Firma --}}
+                        {{-- Mostrar firma si existe --}}
                         @if($firma && $firma->usuario && $firma->usuario->signature)
                         <img src="{{ asset('storage/' . $firma->usuario->signature) }}" alt="Firma"
                             class="img-fluid rounded-circle mb-2" style="max-width: 80px; max-height: 80px;">
@@ -128,18 +136,15 @@
                         <div class="mb-2">{{ $nombreArea }}</div>
 
                         {{-- Botón firmar --}}
-                        @if($esMiRol)
+                        @if($permiso && auth()->user()->can($permiso) && !$yaFirmado)
                         <form method="POST" action="{{ route('firmas.firmar', ['recibo' => $recibo->idrecibos]) }}">
                             @csrf
                             <input type="hidden" name="catalogo_firma_idcatalogo_firma" value="{{ $idArea }}">
-                            <button type="submit" class="btn btn-sm {{ $yaFirmado ? 'btn-primary' : 'btn-warning' }}" {{
-                                $yaFirmado ? 'disabled' : '' }}>
-                                Firmar
-                            </button>
+                            <button type="submit" class="btn btn-warning btn-sm">Firmar</button>
                         </form>
                         @else
-                        <button class="btn btn-sm {{ $yaFirmado ? 'btn-warning' : 'btn-secondary' }}" disabled>
-                            Firmar
+                        <button class="btn btn-secondary btn-sm" disabled>
+                            {{ $yaFirmado ? 'Firmado' : 'Firmar' }}
                         </button>
                         @endif
                     </div>
@@ -149,7 +154,7 @@
                 {{-- Botón Volver --}}
                 <div class="text-end">
                     <a href="{{ route('recibos.index') }}" class="btn btn-success me-2">⬅️ Volver</a>
-                    @can('editar')
+                    @can('Devoluciones.editar')
                     <a href="{{ route('recibos.edit', $recibo->idrecibos) }}" class="btn btn-info">✏️ Editar</a>
                     @endcan
                 </div>
