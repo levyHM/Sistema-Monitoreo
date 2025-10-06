@@ -32,6 +32,10 @@ use App\Http\Controllers\ReporteFaltanteController;
 use App\Http\Controllers\CatalogoFaltanteController;
 use App\Http\Controllers\CatalogoProductoController;
 use App\Http\Controllers\RolesPermissionsController;
+use App\Http\Controllers\ReporteSolucionesClienteController;
+use App\Http\Controllers\CatalogoClienteController;
+use App\Http\Controllers\SolucionesController;
+
 
 
 
@@ -96,7 +100,18 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::put('/{id}/autorizacion', [ReporteFaltanteController::class, 'autorizacionFirma'])->name('reporte.faltante.autorizacion');
 	});
 
+	//Rutas para soluciones a clientes
+	Route::resource('soluciones', ReporteSolucionesClienteController::class);
+	Route::put('/soluciones/{id}/estatus', [ReporteSolucionesClienteController::class, 'cambiarEstatusSolucionesClientes'])->name('soluciones.cambiar.estatus');
+	Route::get('/buscar-catalogo', [SolucionesController::class, 'buscarCatalogo'])->name('soluciones.buscar.catalogo');
+	Route::post('/soluciones/{id}/firmar', [ReporteSolucionesClienteController::class, 'firmar'])->name('soluciones.firmas');
+
+
+
+	Route::get('/clientes/buscar-cliente', [CatalogoClienteController::class, 'buscar'])->name('clientes.buscar.cliente');
+
 	Route::get('/clientes/buscar', [CatalogoFaltanteController::class, 'buscar'])->name('clientes.buscar');
+	//Route::get('/clientes/buscar-faltante', [CatalogoFaltanteController::class, 'buscar'])->name('clientes.buscar.faltante');
 
 
 
@@ -119,6 +134,8 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/recibos/pdf/{id}', [PDFController::class, 'generarRecibo'])->name('pdf.recibos');
 	Route::get('faltantes/cdmx/pdf/{id}', [PDFController::class, 'generarFaltante'])->name('pdf.faltantes');
 	Route::get('reporte-faltante/pdf/{id}', [PDFController::class, 'generarReporteFaltantePDF'])->name('pdf.reporte_faltante');
+	Route::get('/reporte-soluciones/pdf/{id}', [PDFController::class, 'generarPDFSolucionesCliente'])->name('pdf.reporte_soluciones_cliente');
+
 
 
 	//recibos
@@ -153,14 +170,14 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::post('/', [UserProfileController::class, 'store'])->name('store');
 	});
 
-Route::prefix('roles')->name('roles.')->group(function () {
-    Route::get('/', [RolesPermissionsController::class, 'index'])->name('index');
-    Route::get('/create', [RolesPermissionsController::class, 'create'])->name('create');
-    Route::post('/', [RolesPermissionsController::class, 'store'])->name('store');
-    Route::get('/{id}/edit', [RolesPermissionsController::class, 'edit'])->name('edit');
-    Route::put('/{id}', [RolesPermissionsController::class, 'update'])->name('update');
-    Route::delete('/{id}', [RolesPermissionsController::class, 'destroy'])->name('destroy');
-});
+	Route::prefix('roles')->name('roles.')->group(function () {
+		Route::get('/', [RolesPermissionsController::class, 'index'])->name('index');
+		Route::get('/create', [RolesPermissionsController::class, 'create'])->name('create');
+		Route::post('/', [RolesPermissionsController::class, 'store'])->name('store');
+		Route::get('/{id}/edit', [RolesPermissionsController::class, 'edit'])->name('edit');
+		Route::put('/{id}', [RolesPermissionsController::class, 'update'])->name('update');
+		Route::delete('/{id}', [RolesPermissionsController::class, 'destroy'])->name('destroy');
+	});
 
 
 	Route::get('/{page}', [PageController::class, 'index'])->name('page');
@@ -169,7 +186,6 @@ Route::prefix('roles')->name('roles.')->group(function () {
 	Route::get('/page/copy-data-pedidos', [DataPedidosController::class, 'copyData'])->name('copyDataPedidos'); // Ruta para copiar y actualizar datos
 	Route::get('/page/copy-data-clientes', [DataClientesController::class, 'copyData'])->name('copyDataClientes'); // Ruta para copiar y actualizar datos
 	Route::get('rutas/s', [DataRutasController::class, 'copyData'])->name('copyDataRutas'); // Ruta para copiar y actualizar datos
-
 
 
 

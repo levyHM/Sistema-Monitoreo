@@ -8,7 +8,7 @@
             <div class="card shadow mb-4">
                 <div class="card-body">
 
-                    <h1 class="text-center mb-4">🧾 Editar Reporte de Faltante</h1>
+                    <h1 class="text-center mb-4">🧾 Editar Reporte de Error Checado</h1>
 
                     {{-- Errores de validación --}}
                     @if ($errors->any())
@@ -131,16 +131,6 @@
                                 </div>
                             </div>
                             @endforeach
-                            {{-- Total --}}
-                            <div class="mt-3 text-end">
-                                @php
-                                $total = $reporte->reportesFalta->sum(function($factura){
-                                return ($factura->catalogoProducto->aiprecio ?? 0);
-                                });
-                                @endphp
-                                <h5>Total: <span class="text-success">${{ number_format($total, 5) }}</span></h5>
-                            </div>
-
                         </div>
 
                         <button type="button" id="add-factura" class="btn btn-primary mb-3">Agregar Factura</button>
@@ -148,39 +138,53 @@
                         {{-- Motivo y Solución --}}
                         <div class="mb-3">
                             <label class="form-label">Motivo faltante</label>
-                            <input type="text" name="motivo_faltante" class="form-control"
-                                value="{{ $reporte->motivo_faltante }}">
+                            <select name="motivo_faltante_id" class="form-control">
+                                <option value="">-- Seleccione un motivo --</option>
+                                @foreach($motivos as $motivo)
+                                <option value="{{ $motivo->id }}" {{ old('motivo_faltante_id', $reporte->
+                                    motivo_faltante_id) == $motivo->id ? 'selected' : '' }}>
+                                    {{ $motivo->descripcion }}
+                                </option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Solución</label>
                             <input type="text" name="solucion" class="form-control" value="{{ $reporte->solucion }}">
                         </div>
 
-                        {{-- Autorizaciones y flags --}}
+                        {{-- Tipo de solución --}}
                         <div class="row mb-3">
                             <div class="col-md-3 form-check">
-                                <input type="hidden" name="procede" value="0">
-                                <input type="checkbox" name="procede" value="1" class="form-check-input" {{
-                                    $reporte->procede ? 'checked' : '' }}>
-                                <label class="form-check-label">Procede</label>
+                                <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="1"
+                                    class="form-check-input" id="tipo_procede" {{
+                                    old('catalogo_reporte_faltante_tipo_id',
+                                    $reporte->catalogo_reporte_faltante_tipo_id) == 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="tipo_procede">Procede</label>
                             </div>
+
                             <div class="col-md-3 form-check">
-                                <input type="hidden" name="cambio_fisico" value="0">
-                                <input type="checkbox" name="cambio_fisico" value="1" class="form-check-input" {{
-                                    $reporte->cambio_fisico ? 'checked' : '' }}>
-                                <label class="form-check-label">Cambio Físico</label>
+                                <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="2"
+                                    class="form-check-input" id="tipo_cambio_fisico" {{
+                                    old('catalogo_reporte_faltante_tipo_id',
+                                    $reporte->catalogo_reporte_faltante_tipo_id) == 2 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="tipo_cambio_fisico">Cambio Físico</label>
                             </div>
+
                             <div class="col-md-3 form-check">
-                                <input type="hidden" name="nc_servicio" value="0">
-                                <input type="checkbox" name="nc_servicio" value="1" class="form-check-input" {{
-                                    $reporte->nc_servicio ? 'checked' : '' }}>
-                                <label class="form-check-label">NC Servicio</label>
+                                <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="3"
+                                    class="form-check-input" id="tipo_nc_servicio" {{
+                                    old('catalogo_reporte_faltante_tipo_id',
+                                    $reporte->catalogo_reporte_faltante_tipo_id) == 3 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="tipo_nc_servicio">NC Servicio</label>
                             </div>
                         </div>
 
+
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-success btn-lg">Guardar Cambios</button>
-                            <a href="{{ route('reporte.faltante.show', $reporte->idreporte_faltante) }}" class="btn btn-secondary btn-lg ms-2">Cancelar y Volver</a>
+                            <a href="{{ route('reporte.faltante.show', $reporte->idreporte_faltante) }}"
+                                class="btn btn-secondary btn-lg ms-2">Cancelar y Volver</a>
                         </div>
                     </form>
 

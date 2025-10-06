@@ -26,8 +26,9 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Definición modular
         $modulos = [
-            'firmas' => [ 'Soluciones', 'Almacen', 'Compras', 'Proveedor','Reporte Faltantes'],
+            'firmas' => ['Soluciones', 'Almacen', 'Compras', 'Proveedor', 'Reporte Faltantes', 'Reporte Soluciones','Soluciones Credito'],
             'Faltante' => ['crear', 'editar', 'visualizar', 'eliminar'],
+            'Reporte Soluciones' => ['crear', 'editar', 'visualizar', 'eliminar'], // ← NUEVO
             'Reporte Faltantes' => ['crear', 'editar', 'visualizar', 'eliminar'],
             'Devoluciones' => ['crear', 'editar', 'visualizar', 'eliminar'],
             'Faltante Sobrante' => ['crear', 'editar', 'visualizar', 'eliminar'],
@@ -62,6 +63,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'firmas.Compras',
                 'firmas.Proveedor',
                 'firmas.Reporte Faltantes',
+                'firmas.Reporte Soluciones',
+                'firmas.Soluciones Credito',
             ],
             'Faltante' => [
                 'Faltante.crear',
@@ -74,6 +77,12 @@ class RolesAndPermissionsSeeder extends Seeder
                 'Reporte Faltantes.editar',
                 'Reporte Faltantes.visualizar',
                 'Reporte Faltantes.eliminar',
+            ],
+            'Reporte Soluciones' => [
+                'Reporte Soluciones.crear',
+                'Reporte Soluciones.editar',
+                'Reporte Soluciones.visualizar',
+                'Reporte Soluciones.eliminar',
             ],
             'Devoluciones' => [
                 'Devoluciones.crear',

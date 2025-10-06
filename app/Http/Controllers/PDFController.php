@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Recibo;
 use App\Models\ReporteFaltante;
 
+use App\Models\ReporteSolucionesCliente;
+
 use Barryvdh\DomPDF\Facade\Pdf;;
 
 use Illuminate\Support\Facades\Log;
@@ -121,7 +123,7 @@ class PDFController extends Controller
     public function generarReporteFaltantePDF($id)
     {
         // Cargar reporte con cliente y productos relacionados
-        $reporte = ReporteFaltante::with(['catalogoFaltante','reportesFalta.catalogoProducto'])->findOrFail($id);
+        $reporte = ReporteFaltante::with(['catalogoFaltante', 'reportesFalta.catalogoProducto'])->findOrFail($id);
 
         // Calcular total
         $total = $reporte->reportesFalta->sum(function ($item) {
@@ -139,5 +141,64 @@ class PDFController extends Controller
             ->setPaper('a4', 'portrait');
 
         return $pdf->download('reporte-faltante-' . $reporte->idreporte_faltante . '.pdf');
+    }
+
+    public function generarPDFSolucionesCliente($id)
+    {
+        // Cargar reporte con cliente, soluciones y firmantes
+        $reporte = ReporteSolucionesCliente::with([
+            'cliente',
+            'soluciones.catalogo',
+            'firmanteCliente',
+            'firmanteSoluciones',
+            'firmanteCredito'
+        ])->findOrFail($id);
+
+        // Preparar datos para la vista
+        $datos = [
+            'folio' => $reporte->idreporte_soluciones_clientes,
+            'cliente' => [
+                'clicod' => $reporte->cliente->clicod ?? '',
+                'razon_social' => $reporte->cliente->clinom ?? '',
+                'colaborador' => $reporte->cliente->clipar1 ?? '',
+            ],
+            'estatus' => ($reporte->estatus == 2) ? 'cancelado' : $reporte->estatus,
+            'devolucion' => $reporte->catalogo_tipo_id == 2 ? 'Sí' : 'No',
+            'garantia' => $reporte->catalogo_tipo_id == 1 ? 'Sí' : 'No',
+            'observaciones' => $reporte->observaciones ?? '',
+            'facturas' => $reporte->soluciones->map(function ($solucion) {
+                $catalogo = $solucion->catalogo;
+                $cantidad = $solucion->cantidad ?? 1;
+                $precio = $catalogo->aiprecio ?? 0;
+                $totalLinea = $cantidad * $precio;
+
+                return [
+                    'factura' => $solucion->factura,
+                    'icod' => $catalogo->icod ?? '',
+                    'descripcion' => $catalogo->idescr ?? '',
+                    'cantidad' => $cantidad,
+                    'p_unitario' => $precio,
+                    'total' => $totalLinea,
+                    'observaciones' => $solucion->observaciones ?? '',
+                ];
+            })->toArray(),
+            'totales' => [
+                'total' => $reporte->total ?? 0,
+                'descuento' => $reporte->descuento ?? 0,
+                'subtotal' => $reporte->subtotal ?? 0,
+                'iva' => $reporte->iva ?? 0,
+                'total_completo' => $reporte->total_completo ?? 0,
+            ],
+            'reporte' => $reporte // ← importante para acceder a firmantes en la vista
+        ];
+
+        // Registrar en el log
+        Log::info('Generando PDF de soluciones cliente ID: ' . $id, $datos);
+
+        // Generar PDF
+        $pdf = Pdf::loadView('pdf.reporte_soluciones_clientes', $datos)
+            ->setPaper('A4', 'portrait');
+
+        return $pdf->download("Reporte_Soluciones_{$reporte->cliente->clicod}.pdf");
     }
 }

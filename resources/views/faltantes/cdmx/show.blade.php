@@ -95,7 +95,6 @@
                 @endif
 
                 {{-- Firmas --}}
-                {{-- Firmas --}}
                 <div class="row text-center">
                     @php
                     $areas = [

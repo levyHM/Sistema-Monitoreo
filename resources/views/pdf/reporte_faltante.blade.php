@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8" />
     <title>Reporte de Faltante</title>
@@ -80,7 +81,8 @@
             page-break-after: auto;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid #bdc3c7;
             padding: 5px;
             text-align: left;
@@ -114,19 +116,36 @@
             margin-right: 5px;
         }
 
-        .firma {
+        .firmas-table {
             text-align: center;
             margin-top: 40px;
         }
+
+        /* Firmas horizontales estilo tabla */
+        .firmas-table {
+            width: 100%;
+            margin-top: 50px;
+            border-collapse: collapse;
+        }
+
+        .firmas-table td {
+            text-align: center;
+            vertical-align: top;
+            width: 25%;
+            padding: 10px 5px;
+            border: none;
+            /* quitar borde */
+        }
     </style>
 </head>
+
 <body>
 
     {{-- Marca de agua --}}
     <img src="{{ public_path('img/logo.png') }}" alt="Marca de agua" class="marca-agua" />
 
-    @if(isset($reporte->estatus) && strtolower($reporte->estatus) === '0')
-        <div class="marca-agua-cancelado">CANCELADO</div>
+    @if(isset($reporte->estatus) && strtolower($reporte->estatus) === '3')
+    <div class="marca-agua-cancelado">CANCELADO</div>
     @endif
 
     {{-- Encabezado --}}
@@ -135,7 +154,8 @@
             <img src="{{ public_path('img/logos/faltante_cdmx.jpeg') }}" alt="JIGAFRA Logo" />
         </div>
         <div class="info">
-            <strong>Folio:</strong> <span style="color: red;">{{ str_pad($reporte->idreporte_faltante, 5, '0', STR_PAD_LEFT) }}</span><br />
+            <strong>Folio:</strong> <span style="color: red;">{{ str_pad($reporte->idreporte_faltante, 5, '0',
+                STR_PAD_LEFT) }}</span><br />
             <strong>Fecha:</strong> {{ \Carbon\Carbon::parse($reporte->fecha)->format('d/m/Y') }}
         </div>
     </div>
@@ -168,14 +188,14 @@
             <tbody>
                 @php $total = 0; @endphp
                 @foreach ($reporte->reportesFalta as $item)
-                    @php $precio = $item->catalogoProducto->aiprecio ?? 0; $total += $precio; @endphp
-                    <tr>
-                        <td>{{ $item->cantidad }}</td>
-                        <td>{{ $item->numero_factura }}</td>
-                        <td>{{ $item->catalogoProducto->icod ?? '' }}</td>
-                        <td>{{ $item->catalogoProducto->idescr ?? '' }}</td>
-                        <td>${{ number_format($precio, 2) }}</td>
-                    </tr>
+                @php $precio = $item->catalogoProducto->aiprecio ?? 0; $total += $precio; @endphp
+                <tr>
+                    <td>{{ $item->cantidad }}</td>
+                    <td>{{ $item->numero_factura }}</td>
+                    <td>{{ $item->catalogoProducto->icod ?? '' }}</td>
+                    <td>{{ $item->catalogoProducto->idescr ?? '' }}</td>
+                    <td>${{ number_format($precio, 2) }}</td>
+                </tr>
                 @endforeach
                 <tr>
                     <td colspan="4" style="text-align: right;"><strong>Total:</strong></td>
@@ -187,7 +207,7 @@
 
     {{-- Motivo y solución --}}
     <div class="section">
-        <p><strong>Motivo del Faltante:</strong> {{ $reporte->motivo_faltante ?? 'N/A' }}</p>
+        <p><strong>Motivo del Faltante:</strong> {{ $reporte->motivoFaltante->descripcion ?? 'N/A' }}</p>
         <p><strong>Solución:</strong> {{ $reporte->solucion ?? 'N/A' }}</p>
     </div>
 
@@ -196,26 +216,45 @@
         <div class="section-title">Indicadores</div>
         <div class="indicadores-horizontal">
             <span>
-                <div class="checkbox-square">{{ $reporte->procede ? 'X' : '' }}</div> Procede
+                <div class="checkbox-square">{{ $reporte->catalogo_reporte_faltante_tipo_id == 1 ? 'X' : '' }}</div>
+                Procede
             </span>
             <span>
-                <div class="checkbox-square">{{ !$reporte->procede ? 'X' : '' }}</div> No Procede
+                <div class="checkbox-square">{{ $reporte->catalogo_reporte_faltante_tipo_id == 2 ? 'X' : '' }}</div>
+                Cambio Físico
             </span>
             <span>
-                <div class="checkbox-square">{{ $reporte->cambio_fisico ? 'X' : '' }}</div> Cambio Físico
-            </span>
-            <span>
-                <div class="checkbox-square">{{ $reporte->nc_servicio ? 'X' : '' }}</div> NC por Servicio
+                <div class="checkbox-square">{{ $reporte->catalogo_reporte_faltante_tipo_id == 3 ? 'X' : '' }}</div> NC
+                por Servicio
             </span>
         </div>
     </div>
 
+
     {{-- Firma centrada --}}
-    <div class="firma">
-        <p><strong>Autorizó:</strong> {{ $reporte->autorizo ?? 'JEFE DE ALMACÉN' }}</p>
-        <p>__________________________</p>
-        <p>Firma</p>
+    {{-- Firma centrada --}}
+    <div class="firmas-table">
+        @if($reporte->userAutorizo && $reporte->userAutorizo->signature && file_exists(public_path('storage/' .
+        $reporte->userAutorizo->signature)))
+        <img src="{{ public_path('storage/' . $reporte->userAutorizo->signature) }}" class="firma-img"
+            alt="Firma {{ $reporte->userAutorizo->firstname }}"
+            style="max-width: 120px; max-height: 60px; display:block; margin:0 auto 5px auto;">
+        @else
+        {{-- Línea para firma si no hay imagen --}}
+        <div style="width:120px; border-bottom:1px solid #000; margin:0 auto 5px auto;"></div>
+        @endif
+
+        {{-- Nombre del usuario --}}
+        <p style="margin:0; font-weight:bold; text-align:center;">
+            {{ $reporte->userAutorizo
+            ? $reporte->userAutorizo->firstname . ' ' . $reporte->userAutorizo->lastname
+            : 'JEFE DE ALMACÉN' }}
+        </p>
+
+        {{-- Etiqueta Firma --}}
+        <p style="margin:0; text-align:center;">Jefe de Almacén</p>
     </div>
 
 </body>
+
 </html>

@@ -2,17 +2,42 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CatalogoMotivoFaltante;
+use App\Models\CatalogoReporteFaltanteTipo;
 use App\Models\ReporteFaltante;
 use Illuminate\Http\Request;
 
 class ReporteFaltanteController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Traer reportes con paginación y relación a catalogo_faltante
-        $reportes = ReporteFaltante::with('catalogoFaltante')->paginate(15);
-        return view('reportes.reporte_faltante', compact('reportes'));
+        $query = ReporteFaltante::with('catalogoFaltante')->orderByDesc('idreporte_faltante');
+        $tipos = CatalogoReporteFaltanteTipo::where('estatus', 1)->get();
+
+        // Filtro por motivo
+        if ($request->filled('motivo_id')) {
+            $query->where('motivo_faltante_id', $request->motivo_id);
+        }
+
+        // Filtro por solución 
+        if ($request->filled('catalogo_reporte_faltante_tipo_id')) {
+            $query->where('catalogo_reporte_faltante_tipo_id', $request->catalogo_reporte_faltante_tipo_id);
+        }
+
+
+        // Filtro por estatus
+        if ($request->filled('estatus')) {
+            $query->where('estatus', $request->estatus);
+        }
+
+        $reportes = $query->paginate(10)->appends($request->query());
+
+        // Para el select de motivos en el formulario
+        $motivos = CatalogoMotivoFaltante::where('estatus', 1)->get();
+
+        return view('reportes.reporte_faltante', compact('reportes', 'motivos', 'tipos'));
     }
+
 
     public function show($id)
     {
@@ -22,13 +47,17 @@ class ReporteFaltanteController extends Controller
     public function edit($id)
     {
         $reporte = ReporteFaltante::findOrFail($id);
-        return view('reportes.edit_reporte_faltante', compact('reporte'));
+        $motivos = CatalogoMotivoFaltante::where('estatus', 1)->get();
+
+        return view('reportes.edit_reporte_faltante', compact('reporte', 'motivos'));
     }
 
     public function create()
     {
         $catalogoFaltantes = ReporteFaltante::all();
-        return view('reportes.create_reporte_faltante', compact('catalogoFaltantes'));
+        $motivos = CatalogoMotivoFaltante::where('estatus', 1)->get(); // Para el select de motivos
+
+        return view('reportes.create_reporte_faltante', compact('catalogoFaltantes', 'motivos'));
     }
 
     public function store(Request $request)
@@ -38,11 +67,9 @@ class ReporteFaltanteController extends Controller
             'fecha' => 'required|date',
             'recibe_reporte' => 'nullable|string|max:45',
             'catalogo_faltante_idcatalogo_faltante' => 'required|integer|exists:catalogo_faltante,idcatalogo_faltante',
-            'motivo_faltante' => 'nullable|string|max:70',
+            'motivo_faltante_id' => 'nullable|integer|exists:catalogo_motivo_faltante,id',
             'solucion' => 'nullable|string|max:45',
-            'procede' => 'nullable|boolean',
-            'cambio_fisico' => 'nullable|boolean',
-            'nc_servicio' => 'nullable|boolean',
+            'catalogo_reporte_faltante_tipo_id' => 'required|in:1,2,3',
             'autorizo' => 'nullable|string|max:45',
 
             // Validación facturas
@@ -62,13 +89,11 @@ class ReporteFaltanteController extends Controller
             'fecha' => $validated['fecha'],
             'recibe_reporte' => $validated['recibe_reporte'] ?? null,
             'catalogo_faltante_idcatalogo_faltante' => $validated['catalogo_faltante_idcatalogo_faltante'],
-            'motivo_faltante' => $validated['motivo_faltante'] ?? null,
+            'motivo_faltante_id' => $validated['motivo_faltante_id'] ?? 0,
             'solucion' => $validated['solucion'] ?? null,
-            'procede' => $request->boolean('procede'),
-            'cambio_fisico' => $request->boolean('cambio_fisico'),
-            'nc_servicio' => $request->boolean('nc_servicio'),
+            'catalogo_reporte_faltante_tipo_id' => $validated['catalogo_reporte_faltante_tipo_id'],
             'user_id_registro'  => auth()->id(),
-            'estatus' => 1, // Activo por defecto
+            'estatus' => 2, // Activo por defecto Pendiente
         ]);
 
         // Guardar facturas asociadas
@@ -86,8 +111,7 @@ class ReporteFaltanteController extends Controller
             ]);
         }
 
-        return redirect()->route('reporte.faltante')
-            ->with('success', 'Reporte creado correctamente con sus facturas.');
+        return redirect()->route('reporte.faltante')->with('success', 'Reporte creado correctamente con sus facturas.');
     }
 
     public function update(Request $request, $id)
@@ -99,11 +123,9 @@ class ReporteFaltanteController extends Controller
             'fecha' => 'required|date',
             'recibe_reporte' => 'nullable|string|max:45',
             'catalogo_faltante_idcatalogo_faltante' => 'required|integer|exists:catalogo_faltante,idcatalogo_faltante',
-            'motivo_faltante' => 'nullable|string|max:70',
+            'motivo_faltante_id' => 'nullable|integer|exists:catalogo_motivo_faltante,id',
             'solucion' => 'nullable|string|max:45',
-            'procede' => 'nullable|boolean',
-            'cambio_fisico' => 'nullable|boolean',
-            'nc_servicio' => 'nullable|boolean',
+            'catalogo_reporte_faltante_tipo_id' => 'required|in:1,2,3',
             'autorizo' => 'nullable|string|max:45',
 
             'facturas' => 'required|array|min:1',
@@ -159,14 +181,14 @@ class ReporteFaltanteController extends Controller
             }
         }
 
-        return redirect()->route('reporte.faltante')->with('success', 'Reporte actualizado correctamente.');
+        return redirect()->route('reporte.faltante.show', $reporte->idreporte_faltante)->with('success', 'Reporte actualizado correctamente.');
     }
 
 
     public function cambiarEstatus(Request $request, $id)
     {
         $reporte = ReporteFaltante::findOrFail($id);
-        $reporte->estatus = 0;
+        $reporte->estatus = 3;
         $reporte->observaciones = $request->input('observaciones'); // Agrega observaciones
         $reporte->save();
         return redirect()->route('reporte.faltante')->with('success', 'Reporte desactivado correctamente.');
@@ -176,6 +198,7 @@ class ReporteFaltanteController extends Controller
     {
         $reporte = ReporteFaltante::findOrFail($id);
         $reporte->user_id_autorizo = auth()->id(); // Guarda el id del usuario que autoriza
+        $reporte->estatus = 1; // Cambia el estatus a autorizado
         $reporte->save();
         return redirect()->back()->with('success', 'Reporte autorizado correctamente.');
     }

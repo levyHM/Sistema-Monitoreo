@@ -130,8 +130,15 @@
                         {{-- Motivo faltante --}}
                         <div class="mb-3">
                             <label class="form-label">Motivo faltante</label>
-                            <input type="text" name="motivo_faltante" class="form-control"
-                                value="{{ old('motivo_faltante') }}">
+                            <select name="motivo_faltante_id" class="form-control">
+                                <option value="">-- Seleccione un motivo --</option>
+                                @foreach($motivos as $motivo)
+                                <option value="{{ $motivo->id }}" {{ old('motivo_faltante_id')==$motivo->id ? 'selected'
+                                    : '' }}>
+                                    {{ $motivo->descripcion }}
+                                </option>
+                                @endforeach
+                            </select>
                         </div>
 
                         {{-- Solución --}}
@@ -141,26 +148,32 @@
                         </div>
 
                         {{-- Autorizaciones y flags --}}
-                        <div class="row mb-3">
-                            <div class="col-md-3 form-check">
-                                <input type="hidden" name="procede" value="0">
-                                <input type="checkbox" name="procede" value="1" class="form-check-input" {{
-                                    old('procede') ? 'checked' : '' }}>
-                                <label class="form-check-label">Procede</label>
-                            </div>
-                            <div class="col-md-3 form-check">
-                                <input type="hidden" name="cambio_fisico" value="0">
-                                <input type="checkbox" name="cambio_fisico" value="1" class="form-check-input" {{
-                                    old('cambio_fisico') ? 'checked' : '' }}>
-                                <label class="form-check-label">Cambio Físico</label>
-                            </div>
-                            <div class="col-md-3 form-check">
-                                <input type="hidden" name="nc_servicio" value="0">
-                                <input type="checkbox" name="nc_servicio" value="1" class="form-check-input" {{
-                                    old('nc_servicio') ? 'checked' : '' }}>
-                                <label class="form-check-label">NC Servicio</label>
-                            </div>
-                        </div>
+<div class="row mb-3">
+    @php
+        $tipoSeleccionado = old('catalogo_reporte_faltante_tipo_id', $reporte->catalogo_reporte_faltante_tipo_id ?? null);
+    @endphp
+
+    <div class="col-md-3 form-check">
+        <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="1" class="form-check-input"
+            {{ $tipoSeleccionado == 1 ? 'checked' : '' }} id="tipo_procede">
+        <label class="form-check-label" for="tipo_procede">Procede</label>
+    </div>
+
+    <div class="col-md-3 form-check">
+        <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="2" class="form-check-input"
+            {{ $tipoSeleccionado == 2 ? 'checked' : '' }} id="tipo_cambio_fisico">
+        <label class="form-check-label" for="tipo_cambio_fisico">Cambio Físico</label>
+    </div>
+
+    <div class="col-md-3 form-check">
+        <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="3" class="form-check-input"
+            {{ $tipoSeleccionado == 3 ? 'checked' : '' }} id="tipo_nc_servicio">
+        <label class="form-check-label" for="tipo_nc_servicio">NC Servicio</label>
+    </div>
+</div>
+
+
+
 
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-success btn-lg">Guardar Reporte</button>
@@ -241,7 +254,7 @@
             let html = data.length ? data.map(item => `
                 <div class="list-group-item list-group-item-action" role="button"
                     onclick='seleccionarFactura(${JSON.stringify(item)}, this)'>
-                    ${item.dnum} - ${item.dpar1}
+                    ${item.dnum} -> <b>${item.icod}</b>
                 </div>`).join('') : '<div class="list-group-item">Sin coincidencias</div>';
             suggestions.html(html).show();
         });
@@ -268,4 +281,5 @@ window.seleccionarFactura = function(producto, inputEl) {
 };
 
 });
+
 </script>

@@ -17,11 +17,9 @@ class ReporteFaltante extends Model
         'fecha',
         'recibe_reporte',
         'catalogo_faltante_idcatalogo_faltante',
-        'motivo_faltante',
+        'motivo_faltante_id',
         'solucion',
-        'procede',
-        'cambio_fisico',
-        'nc_servicio',
+        'catalogo_reporte_faltante_tipo_id',
         'user_id_registro',
         'user_id_autorizo',
         'observaciones',
@@ -43,5 +41,20 @@ class ReporteFaltante extends Model
     public function userAutorizo()
     {
         return $this->belongsTo(User::class, 'user_id_autorizo');
+    }
+
+    /**
+     * Relación con catálogo de motivo de faltante
+     */
+    public function motivoFaltante()
+    {
+        return $this->belongsTo(CatalogoMotivoFaltante::class, 'motivo_faltante_id', 'id');
+    }
+    /**
+     * Relación con catálogo de tipo de faltante
+     */
+    public function catalogoTipoFaltante()
+    {
+        return $this->belongsTo(CatalogoReporteFaltanteTipo::class, 'catalogo_reporte_faltante_tipo_id', 'id');
     }
 }
