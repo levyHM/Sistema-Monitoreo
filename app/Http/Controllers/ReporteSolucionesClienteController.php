@@ -2,22 +2,45 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CatalogoTipo;
 use App\Models\ReporteSolucionesCliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class ReporteSolucionesClienteController extends Controller
 {
-    // Mostrar listado de reportes
-    public function index()
+    // Mostrar listado de reportes con filtros
+    public function index(Request $request)
     {
-        $reportes = ReporteSolucionesCliente::with(['cliente', 'soluciones'])
-            ->orderBy('idreporte_soluciones_clientes', 'desc') // de mayor a menor
-            ->paginate(100);
+        $query = ReporteSolucionesCliente::with(['cliente', 'soluciones', 'catalogoTipo'])
+            ->orderBy('idreporte_soluciones_clientes', 'desc');
 
-        return view('soluciones.index', compact('reportes'));
+        // Filtros dinámicos
+        if ($request->filled('fecha')) {
+            $query->whereDate('fecha', $request->fecha);
+            Log::info('Filtrando por fecha: ' . $request->fecha);
+        }
+
+        if ($request->filled('codigo')) {
+            $query->whereHas('cliente', function ($q) use ($request) {
+                $q->where('clicod', 'like', "%{$request->codigo}%");
+            });
+        }
+
+        if ($request->filled('catalogo_tipo_id')) {
+            $query->where('catalogo_tipo_id', $request->catalogo_tipo_id);
+        }
+
+        if ($request->filled('estatus')) {
+            $query->where('estatus', $request->estatus);
+        }
+        // Obtener todos los tipos para el filtro
+        $tipos = CatalogoTipo::all();
+
+        $reportes = $query->paginate(100)->appends($request->query());
+
+        return view('soluciones.index', compact('reportes', 'tipos'));
     }
-
 
     // Mostrar formulario de creación
     public function create()

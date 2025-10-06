@@ -15,15 +15,41 @@ use App\Models\Concepto;
 
 class FaltanteController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $proveedores = CatalogoProveedor::all();
-        $recibos = Recibo::with('proveedor')
+
+        $query = Recibo::with('proveedor')
             ->where('tipo_recibo', 'F')
-            ->orderByDesc('idrecibos')
-            ->paginate(100);
+            ->orderByDesc('idrecibos');
+
+        // Filtros dinámicos
+        if ($request->filled('fecha')) {
+            $query->whereDate('fecha', $request->fecha);
+        }
+
+        if ($request->filled('proveedor')) {
+            $query->whereHas('proveedor', function ($q) use ($request) {
+                $q->where('prvcod', 'like', "%{$request->proveedor}%")
+                    ->orWhere('prvnom', 'like', "%{$request->proveedor}%");
+            });
+        }
+
+        if ($request->filled('numero_factura')) {
+            $query->whereHas('conceptos', function ($q) use ($request) {
+                $q->where('numero_factura', 'like', "%{$request->numero_factura}%");
+            });
+        }
+
+        if ($request->filled('estatus')) {
+            $query->where('estatus', $request->estatus);
+        }
+
+        $recibos = $query->paginate(100)->appends($request->query());
+
         return view('faltantes.cdmx.index', compact('recibos', 'proveedores'));
     }
+
 
     public function create()
     {
@@ -182,7 +208,7 @@ class FaltanteController extends Controller
                 ]);
             } else {
                 Concepto::create([
-                    'devolucion' =>0,
+                    'devolucion' => 0,
                     'faltante' => $request->input('faltante') ? 1 : 0,
                     'sobrante' => $request->input('sobrante') ? 1 : 0,
                     'recibos_idrecibos' => $recibo->idrecibos,

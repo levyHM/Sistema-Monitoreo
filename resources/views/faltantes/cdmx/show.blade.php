@@ -141,7 +141,7 @@
                         <form method="POST" action="{{ route('firmas.firmar', ['recibo' => $recibo->idrecibos]) }}">
                             @csrf
                             <input type="hidden" name="catalogo_firma_idcatalogo_firma" value="{{ $idArea }}">
-                            <button type="submit" class="btn btn-warning btn-sm">Firmar</button>
+                            <button type="submit" class="btn bg-gradient-success btn-sm">Firmar</button>
                         </form>
                         @else
                         <button class="btn btn-secondary btn-sm" disabled>
@@ -154,9 +154,9 @@
 
                 {{-- Botón Volver --}}
                 <div class="text-end">
-                    <a href="{{ route('faltantes.cdmx.index') }}" class="btn btn-success">⬅️ Volver</a>
+                    <a href="{{ route('faltantes.cdmx.index') }}" class="btn bg-gradient-info">⬅️ Volver</a>
                     @can('Faltante.editar')
-                    <a href="{{ route('faltantes.cdmx.edit', $recibo->idrecibos) }}" class="btn btn-info">✏️ Editar</a>
+                    <a href="{{ route('faltantes.cdmx.edit', $recibo->idrecibos) }}" class="btn bg-gradient-warning">✏️ Editar</a>
                     @endcan
                 </div>
             </div>

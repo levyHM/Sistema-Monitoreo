@@ -198,10 +198,10 @@
                             action="{{ route('soluciones.firmas', ['id' => $reporte->idreporte_soluciones_clientes]) }}">
                             @csrf
                             <input type="hidden" name="campo" value="{{ $campo }}">
-                            <button type="submit" class="btn btn-warning btn-sm">Firmar</button>
+                            <button type="submit" class="btn bg-gradient-success btn-sm">Firmar</button>
                         </form>
                         @else
-                        <button class="btn btn-secondary btn-sm" disabled>
+                        <button class="btn bg-gradient-success btn-sm" disabled>
                             {{ $yaFirmado ? 'Firmado' : 'Firmar' }}
                         </button>
                         @endif
@@ -211,9 +211,9 @@
 
                 {{-- Botón volver y editar --}}
                 <div class="mt-4 text-center">
-                    <a href="{{ route('soluciones.index') }}" class="btn btn-outline-secondary">⬅️ Volver al listado</a>
+                    <a href="{{ route('soluciones.index') }}" class="btn bg-gradient-info">⬅️ Volver al listado</a>
                     <a href="{{ route('soluciones.edit', $reporte->idreporte_soluciones_clientes) }}"
-                        class="btn btn-primary ms-2">✏️ Editar</a>
+                        class="btn bg-gradient-warning ms-2">✏️ Editar</a>
                 </div>
             </div>
         </div>

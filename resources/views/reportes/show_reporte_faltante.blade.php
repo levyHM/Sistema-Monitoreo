@@ -163,7 +163,7 @@
                         method="POST" style="display:inline;">
                         @csrf
                         @method('PUT')
-                        <button type="submit" class="btn btn-success mt-3" @cannot('firmas.Reporte Faltantes') disabled
+                        <button type="submit" class="btn bg-gradient-success mt-3" @cannot('firmas.Reporte Faltantes') disabled
                             @endcannot @if($reporte && $reporte->userAutorizo && $reporte->userAutorizo->signature)
                             disabled @endif>
                             ✍️ Firmar Reporte
@@ -174,12 +174,12 @@
 
                 {{-- Botones de acción --}}
                 <div class="mt-4 text-center">
-                    <a href="{{ route('reporte.faltante.edit', $reporte->idreporte_faltante) }}"
-                        class="btn btn-outline-primary me-2">
-                        ✏️ Editar Reporte
-                    </a>
-                    <a href="{{ route('reporte.faltante') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('reporte.faltante') }}" class="btn bg-gradient-info">
                         ⬅️ Volver al listado
+                    </a>
+                    <a href="{{ route('reporte.faltante.edit', $reporte->idreporte_faltante) }}"
+                        class="btn bg-gradient-warning me-2">
+                        ✏️ Editar Reporte
                     </a>
                 </div>
 

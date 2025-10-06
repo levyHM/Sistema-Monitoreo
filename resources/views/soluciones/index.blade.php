@@ -25,6 +25,55 @@
                 </div>
                 @endcan
 
+                {{-- Filtros --}}
+                <div class="p-4 border-bottom">
+                    <form method="GET" action="{{ route('soluciones.index') }}" class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label for="fecha" class="form-label text-sm">Fecha</label>
+                            <input type="date" name="fecha" id="fecha" value="{{ request('fecha') }}"
+                                class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="codigo" class="form-label text-sm">Código Cliente</label>
+                            <input type="text" name="codigo" id="codigo" value="{{ request('codigo') }}"
+                                class="form-control" placeholder="Ej. C1234">
+                        </div>
+                        <div class="col-md-3">
+                            <select name="catalogo_tipo_id" id="catalogo_tipo_id" class="form-select">
+                                <option value="">Todos</option>
+                                @foreach($tipos as $tipo)
+                                <option value="{{ $tipo->id }}" {{ request('catalogo_tipo_id')==$tipo->id ? 'selected' :
+                                    ''
+                                    }}>
+                                    {{ $tipo->nombre }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="estatus" class="form-label text-sm">Estatus</label>
+                            <select name="estatus" id="estatus" class="form-select">
+                                <option value="">Todos</option>
+                                <option value="1" {{ request('estatus')=='1' ? 'selected' : '' }}>Aprobado</option>
+                                <option value="2" {{ request('estatus')=='2' ? 'selected' : '' }}>No aprobado</option>
+                                <option value="3" {{ request('estatus')=='3' ? 'selected' : '' }}>En Recolección
+                                </option>
+                                <option value="4" {{ request('estatus')=='4' ? 'selected' : '' }}>En Almacén</option>
+                                <option value="5" {{ request('estatus')=='5' ? 'selected' : '' }}>En Dictamen</option>
+                                <option value="6" {{ request('estatus')=='6' ? 'selected' : '' }}>Cancelado</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-primary me-2">Filtrar</button>
+                            <a href="{{ route('soluciones.index') }}" class="btn btn-outline-secondary">Limpiar
+                                filtros</a>
+                        </div>
+                    </form>
+                </div>
+
                 {{-- Tabla --}}
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">

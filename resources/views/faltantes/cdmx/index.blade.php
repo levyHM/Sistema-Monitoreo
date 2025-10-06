@@ -32,6 +32,52 @@
                 </div>
                 @endcan
 
+                {{-- Filtros --}}
+                <div class="p-4 border-bottom">
+                    <form method="GET" action="{{ route('faltantes.cdmx.index') }}" class="row g-3 align-items-end">
+
+                        <div class="col-md-2">
+                            <label for="fecha" class="form-label text-sm">Fecha</label>
+                            <input type="date" name="fecha" id="fecha" value="{{ request('fecha') }}"
+                                class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="proveedor" class="form-label text-sm">Codigo Proveedor</label>
+                            <input type="text" name="proveedor" id="proveedor" value="{{ request('proveedor') }}"
+                                class="form-control" placeholder="Código o nombre">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="numero_factura" class="form-label text-sm">Factura</label>
+                            <input type="text" name="numero_factura" id="numero_factura"
+                                value="{{ request('numero_factura') }}" class="form-control"
+                                placeholder="Número de factura">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label for="estatus" class="form-label text-sm">Estatus</label>
+                            <select name="estatus" id="estatus" class="form-select">
+                                <option value="">Todos</option>
+                                <option value="activo" {{ request('estatus')=='activo' ? 'selected' : '' }}>Activo
+                                </option>
+                                <option value="inactivo" {{ request('estatus')=='inactivo' ? 'selected' : '' }}>Inactivo
+                                </option>
+                                <option value="cancelado" {{ request('estatus')=='cancelado' ? 'selected' : '' }}>
+                                    Cancelado</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-primary me-2">Filtrar</button>
+                            <a href="{{ route('faltantes.cdmx.index') }}" class="btn btn-outline-secondary">Limpiar
+                                filtros</a>
+                        </div>
+
+                    </form>
+                </div>
+
+
                 {{-- Tabla --}}
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
