@@ -311,6 +311,7 @@ $(document).ready(function(){
 
     window.seleccionarCatalogo = function(item, el){
         let row = $(el).closest('.factura-item');
+        row.find('.factura').val(item.dnum)
         row.find('.icod').val(item.icod);
         row.find('.descripcion').val(item.idescr);
         row.find('.p_unitario').val(item.aiprecio);
