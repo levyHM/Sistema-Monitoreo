@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card mb-4">
-                <h1 class="text-center">🛠️ Soluciónes a clientes</h1>
+                <h1 class="text-center">Reporte De Error Checado</h1>
 
                 {{-- Alertas --}}
                 @if (session('success'))

@@ -79,7 +79,9 @@
                                 <div class="row g-3 align-items-end">
                                     <div class="col-md-2">
                                         <label class="form-label">No. Factura</label>
-                                        <input type="text" name="facturas[0][factura]" class="form-control" required>
+                                        <input type="text" name="facturas[0][factura]" class="form-control factura"  autocomplete="off">
+                                        <div class="list-group position-absolute w-100 icod-suggestions"
+                                            style="z-index:1000;"></div>
                                     </div>
                                     <div class="col-md-1">
                                         <label class="form-label">Cantidad</label>
@@ -88,10 +90,7 @@
                                     </div>
                                     <div class="col-md-3 position-relative">
                                         <label class="form-label">Código (ICOD)</label>
-                                        <input type="text" name="facturas[0][icod]" class="form-control icod"
-                                            autocomplete="off">
-                                        <div class="list-group position-absolute w-100 icod-suggestions"
-                                            style="z-index:1000;"></div>
+                                        <input type="text" name="facturas[0][icod]" class="form-control icod" readonly required>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Descripción</label>
@@ -212,11 +211,10 @@
     </div>
 </div>
 @endsection
-
 @push('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function(){
+$(document).ready(function(){
 
     // ===== Inicializar totales =====
     calcularTotales();
@@ -276,31 +274,36 @@
         calcularTotales();
     });
 
-    // ===== Autocompletado ICOD =====
-    $(document).on('input', '.icod', function(){
+    // ===== 🔍 Autocompletado ICOD (actualizado con dnum + clicod) =====
+    $(document).on('input', '.factura', function(){
         let input = $(this);
         let val = input.val().trim();
         let row = input.closest('.factura-item');
         let suggestions = input.siblings('.icod-suggestions');
+        let clicod = $('#cliente').val().trim();
 
-        if(val.length < 1){
+        if(!clicod){
+            suggestions.html('<div class="list-group-item text-danger">Selecciona un cliente primero</div>').show();
+            return;
+        }
+
+        if(val.length < 2){
+            row.find('.icod').val('');
             row.find('.descripcion').val('');
             row.find('.p_unitario').val('');
             row.find('.total').val('');
             row.find('.observaciones').val('');
             row.find('.catalogo_idcatalogo').val('');
             suggestions.empty().hide();
-            calcularTotales();
             return;
         }
 
-        if(val.length < 2){ suggestions.empty().hide(); return; }
-
-        $.get('{{ route("soluciones.buscar.catalogo") }}', { icod: val }, function(data){
+        // Se envía el número de factura (query) y el cliente (clicod)
+        $.get('{{ route("soluciones.buscar.catalogo") }}', { query: val, clicod }, function(data){
             let html = data.length
                 ? data.map(item => `<div class="list-group-item list-group-item-action" role="button"
                     onclick='seleccionarCatalogo(${JSON.stringify(item)}, this)'>
-                    <strong>${item.icod}</strong> - ${item.idescr}</div>`).join('')
+                    <strong>${item.dnum}</strong> - ${item.icod} - ${item.idescr}</div>`).join('')
                 : '<div class="list-group-item">Sin coincidencias</div>';
             suggestions.html(html).show();
         });

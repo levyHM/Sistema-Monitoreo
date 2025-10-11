@@ -148,33 +148,33 @@
                         </div>
 
                         {{-- Autorizaciones y flags --}}
-<div class="row mb-3">
-    @php
-        $tipoSeleccionado = old('catalogo_reporte_faltante_tipo_id', $reporte->catalogo_reporte_faltante_tipo_id ?? null);
-    @endphp
+                        <div class="row mb-3">
+                            @php
+                            $tipoSeleccionado = old('catalogo_reporte_faltante_tipo_id',
+                            $reporte->catalogo_reporte_faltante_tipo_id ?? null);
+                            @endphp
 
-    <div class="col-md-3 form-check">
-        <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="1" class="form-check-input"
-            {{ $tipoSeleccionado == 1 ? 'checked' : '' }} id="tipo_procede">
-        <label class="form-check-label" for="tipo_procede">Procede</label>
-    </div>
+                            <div class="col-md-3 form-check">
+                                <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="1"
+                                    class="form-check-input" {{ $tipoSeleccionado==1 ? 'checked' : '' }}
+                                    id="tipo_procede">
+                                <label class="form-check-label" for="tipo_procede">Procede</label>
+                            </div>
 
-    <div class="col-md-3 form-check">
-        <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="2" class="form-check-input"
-            {{ $tipoSeleccionado == 2 ? 'checked' : '' }} id="tipo_cambio_fisico">
-        <label class="form-check-label" for="tipo_cambio_fisico">Cambio Físico</label>
-    </div>
+                            <div class="col-md-3 form-check">
+                                <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="2"
+                                    class="form-check-input" {{ $tipoSeleccionado==2 ? 'checked' : '' }}
+                                    id="tipo_cambio_fisico">
+                                <label class="form-check-label" for="tipo_cambio_fisico">Cambio Físico</label>
+                            </div>
 
-    <div class="col-md-3 form-check">
-        <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="3" class="form-check-input"
-            {{ $tipoSeleccionado == 3 ? 'checked' : '' }} id="tipo_nc_servicio">
-        <label class="form-check-label" for="tipo_nc_servicio">NC Servicio</label>
-    </div>
-</div>
-
-
-
-
+                            <div class="col-md-3 form-check">
+                                <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="3"
+                                    class="form-check-input" {{ $tipoSeleccionado==3 ? 'checked' : '' }}
+                                    id="tipo_nc_servicio">
+                                <label class="form-check-label" for="tipo_nc_servicio">NC Servicio</label>
+                            </div>
+                        </div>
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-success btn-lg">Guardar Reporte</button>
                         </div>
@@ -250,7 +250,15 @@
 
         if(query.length < 2){ suggestions.empty().hide(); return; }
 
-        $.get('{{ route("facturas.buscar") }}', { query }, function(data){
+        // Obtener el cliente actual
+        let clicod = $('#cliente').val().trim();
+
+        if(!clicod){
+            suggestions.html('<div class="list-group-item text-danger">Seleccione un cliente primero</div>').show();
+            return;
+        }
+
+        $.get('{{ route("facturas.buscar") }}', { query, clicod }, function(data){
             let html = data.length ? data.map(item => `
                 <div class="list-group-item list-group-item-action" role="button"
                     onclick='seleccionarFactura(${JSON.stringify(item)}, this)'>

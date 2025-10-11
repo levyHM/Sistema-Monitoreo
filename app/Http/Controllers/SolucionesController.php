@@ -1,21 +1,43 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
 use App\Models\CatalogoSolucionesCliente;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SolucionesController extends Controller
 {
     public function buscarCatalogo(Request $request)
     {
-        $icod = $request->get('icod', '');
-        if (!$icod) return response()->json([]);
+        $query = $request->get('query', '');
+        $clicod = $request->get('clicod', '');
 
-        $resultados = CatalogoSolucionesCliente::where('icod', 'like', $icod . '%')
-            ->orderBy('icod')
-            ->take(10)
-            ->get(['idCatalogoSolucionesClientes', 'icod', 'idescr', 'aiprecio', 'observaciones']);
+        // Validación básica
+        if (!$query || !$clicod) {
+            return response()->json([]);
+        }
+
+        $consulta = CatalogoSolucionesCliente::where('dnum', 'like', "%{$query}%")
+            ->where('clicod', $clicod)
+            ->orderBy('dnum')
+            ->take(10);
+
+        $resultados = $consulta->get([
+            'idCatalogoSolucionesClientes',
+            'dnum',
+            'icod',
+            'idescr',
+            'aiprecio',
+            'observaciones'
+        ]);
+
+        Log::info('Resultados de búsqueda de catálogo', [
+            'query' => $query,
+            'clicod' => $clicod,
+            'total_resultados' => $resultados->count(),
+            'sql' => $consulta->toSql(), // ✅ ahora sí se puede usar
+            'bindings' => $consulta->getBindings()
+        ]);
 
         return response()->json($resultados);
     }

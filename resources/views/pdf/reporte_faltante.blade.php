@@ -43,13 +43,14 @@
         .header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 2px solid #ccc;
+            align-items: center;
+            border-bottom: 3px solid #00953A;
             padding-bottom: 8px;
+            margin-bottom: 15px;
         }
 
         .logo img {
-            height: 50px;
+            height: 100px;
         }
 
         .info {
@@ -159,8 +160,6 @@
             <strong>Fecha:</strong> {{ \Carbon\Carbon::parse($reporte->fecha)->format('d/m/Y') }}
         </div>
     </div>
-
-    <h1>Reporte de Faltante</h1>
 
     {{-- Datos del cliente --}}
     <div class="section">

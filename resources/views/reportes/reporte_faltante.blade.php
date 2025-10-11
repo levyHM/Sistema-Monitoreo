@@ -12,7 +12,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card mb-4">
-                <h1 class="text-center">Reporte de Error Checado</h1>
+                <h1 class="text-center">Reporte de Faltante</h1>
 
                 {{-- Alertas --}}
                 @if (session('success'))

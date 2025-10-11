@@ -23,22 +23,7 @@
         }
 
         .logo img {
-            height: 60px;
-        }
-
-        .empresa {
-            text-align: center;
-            flex-grow: 1;
-            font-size: 16px;
-            font-weight: bold;
-            color: #00953A;
-        }
-
-        .empresa small {
-            display: block;
-            font-weight: normal;
-            font-size: 12px;
-            color: #555;
+            height: 100px;
         }
 
         .folio-fecha {
@@ -188,11 +173,7 @@
     <!-- Header -->
     <div class="header">
         <div class="logo">
-            <img src="{{ public_path('img/logos/soluciones_cliente.png') }}" alt="Logo">
-        </div>
-        <div class="empresa">
-            JIGAFRA S A DE C V
-            <small>Dpto. de Soluciones a Clientes - CDMX</small>
+            <img src="{{ public_path('img/logos/reporte_error-checado_cdmx.jpg') }}" alt="Logo">
         </div>
         <div class="folio-fecha">
             <strong>Folio:</strong> <span class="folio">{{ str_pad($folio, 5, '0', STR_PAD_LEFT) }}</span><br>
