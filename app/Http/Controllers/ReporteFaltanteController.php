@@ -69,7 +69,7 @@ class ReporteFaltanteController extends Controller
             'catalogo_faltante_idcatalogo_faltante' => 'required|integer|exists:catalogo_faltante,idcatalogo_faltante',
             'motivo_faltante_id' => 'nullable|integer|exists:catalogo_motivo_faltante,id',
             'solucion' => 'nullable|string|max:45',
-            'catalogo_reporte_faltante_tipo_id' => 'required|in:1,2,3',
+            'catalogo_reporte_faltante_tipo_id' => 'required|in:1,2,3,4',
             'autorizo' => 'nullable|string|max:45',
 
             // Validación facturas
@@ -125,7 +125,7 @@ class ReporteFaltanteController extends Controller
             'catalogo_faltante_idcatalogo_faltante' => 'required|integer|exists:catalogo_faltante,idcatalogo_faltante',
             'motivo_faltante_id' => 'nullable|integer|exists:catalogo_motivo_faltante,id',
             'solucion' => 'nullable|string|max:45',
-            'catalogo_reporte_faltante_tipo_id' => 'required|in:1,2,3',
+            'catalogo_reporte_faltante_tipo_id' => 'required|in:1,2,3,4',
             'autorizo' => 'nullable|string|max:45',
 
             'facturas' => 'required|array|min:1',

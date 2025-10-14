@@ -216,21 +216,24 @@
         <div class="indicadores-horizontal">
             <span>
                 <div class="checkbox-square">{{ $reporte->catalogo_reporte_faltante_tipo_id == 1 ? 'X' : '' }}</div>
-                Procede
+                No Procede
             </span>
             <span>
                 <div class="checkbox-square">{{ $reporte->catalogo_reporte_faltante_tipo_id == 2 ? 'X' : '' }}</div>
+                Procede
+            </span>
+            <span>
+                <div class="checkbox-square">{{ $reporte->catalogo_reporte_faltante_tipo_id == 3 ? 'X' : '' }}</div>
                 Cambio Físico
             </span>
             <span>
-                <div class="checkbox-square">{{ $reporte->catalogo_reporte_faltante_tipo_id == 3 ? 'X' : '' }}</div> NC
-                por Servicio
+                <div class="checkbox-square">{{ $reporte->catalogo_reporte_faltante_tipo_id == 4 ? 'X' : '' }}</div>
+                NC por Servicio
             </span>
         </div>
     </div>
 
 
-    {{-- Firma centrada --}}
     {{-- Firma centrada --}}
     <div class="firmas-table">
         @if($reporte->userAutorizo && $reporte->userAutorizo->signature && file_exists(public_path('storage/' .

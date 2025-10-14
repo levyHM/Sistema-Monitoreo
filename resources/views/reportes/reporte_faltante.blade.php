@@ -102,8 +102,8 @@
                                         <span class="badge bg-success rounded-circle"
                                             style="width:20px; height:20px; display:inline-block;">&nbsp;</span>
                                         @elseif($reporte->estatus == 2)
-                                        <span class="badge bg-warning rounded-circle"
-                                            style="width:20px; height:20px; display:inline-block;">&nbsp;</span>
+                                        <span class="badge bg-yellow rounded-circle"
+                                            style="background-color: #FFD700; width:20px; height:20px; display:inline-block;">&nbsp;</span>
                                         @elseif($reporte->estatus == 3)
                                         <span class="badge bg-danger rounded-circle"
                                             style="width:20px; height:20px; display:inline-block;">&nbsp;</span>

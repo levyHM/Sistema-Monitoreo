@@ -55,6 +55,7 @@ class ReporteSolucionesClienteController extends Controller
         Log::info('Guardando nuevo reporte de soluciones para cliente.');
         $request->validate([
             'catalogo_clientes_idcatalogo_clientes' => 'required|integer',
+            'catalogo_tipo_id' => 'required|in:1,2',
             'observaciones' => 'nullable|string|max:255',
             'total' => 'required|numeric',
             'descuento' => 'required|numeric',

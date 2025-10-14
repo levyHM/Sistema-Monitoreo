@@ -119,7 +119,16 @@
                         <div class="form-check">
                             <input class="form-check-input tipo-radio" type="radio"
                                 name="catalogo_reporte_faltante_tipo_id" value="1" {{
-                                $reporte->catalogo_reporte_faltante_tipo_id == 1 ? 'checked' : '' }} id="tipo_procede"
+                                $reporte->catalogo_reporte_faltante_tipo_id == 1 ? 'checked' : '' }} id="tipo_no_procede"
+                            disabled>
+                            <label class="form-check-label fw-bold" for="tipo_no_procede">No Procede</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-check">
+                            <input class="form-check-input tipo-radio" type="radio"
+                                name="catalogo_reporte_faltante_tipo_id" value="2" {{
+                                $reporte->catalogo_reporte_faltante_tipo_id == 2 ? 'checked' : '' }} id="tipo_procede"
                             disabled>
                             <label class="form-check-label fw-bold" for="tipo_procede">Procede</label>
                         </div>
@@ -127,8 +136,8 @@
                     <div class="col-md-3">
                         <div class="form-check">
                             <input class="form-check-input tipo-radio" type="radio"
-                                name="catalogo_reporte_faltante_tipo_id" value="2" {{
-                                $reporte->catalogo_reporte_faltante_tipo_id == 2 ? 'checked' : '' }}
+                                name="catalogo_reporte_faltante_tipo_id" value="3" {{
+                                $reporte->catalogo_reporte_faltante_tipo_id == 3 ? 'checked' : '' }}
                             id="tipo_cambio_fisico" disabled>
                             <label class="form-check-label fw-bold" for="tipo_cambio_fisico">Cambio Físico</label>
                         </div>
@@ -136,16 +145,14 @@
                     <div class="col-md-3">
                         <div class="form-check">
                             <input class="form-check-input tipo-radio" type="radio"
-                                name="catalogo_reporte_faltante_tipo_id" value="3" {{
-                                $reporte->catalogo_reporte_faltante_tipo_id == 3 ? 'checked' : '' }}
+                                name="catalogo_reporte_faltante_tipo_id" value="4" {{
+                                $reporte->catalogo_reporte_faltante_tipo_id == 4 ? 'checked' : '' }}
                             id="tipo_nc_servicio" disabled>
                             <label class="form-check-label fw-bold" for="tipo_nc_servicio">NC por Servicio</label>
                         </div>
                     </div>
                 </div>
 
-
-                {{-- Firma --}}
                 {{-- Firma --}}
                 <div class="mt-5 text-center">
                     @if($reporte && $reporte->userAutorizo && $reporte->userAutorizo->signature)
@@ -163,8 +170,9 @@
                         method="POST" style="display:inline;">
                         @csrf
                         @method('PUT')
-                        <button type="submit" class="btn bg-gradient-success mt-3" @cannot('firmas.Reporte Faltantes') disabled
-                            @endcannot @if($reporte && $reporte->userAutorizo && $reporte->userAutorizo->signature)
+                        <button type="submit" class="btn bg-gradient-success mt-3" @cannot('firmas.Reporte Faltantes')
+                            disabled @endcannot @if($reporte && $reporte->userAutorizo &&
+                            $reporte->userAutorizo->signature)
                             disabled @endif>
                             ✍️ Firmar Reporte
                         </button>

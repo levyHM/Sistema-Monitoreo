@@ -154,23 +154,31 @@
                             $reporte->catalogo_reporte_faltante_tipo_id ?? null);
                             @endphp
 
+
                             <div class="col-md-3 form-check">
                                 <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="1"
                                     class="form-check-input" {{ $tipoSeleccionado==1 ? 'checked' : '' }}
                                     id="tipo_procede">
-                                <label class="form-check-label" for="tipo_procede">Procede</label>
+                                <label class="form-check-label" for="tipo_No_procede">No Procede</label>
                             </div>
 
                             <div class="col-md-3 form-check">
                                 <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="2"
                                     class="form-check-input" {{ $tipoSeleccionado==2 ? 'checked' : '' }}
-                                    id="tipo_cambio_fisico">
-                                <label class="form-check-label" for="tipo_cambio_fisico">Cambio Físico</label>
+                                    id="tipo_No_procede">
+                                <label class="form-check-label" for="tipo_procede">Procede</label>
                             </div>
 
                             <div class="col-md-3 form-check">
                                 <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="3"
                                     class="form-check-input" {{ $tipoSeleccionado==3 ? 'checked' : '' }}
+                                    id="tipo_cambio_fisico">
+                                <label class="form-check-label" for="tipo_cambio_fisico">Cambio Físico</label>
+                            </div>
+
+                            <div class="col-md-3 form-check">
+                                <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="4"
+                                    class="form-check-input" {{ $tipoSeleccionado==4 ? 'checked' : '' }}
                                     id="tipo_nc_servicio">
                                 <label class="form-check-label" for="tipo_nc_servicio">NC Servicio</label>
                             </div>

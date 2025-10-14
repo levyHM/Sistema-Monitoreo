@@ -168,25 +168,28 @@
                                         </div>
                                     </td>
                                     <td>
-                                        @if($reporte->estatus == 0)
-                                        <span class="badge bg-secondary">N/A</span>
-                                        @elseif($reporte->estatus == 1)
-                                        <span class="badge"
-                                            style="background-color: #FFD600; color: #212529;">Aprobado</span>
-                                        @elseif($reporte->estatus == 2)
-                                        <span class="badge" style="background-color: #FFD600; color: #212529;">No
-                                            aprobado</span>
-                                        @elseif($reporte->estatus == 3)
-                                        <span class="badge" style="background-color: #FFD600; color: #212529;">En
-                                            Recolección</span>
-                                        @elseif($reporte->estatus == 4)
-                                        <span class="badge bg-primary">En Almacén</span>
-                                        @elseif($reporte->estatus == 5)
-                                        <span class="badge bg-info">EnDictamen</span>
-                                        @elseif($reporte->estatus == 6)
-                                        <span class="badge bg-danger text-white">Cancelado</span>
+                                        @if($reporte->estatus == 1)
+                                            <span class="badge bg-success text-white">Aprobado</span>
+                                        @elseif($reporte->estatus == 6 || $reporte->estatus == 2)
+                                            <span class="badge bg-danger text-white">
+                                                {{ $reporte->estatus == 6 ? 'Cancelado' : 'No aprobado' }}
+                                            </span>
                                         @else
-                                        <span class="badge bg-secondary">{{ $reporte->estatus }}</span>
+                                            <span class="badge" style="background-color: #FFD600; color: #333;">
+                                                @switch($reporte->estatus)
+                                                    @case(3)
+                                                        En Recolección
+                                                        @break
+                                                    @case(4)
+                                                        En Almacén
+                                                        @break
+                                                    @case(5)
+                                                        En Dictamen
+                                                        @break
+                                                    @default
+                                                        N/A
+                                                @endswitch
+                                            </span>
                                         @endif
                                     </td>
                                     <td class="align-middle text-center">

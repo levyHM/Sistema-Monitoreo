@@ -157,25 +157,33 @@
                         <div class="row mb-3">
                             <div class="col-md-3 form-check">
                                 <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="1"
-                                    class="form-check-input" id="tipo_procede" {{
+                                    class="form-check-input" id="tipo_no_procede" {{
                                     old('catalogo_reporte_faltante_tipo_id',
                                     $reporte->catalogo_reporte_faltante_tipo_id) == 1 ? 'checked' : '' }}>
-                                <label class="form-check-label" for="tipo_procede">Procede</label>
+                                <label class="form-check-label" for="tipo_no_procede">No Procede</label>
                             </div>
 
                             <div class="col-md-3 form-check">
                                 <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="2"
-                                    class="form-check-input" id="tipo_cambio_fisico" {{
+                                    class="form-check-input" id="tipo_procede" {{
                                     old('catalogo_reporte_faltante_tipo_id',
                                     $reporte->catalogo_reporte_faltante_tipo_id) == 2 ? 'checked' : '' }}>
-                                <label class="form-check-label" for="tipo_cambio_fisico">Cambio Físico</label>
+                                <label class="form-check-label" for="tipo_procede">Procede</label>
                             </div>
 
                             <div class="col-md-3 form-check">
                                 <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="3"
-                                    class="form-check-input" id="tipo_nc_servicio" {{
+                                    class="form-check-input" id="tipo_cambio_fisico" {{
                                     old('catalogo_reporte_faltante_tipo_id',
                                     $reporte->catalogo_reporte_faltante_tipo_id) == 3 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="tipo_cambio_fisico">Cambio Físico</label>
+                            </div>
+
+                            <div class="col-md-3 form-check">
+                                <input type="radio" name="catalogo_reporte_faltante_tipo_id" value="4"
+                                    class="form-check-input" id="tipo_nc_servicio" {{
+                                    old('catalogo_reporte_faltante_tipo_id',
+                                    $reporte->catalogo_reporte_faltante_tipo_id) == 4 ? 'checked' : '' }}>
                                 <label class="form-check-label" for="tipo_nc_servicio">NC Servicio</label>
                             </div>
                         </div>
@@ -194,12 +202,11 @@
     </div>
 </div>
 @endsection
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function(){
+$(document).ready(function(){
 
-    // Autocompletado Cliente
+    // === AUTOCOMPLETADO CLIENTE ===
     $('#cliente').on('input', function(){
         let query = $(this).val().trim();
         if(!query || query.length < 2){
@@ -208,17 +215,20 @@
             $('#catalogo_faltante_idcatalogo_faltante').val('');
             return;
         }
-        $.get('{{ route("clientes.buscar") }}',{query}, function(data){
-            let html = data.length ? data.map(item => `
-                <div class="list-group-item list-group-item-action" role="button"
-                    onclick="seleccionarCliente('${item.codigo}','${item.codigo_nombre}','${item.zona}','${item.idcatalogo_faltante}')">
-                    ${item.codigo} - ${item.codigo_nombre}
-                </div>`).join('') : '<div class="list-group-item">Sin coincidencias</div>';
+
+        $.get('{{ route("clientes.buscar") }}', { query }, function(data){
+            let html = data.length
+                ? data.map(item => `
+                    <div class="list-group-item list-group-item-action" role="button"
+                        onclick="seleccionarCliente('${item.codigo}','${item.codigo_nombre}','${item.zona}','${item.idcatalogo_faltante}')">
+                        ${item.codigo} - ${item.codigo_nombre}
+                    </div>`).join('')
+                : '<div class="list-group-item">Sin coincidencias</div>';
             $('#suggestions_cliente').html(html).show();
         });
     });
 
-    window.seleccionarCliente = function(codigo,nombre,zona,id){
+    window.seleccionarCliente = function(codigo, nombre, zona, id){
         $('#cliente').val(codigo);
         $('#razon_social').val(nombre);
         $('#zona').val(zona);
@@ -226,7 +236,7 @@
         $('#suggestions_cliente').empty().hide();
     };
 
-    // Agregar/Clonar Factura
+    // === AGREGAR / CLONAR FACTURA ===
     let facturaIndex = {{ count($reporte->reportesFalta) }};
     $('#add-factura').click(function(){
         let clone = $('.factura-item').first().clone();
@@ -236,39 +246,48 @@
             if(name) $(this).attr('name', name.replace(/\d+/, facturaIndex));
             if($(this).attr('id')) $(this).attr('id', $(this).attr('id').replace(/\d+/, facturaIndex));
             $(this).val('');
-            if($(this).is(':checkbox')) $(this).prop('checked', false);
         });
 
-        // Reset hidden catalogo_idcatalogo
         clone.find('input[name$="[catalogo_idcatalogo]"]').val('');
-
         clone.find('.remove-factura').show();
         $('#factura-wrapper').append(clone);
         facturaIndex++;
     });
 
-    $(document).on('click','.remove-factura',function(){
+    $(document).on('click', '.remove-factura', function(){
         $(this).closest('.factura-item').remove();
     });
 
-    // Autocompletado Factura
+    // === AUTOCOMPLETADO FACTURA (ahora con cliente obligatorio) ===
     $(document).on('input', 'input[name$="[factura]"]', function() {
         let input = $(this);
         let query = input.val().trim();
         let suggestions = input.siblings('.factura-suggestions');
 
-        if(query.length < 2){ suggestions.empty().hide(); return; }
+        if(query.length < 2){
+            suggestions.empty().hide();
+            return;
+        }
 
-        $.get('{{ route("facturas.buscar") }}', { query }, function(data){
-            let html = data.length ? data.map(item => `
-                <div class="list-group-item list-group-item-action" role="button"
-                    onclick='seleccionarFactura(${JSON.stringify(item)}, this)'>
-                    ${item.dnum} - ${item.dpar1}
-                </div>`).join('') : '<div class="list-group-item">Sin coincidencias</div>';
+        let clicod = $('#cliente').val().trim();
+        if(!clicod){
+            suggestions.html('<div class="list-group-item text-danger">Seleccione un cliente primero</div>').show();
+            return;
+        }
+
+        $.get('{{ route("facturas.buscar") }}', { query, clicod }, function(data){
+            let html = data.length
+                ? data.map(item => `
+                    <div class="list-group-item list-group-item-action" role="button"
+                        onclick='seleccionarFactura(${JSON.stringify(item)}, this)'>
+                        ${item.dnum} → <b>${item.icod}</b>
+                    </div>`).join('')
+                : '<div class="list-group-item">Sin coincidencias</div>';
             suggestions.html(html).show();
         });
     });
 
+    // === SELECCIONAR FACTURA ===
     window.seleccionarFactura = function(producto, inputEl) {
         let row = $(inputEl).closest('.factura-item');
 
@@ -277,15 +296,16 @@
         row.find('input[name$="[icod]"]').val(producto.icod);
         row.find('input[name$="[p_unitario]"]').val(producto.aiprecio);
 
-        // Solo asigna cantidad si está vacío
+        // Asignar cantidad si está vacía
         let cantidadInput = row.find('input[name$="[cantidad]"]');
         if(!cantidadInput.val()) {
             cantidadInput.val(producto.aicant);
         }
 
-        // Actualiza hidden catalogo_idcatalogo
+        // Asignar ID de producto oculto
         row.find('input[name$="[catalogo_idcatalogo]"]').val(producto.idcatalogoproducto);
 
+        // Ocultar sugerencias
         row.find('.factura-suggestions').empty().hide();
     };
 

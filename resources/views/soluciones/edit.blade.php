@@ -20,9 +20,7 @@
                     </div>
                     @endif
 
-                    <form id="form-soluciones"
-                        action="{{ route('soluciones.update', $reporte->idreporte_soluciones_clientes) }}"
-                        method="POST">
+                    <form id="form-soluciones" action="{{ route('soluciones.update', $reporte->idreporte_soluciones_clientes) }}" method="POST">
                         @csrf
                         @method('PUT')
 
@@ -34,8 +32,7 @@
                                     value="{{ old('cliente', $reporte->cliente->clicod ?? '') }}">
                                 <input type="hidden" name="catalogo_clientes_idcatalogo_clientes" id="cliente_id"
                                     value="{{ old('catalogo_clientes_idcatalogo_clientes', $reporte->catalogo_clientes_idcatalogo_clientes) }}">
-                                <div id="suggestions_cliente" class="list-group position-absolute w-100"
-                                    style="z-index: 1000;"></div>
+                                <div id="suggestions_cliente" class="list-group position-absolute w-100" style="z-index: 1000;"></div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Razón Social</label>
@@ -52,26 +49,21 @@
                         {{-- Devolución y Garantía --}}
                         <div class="row mb-3 align-items-center">
                             <label class="form-label">Tipo</label>
-
                             <div class="col-md-3">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="radio" id="tipo_garantia"
-                                        name="catalogo_tipo_id" value="1" {{ old('catalogo_tipo_id',
-                                        $reporte->catalogo_tipo_id ?? '') == 1 ? 'checked' : '' }}>
+                                        name="catalogo_tipo_id" value="1" {{ old('catalogo_tipo_id', $reporte->catalogo_tipo_id ?? '') == 1 ? 'checked' : '' }}>
                                     <label class="form-check-label" for="tipo_garantia">Garantía</label>
                                 </div>
                             </div>
-
                             <div class="col-md-3">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="radio" id="tipo_devolucion"
-                                        name="catalogo_tipo_id" value="2" {{ old('catalogo_tipo_id',
-                                        $reporte->catalogo_tipo_id ?? '') == 2 ? 'checked' : '' }}>
+                                        name="catalogo_tipo_id" value="2" {{ old('catalogo_tipo_id', $reporte->catalogo_tipo_id ?? '') == 2 ? 'checked' : '' }}>
                                     <label class="form-check-label" for="tipo_devolucion">Devolución</label>
                                 </div>
                             </div>
                         </div>
-
 
                         {{-- Tabla Facturas --}}
                         <h5 class="mt-4">🧾 Detalle de productos</h5>
@@ -83,138 +75,82 @@
                             $precio = $catalogo->aiprecio ?? 0;
                             $totalLinea = $cantidad * $precio;
                             @endphp
-                            <div
-                                class="factura-item card shadow-sm mb-3 border-start border-3 border-secondary position-relative bg-light p-3">
+                            <div class="factura-item card shadow-sm mb-3 border-start border-3 border-secondary position-relative bg-light p-3">
                                 <div class="row g-3 align-items-end">
-                                    <div class="col-md-2">
+                                    <div class="col-md-2 position-relative">
                                         <label class="form-label">No. Factura</label>
-                                        <input type="text" name="facturas[{{ $index }}][factura]" class="form-control"
-                                            value="{{ old(" facturas.$index.factura", $solucion->factura) }}" required>
+                                        <input type="text" name="facturas[{{ $index }}][factura]" class="form-control factura" autocomplete="off" value="{{ old("facturas.$index.factura", $solucion->factura) }}">
+                                        <div class="list-group position-absolute w-100 icod-suggestions" style="z-index:1000;"></div>
                                     </div>
                                     <div class="col-md-1">
                                         <label class="form-label">Cantidad</label>
-                                        <input type="number" name="facturas[{{ $index }}][cantidad]"
-                                            class="form-control cantidad" value="{{ old(" facturas.$index.cantidad",
-                                            $cantidad) }}" required min="1" step="1">
+                                        <input type="number" name="facturas[{{ $index }}][cantidad]" class="form-control cantidad" value="{{ old("facturas.$index.cantidad", $cantidad) }}" required min="1" step="1">
                                     </div>
-                                    <div class="col-md-3 position-relative">
+                                    <div class="col-md-3">
                                         <label class="form-label">Código (ICOD)</label>
-                                        <input type="text" name="facturas[{{ $index }}][icod]" class="form-control icod"
-                                            autocomplete="off" value="{{ old(" facturas.$index.icod", $catalogo->icod ??
-                                        '') }}">
-                                        <div class="list-group position-absolute w-100 icod-suggestions"
-                                            style="z-index:1000;"></div>
+                                        <input type="text" name="facturas[{{ $index }}][icod]" class="form-control icod" value="{{ old("facturas.$index.icod", $catalogo->icod ?? '') }}">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Descripción</label>
-                                        <input type="text" name="facturas[{{ $index }}][descripcion]"
-                                            class="form-control descripcion" readonly value="{{ old("
-                                            facturas.$index.descripcion", $catalogo->idescr ?? '') }}" required>
+                                        <input type="text" name="facturas[{{ $index }}][descripcion]" class="form-control descripcion" readonly value="{{ old("facturas.$index.descripcion", $catalogo->idescr ?? '') }}" required>
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">P. Unitario</label>
-                                        <input type="number" step="0.01" name="facturas[{{ $index }}][p_unitario]"
-                                            class="form-control p_unitario" readonly value="{{ old("
-                                            facturas.$index.p_unitario", $precio) }}" required>
+                                        <input type="number" step="0.01" name="facturas[{{ $index }}][p_unitario]" class="form-control p_unitario" readonly value="{{ old("facturas.$index.p_unitario", $precio) }}" required>
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Total</label>
-                                        <input type="number" step="0.01" name="facturas[{{ $index }}][total]"
-                                            class="form-control total" readonly value="{{ old(" facturas.$index.total",
-                                            $totalLinea) }}" required>
+                                        <input type="number" step="0.01" name="facturas[{{ $index }}][total]" class="form-control total" readonly value="{{ old("facturas.$index.total", $totalLinea) }}" required>
                                     </div>
                                     <div class="col-md-8">
                                         <label class="form-label">Observaciones</label>
-                                        <input type="text" name="facturas[{{ $index }}][observaciones]"
-                                            class="form-control observaciones" value="{{ old("
-                                            facturas.$index.observaciones", $solucion->observaciones) }}">
+                                        <input type="text" name="facturas[{{ $index }}][observaciones]" class="form-control observaciones" value="{{ old("facturas.$index.observaciones", $solucion->observaciones) }}">
                                     </div>
-                                    <input type="hidden"
-                                        name="facturas[{{ $index }}][catalogo_soluciones_clientes_idCatalogoSolucionesClientes]"
-                                        class="catalogo_idcatalogo"
-                                        value="{{ $catalogo->idCatalogoSolucionesClientes ?? '' }}">
+                                    <input type="hidden" name="facturas[{{ $index }}][catalogo_soluciones_clientes_idCatalogoSolucionesClientes]" class="catalogo_idcatalogo" value="{{ $catalogo->idCatalogoSolucionesClientes ?? '' }}">
                                 </div>
-                                <div class="remove-factura text-danger position-absolute top-0 end-0 p-2" role="button"
-                                    style="cursor:pointer; {{ $index == 0 ? 'display:none;' : '' }}">🗑️</div>
+                                <div class="remove-factura text-danger position-absolute top-0 end-0 p-2" role="button" style="cursor:pointer; {{ $index == 0 ? 'display:none;' : '' }}">🗑️</div>
                             </div>
                             @endforeach
                         </div>
 
                         <div class="text-end mb-3">
-                            <button type="button" class="btn btn-outline-primary btn-sm" id="add-factura">➕ Agregar
-                                Factura</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="add-factura">➕ Agregar Factura</button>
                         </div>
+
+                        {{-- Estatus --}}
                         <h5 class="mt-4">📋 Estatus de Nota</h5>
-                        {{-- Estatus (solo uno) --}}
                         <div class="row mb-3 align-items-center">
+                            @foreach([1=>'Aprobado',2=>'No aprobado',3=>'En Recolección',4=>'En Almacén',5=>'En Dictamen'] as $val => $label)
                             <div class="col-md-2">
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="radio" id="estatus_aprobado" name="estatus"
-                                        value="1" {{ old('estatus', $reporte->estatus) == 1 ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="estatus_aprobado">Aprobado</label>
+                                    <input class="form-check-input" type="radio" id="estatus_{{ $val }}" name="estatus" value="{{ $val }}" {{ old('estatus',$reporte->estatus)==$val ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="estatus_{{ $val }}">{{ $label }}</label>
                                 </div>
                             </div>
-
-                            <div class="col-md-2">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="radio" id="estatus_no_aprobado" name="estatus"
-                                        value="2" {{ old('estatus', $reporte->estatus) == 2 ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="estatus_no_aprobado">No aprobado</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-2">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="radio" id="estatus_recoleccion" name="estatus"
-                                        value="3" {{ old('estatus', $reporte->estatus) == 3 ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="estatus_recoleccion">En Recolección</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-2">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="radio" id="estatus_almacen" name="estatus"
-                                        value="4" {{ old('estatus', $reporte->estatus) == 4 ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="estatus_almacen">En Almacén</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-2">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="radio" id="estatus_dictamen" name="estatus"
-                                        value="5" {{ old('estatus', $reporte->estatus) == 5 ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="estatus_dictamen">En Dictamen</label>
-                                </div>
-                            </div>
+                            @endforeach
                         </div>
 
                         {{-- Totales --}}
                         <div class="row mb-3">
                             <div class="col-md-2 mb-2">
                                 <label class="form-label">Total</label>
-                                <input type="number" step="0.01" name="total" id="total" class="form-control" readonly
-                                    value="{{ old('total', $reporte->total ?? 0) }}">
+                                <input type="number" step="0.01" name="total" id="total" class="form-control" readonly value="{{ old('total', $reporte->total ?? 0) }}">
                             </div>
                             <div class="col-md-2 mb-2">
                                 <label class="form-label">Descuento</label>
-                                <input type="number" name="descuento" id="descuento" class="form-control" readonly
-                                    value="{{ old('descuento', $reporte->descuento ?? 0) }}">
+                                <input type="number" name="descuento" id="descuento" class="form-control" readonly value="{{ old('descuento', $reporte->descuento ?? 0) }}">
                             </div>
                             <div class="col-md-2 mb-2">
                                 <label class="form-label">Subtotal</label>
-                                <input type="number" step="0.01" name="subtotal" id="subtotal" class="form-control"
-                                    readonly value="{{ old('subtotal', $reporte->subtotal ?? 0) }}">
+                                <input type="number" step="0.01" name="subtotal" id="subtotal" class="form-control" readonly value="{{ old('subtotal', $reporte->subtotal ?? 0) }}">
                             </div>
                             <div class="col-md-2 mb-2">
                                 <label class="form-label">I.V.A. (16%)</label>
-                                <input type="number" step="0.01" name="iva" id="iva" class="form-control" readonly
-                                    value="{{ old('iva', $reporte->iva ?? 0) }}">
+                                <input type="number" step="0.01" name="iva" id="iva" class="form-control" readonly value="{{ old('iva', $reporte->iva ?? 0) }}">
                             </div>
                             <div class="col-md-2 mb-2">
                                 <label class="form-label">Total Completo</label>
-                                <input type="number" step="0.01" name="total_completo" id="total_completo"
-                                    class="form-control" readonly
-                                    value="{{ old('total_completo', $reporte->total_completo ?? 0) }}">
+                                <input type="number" step="0.01" name="total_completo" id="total_completo" class="form-control" readonly value="{{ old('total_completo', $reporte->total_completo ?? 0) }}">
                             </div>
                         </div>
 
@@ -235,19 +171,14 @@
 @push('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function(){
+$(document).ready(function(){
 
-    // Inicializar totales
     calcularTotales();
 
     // Autocompletado Cliente
     $('#cliente').on('input', function(){
         let q = $(this).val().trim();
-        if(q.length < 2){
-            $('#suggestions_cliente').empty().hide();
-            $('#razon_social,#colaborador,#cliente_id').val('');
-            return;
-        }
+        if(q.length < 2){ $('#suggestions_cliente').empty().hide(); return; }
         $.get('{{ route("clientes.buscar.cliente") }}', { q }, function(data){
             let html = data.length
                 ? data.map(item => `<div class="list-group-item list-group-item-action" role="button"
@@ -263,7 +194,7 @@
         $('#razon_social').val(razon_social);
         $('#colaborador').val(colaborador);
         $('#cliente_id').val(id);
-        $('#descuento').val(clidesc10); 
+        $('#descuento').val(clidesc10);
         $('#suggestions_cliente').empty().hide();
         calcularTotales();
     };
@@ -285,6 +216,7 @@
         });
         clone.find('.descripcion, .p_unitario, .total').prop('readonly', true);
         clone.find('.remove-factura').show();
+        clone.find('.catalogo_idcatalogo').val('');
         $('#factura-wrapper').append(clone);
         facturaIndex++;
         calcularTotales();
@@ -296,30 +228,24 @@
     });
 
     // Autocompletado ICOD
-    $(document).on('input', '.icod', function(){
+    $(document).on('input', '.factura', function(){
         let input = $(this);
         let val = input.val().trim();
         let row = input.closest('.factura-item');
         let suggestions = row.find('.icod-suggestions');
+        let clicod = $('#cliente').val().trim();
 
-        if(val.length < 1){
-            row.find('.descripcion').val('');
-            row.find('.p_unitario').val('');
-            row.find('.total').val('');
-            row.find('.observaciones').val('');
-            row.find('.catalogo_idcatalogo').val('');
-            suggestions.empty().hide();
-            calcularTotales();
+        if(!clicod){
+            suggestions.html('<div class="list-group-item text-danger">Selecciona un cliente primero</div>').show();
             return;
         }
-
         if(val.length < 2){ suggestions.empty().hide(); return; }
 
-        $.get('{{ route("soluciones.buscar.catalogo") }}', { icod: val }, function(data){
+        $.get('{{ route("soluciones.buscar.catalogo") }}', { query: val, clicod: clicod }, function(data){
             let html = data.length
                 ? data.map(item => `<div class="list-group-item list-group-item-action" role="button"
                     onclick='seleccionarCatalogo(${JSON.stringify(item)}, this)'>
-                    <strong>${item.icod}</strong> - ${item.idescr}</div>`).join('')
+                    <strong>${item.dnum}</strong> - ${item.idescr}</div>`).join('')
                 : '<div class="list-group-item">Sin coincidencias</div>';
             suggestions.html(html).show();
         });
@@ -327,6 +253,7 @@
 
     window.seleccionarCatalogo = function(item, el){
         let row = $(el).closest('.factura-item');
+        row.find('.factura').val(item.dnum);
         row.find('.icod').val(item.icod);
         row.find('.descripcion').val(item.idescr);
         row.find('.p_unitario').val(item.aiprecio);
@@ -337,7 +264,7 @@
         calcularTotales();
     };
 
-    $(document).on('blur', '.icod', function(){
+    $(document).on('blur', '.factura', function(){
         let row = $(this).closest('.factura-item');
         if(!row.find('.catalogo_idcatalogo').val()){
             row.find('.icod').val('');
