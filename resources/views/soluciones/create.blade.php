@@ -7,7 +7,7 @@
         <div class="col-12">
             <div class="card shadow mb-4">
                 <div class="card-body">
-                    <h1 class="text-center mb-4">🛠️ Nueva Soluciónes a clientes</h1>
+                    <h1 class="text-center mb-4">🛠️ Nueva Solución a clientes</h1>
 
                     @if ($errors->any())
                     <div class="alert alert-danger">
@@ -32,7 +32,7 @@
                                 <input type="hidden" name="catalogo_clientes_idcatalogo_clientes" id="cliente_id"
                                     value="{{ old('catalogo_clientes_idcatalogo_clientes') }}">
                                 <div id="suggestions_cliente" class="list-group position-absolute w-100"
-                                    style="z-index: 1000;"></div>
+                                    style="z-index:1000;"></div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Razón Social</label>
@@ -46,30 +46,24 @@
                             </div>
                         </div>
 
-                        {{-- Devolución y Garantía --}}
+                        {{-- Tipo --}}
                         <div class="row mb-3 align-items-center">
                             <label class="form-label">Tipo</label>
-
                             <div class="col-md-3">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="radio" id="tipo_garantia"
-                                        name="catalogo_tipo_id" value="1" {{ old('catalogo_tipo_id',
-                                        $reporte->catalogo_tipo_id ?? '') == 1 ? 'checked' : '' }}>
+                                        name="catalogo_tipo_id" value="1">
                                     <label class="form-check-label" for="tipo_garantia">Garantía</label>
                                 </div>
                             </div>
-
                             <div class="col-md-3">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="radio" id="tipo_devolucion"
-                                        name="catalogo_tipo_id" value="2" {{ old('catalogo_tipo_id',
-                                        $reporte->catalogo_tipo_id ?? '') == 2 ? 'checked' : '' }}>
+                                        name="catalogo_tipo_id" value="2">
                                     <label class="form-check-label" for="tipo_devolucion">Devolución</label>
                                 </div>
                             </div>
                         </div>
-
-
 
                         {{-- Tabla Facturas --}}
                         <h5 class="mt-4">🧾 Detalle de productos</h5>
@@ -78,34 +72,39 @@
                                 class="factura-item card shadow-sm mb-3 border-start border-3 border-secondary position-relative bg-light p-3">
                                 <div class="row g-3 align-items-end">
                                     <div class="col-md-2">
-                                        <label class="form-label">No. Factura</label>
-                                        <input type="text" name="facturas[0][factura]" class="form-control factura"  autocomplete="off">
-                                        <div class="list-group position-absolute w-100 icod-suggestions"
-                                            style="z-index:1000;"></div>
+                                        <label class="form-label">Factura</label>
+                                        <div class="input-group">
+                                            <input type="text"  name="facturas[0][factura]" class="form-control factura" placeholder="Buscar factura"
+                                                readonly>
+                                            <span class="input-group-text buscar-factura">
+                                                <i class="ni ni-zoom-split-in"></i>
+                                            </span>
+                                        </div>
                                     </div>
+
                                     <div class="col-md-1">
                                         <label class="form-label">Cantidad</label>
                                         <input type="number" name="facturas[0][cantidad]" class="form-control cantidad"
-                                            value="1" required min="1" step="1">
+                                            value="1" min="1" step="1" >
                                     </div>
-                                    <div class="col-md-3 position-relative">
+                                    <div class="col-md-2">
                                         <label class="form-label">Código (ICOD)</label>
-                                        <input type="text" name="facturas[0][icod]" class="form-control icod" readonly required>
+                                        <input type="text" name="facturas[0][icod]" class="form-control icod" readonly>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
                                         <label class="form-label">Descripción</label>
                                         <input type="text" name="facturas[0][descripcion]"
-                                            class="form-control descripcion" readonly required>
+                                            class="form-control descripcion" readonly>
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">P. Unitario</label>
                                         <input type="number" step="0.01" name="facturas[0][p_unitario]"
-                                            class="form-control p_unitario" readonly required>
+                                            class="form-control p_unitario" readonly>
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Total</label>
                                         <input type="number" step="0.01" name="facturas[0][total]"
-                                            class="form-control total" readonly required>
+                                            class="form-control total" readonly>
                                     </div>
                                     <div class="col-md-8">
                                         <label class="form-label">Observaciones</label>
@@ -124,50 +123,20 @@
                             <button type="button" class="btn btn-outline-primary btn-sm" id="add-factura">➕ Agregar
                                 Factura</button>
                         </div>
+
+                        {{-- Estatus --}}
                         <h5 class="mt-4">📋 Estatus de Nota</h5>
-                        {{-- Estatus (solo uno) --}}
                         <div class="row mb-3 align-items-center">
+                            @foreach([1=>'Aprobado',2=>'No aprobado',3=>'En Recolección',4=>'En Almacén',5=>'En Dictamen'] as $val => $label)
                             <div class="col-md-2">
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="radio" id="estatus_aprobado" name="estatus"
-                                        value="1">
-                                    <label class="form-check-label" for="estatus_aprobado">Aprobado</label>
+                                    <input class="form-check-input" type="radio" id="estatus_{{ $val }}" name="estatus"
+                                        value="{{ $val }}">
+                                    <label class="form-check-label" for="estatus_{{ $val }}">{{ $label }}</label>
                                 </div>
                             </div>
-
-                            <div class="col-md-2">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="radio" id="estatus_no_aprobado" name="estatus"
-                                        value="2">
-                                    <label class="form-check-label" for="estatus_no_aprobado">No aprobado</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-2">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="radio" id="estatus_recoleccion" name="estatus"
-                                        value="3">
-                                    <label class="form-check-label" for="estatus_recoleccion">En Recolección</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-2">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="radio" id="estatus_almacen" name="estatus"
-                                        value="4">
-                                    <label class="form-check-label" for="estatus_almacen">En Almacén</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-2">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="radio" id="estatus_dictamen" name="estatus"
-                                        value="5">
-                                    <label class="form-check-label" for="estatus_dictamen">En Dictamen</label>
-                                </div>
-                            </div>
+                            @endforeach
                         </div>
-
 
                         {{-- Totales --}}
                         <div class="row mb-3">
@@ -178,8 +147,7 @@
                             </div>
                             <div class="col-md-2 mb-2">
                                 <label class="form-label">Descuento</label>
-                                <input type="number" name="descuento" id="descuento" class="form-control" value="0"
-                                    readonly>
+                                <input type="number" name="descuento" id="descuento" class="form-control" value="0" readonly>
                             </div>
                             <div class="col-md-2 mb-2">
                                 <label class="form-label">Subtotal</label>
@@ -206,27 +174,75 @@
                     </form>
                 </div>
             </div>
+
             @include('layouts.footers.auth.footer')
         </div>
     </div>
 </div>
+
+{{-- Modal Facturas --}}
+<div class="modal fade" id="modalFacturas" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Seleccionar Factura</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="searchFacturaModal" class="form-control mb-3" placeholder="Buscar factura">
+                <div class="card">
+                    <div class="table-responsive">
+                        <table id="tablaFacturas" class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Factura</th>
+                                    <th>ICOD</th>
+                                    <th>Seleccionar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Se llena dinámicamente con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Cliente Alert --}}
+<div class="modal fade" id="modalClienteAlert" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-warning">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">⚠️ Atención</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Debes seleccionar un cliente antes de continuar.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
+
 @push('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function(){
 
-    // ===== Inicializar totales =====
-    calcularTotales();
+    let filaActual = null;
+    let facturaIndex = $('#factura-wrapper .factura-item').length;
 
-    // ===== Autocompletado Cliente =====
+    // ===== Cliente =====
     $('#cliente').on('input', function(){
         let q = $(this).val().trim();
-        if(q.length < 2){
-            $('#suggestions_cliente').empty().hide();
-            $('#razon_social,#colaborador,#cliente_id').val('');
-            return;
-        }
+        if(q.length < 2){ $('#suggestions_cliente').empty().hide(); return; }
         $.get('{{ route("clientes.buscar.cliente") }}', { q }, function(data){
             let html = data.length
                 ? data.map(item => `<div class="list-group-item list-group-item-action" role="button"
@@ -242,7 +258,7 @@ $(document).ready(function(){
         $('#razon_social').val(razon_social);
         $('#colaborador').val(colaborador);
         $('#cliente_id').val(id);
-        $('#descuento').val(clidesc10); 
+        $('#descuento').val(clidesc10);
         $('#suggestions_cliente').empty().hide();
     };
 
@@ -253,13 +269,11 @@ $(document).ready(function(){
     });
 
     // ===== Agregar / remover factura =====
-    let facturaIndex = $('#factura-wrapper .factura-item').length;
     $('#add-factura').click(function(){
         let clone = $('.factura-item').first().clone();
         clone.find('input').each(function(){
             let name = $(this).attr('name');
             if(name) $(this).attr('name', name.replace(/\d+/, facturaIndex));
-            if($(this).attr('id')) $(this).attr('id', $(this).attr('id').replace(/\d+/, facturaIndex));
             if(!$(this).hasClass('catalogo_idcatalogo')) $(this).val('');
         });
         clone.find('.descripcion, .p_unitario, .total').prop('readonly', true);
@@ -274,68 +288,49 @@ $(document).ready(function(){
         calcularTotales();
     });
 
-    // ===== 🔍 Autocompletado ICOD (actualizado con dnum + clicod) =====
-    $(document).on('input', '.factura', function(){
-        let input = $(this);
-        let val = input.val().trim();
-        let row = input.closest('.factura-item');
-        let suggestions = input.siblings('.icod-suggestions');
+    // ===== Abrir modal para seleccionar factura =====
+    $(document).on('click','.buscar-factura', function(){
+        if(!$('#cliente').val().trim() || !$('#cliente_id').val()){
+            $('#modalClienteAlert').modal('show'); 
+            return;
+        }
+        filaActual = $(this).closest('.factura-item');
+        $('#modalFacturas').modal('show');
+        $('#searchFacturaModal').val(filaActual.find('.factura').val()).trigger('input');
+    });
+
+    // ===== Buscar facturas en modal =====
+    $('#searchFacturaModal').on('input', function(){
+        let query = $(this).val().trim();
         let clicod = $('#cliente').val().trim();
-
-        if(!clicod){
-            suggestions.html('<div class="list-group-item text-danger">Selecciona un cliente primero</div>').show();
-            return;
-        }
-
-        if(val.length < 2){
-            row.find('.icod').val('');
-            row.find('.descripcion').val('');
-            row.find('.p_unitario').val('');
-            row.find('.total').val('');
-            row.find('.observaciones').val('');
-            row.find('.catalogo_idcatalogo').val('');
-            suggestions.empty().hide();
-            return;
-        }
-
-        // Se envía el número de factura (query) y el cliente (clicod)
-        $.get('{{ route("soluciones.buscar.catalogo") }}', { query: val, clicod }, function(data){
-            let html = data.length
-                ? data.map(item => `<div class="list-group-item list-group-item-action" role="button"
-                    onclick='seleccionarCatalogo(${JSON.stringify(item)}, this)'>
-                    <strong>${item.dnum}</strong> - ${item.icod} - ${item.idescr}</div>`).join('')
-                : '<div class="list-group-item">Sin coincidencias</div>';
-            suggestions.html(html).show();
+        if(!clicod || query.length < 1){ $('#tablaFacturas tbody').html(''); return; }
+        $.get('{{ route("soluciones.buscar.catalogo") }}', { query, clicod }, function(data){
+            let html = data.length ? data.map(f =>
+                `<tr>
+                    <td>${f.dnum}</td>
+                    <td>${f.icod}</td>
+                    <td><a href="#!" class="text-black font-weight-bold text-xs seleccionar-factura"
+                        data-factura="${f.dnum}"
+                        data-icod="${f.icod}"
+                        data-descripcion="${f.idescr}"
+                        data-punit="${f.aiprecio}"
+                        data-id="${f.idCatalogoSolucionesClientes}">Seleccionar</a></td>
+                </tr>`).join('') 
+                : '<tr><td colspan="3" class="text-center">No se encontraron facturas</td></tr>';
+            $('#tablaFacturas tbody').html(html);
         });
     });
 
-    window.seleccionarCatalogo = function(item, el){
-        let row = $(el).closest('.factura-item');
-        row.find('.factura').val(item.dnum)
-        row.find('.icod').val(item.icod);
-        row.find('.descripcion').val(item.idescr);
-        row.find('.p_unitario').val(item.aiprecio);
-        row.find('.observaciones').val(item.observaciones || '');
-        row.find('.total').val((parseFloat(row.find('.cantidad').val()||0) * parseFloat(item.aiprecio||0)).toFixed(2));
-        row.find('.catalogo_idcatalogo').val(item.idCatalogoSolucionesClientes);
-        row.find('.icod-suggestions').empty().hide();
+    // ===== Seleccionar factura =====
+    $(document).on('click', '.seleccionar-factura', function(){
+        filaActual.find('.factura').val($(this).data('factura'));
+        filaActual.find('.icod').val($(this).data('icod'));
+        filaActual.find('.descripcion').val($(this).data('descripcion'));
+        filaActual.find('.p_unitario').val($(this).data('punit'));
+        filaActual.find('.total').val((parseFloat(filaActual.find('.cantidad').val()||1)*parseFloat($(this).data('punit')||0)).toFixed(2));
+        filaActual.find('.catalogo_idcatalogo').val($(this).data('id'));
+        $('#modalFacturas').modal('hide');
         calcularTotales();
-    };
-
-    $(document).on('blur', '.icod', function(){
-        let row = $(this).closest('.factura-item');
-        if(!row.find('.catalogo_idcatalogo').val()){
-            row.find('.icod').val('');
-            row.find('.descripcion').val('');
-            row.find('.p_unitario').val('');
-            row.find('.total').val('');
-        }
-    });
-
-    $(document).on('click', function(e){
-        if(!$(e.target).closest('.icod,.icod-suggestions').length){
-            $('.icod-suggestions').empty().hide();
-        }
     });
 
     // ===== Calcular totales =====
@@ -350,13 +345,11 @@ $(document).ready(function(){
 
     function calcularTotales(){
         let totalFacturas = 0;
-        $('.total').each(function(){ 
-            totalFacturas += parseFloat($(this).val()) || 0; 
-        });
-        let descuento = parseInt($('#descuento').val()) || 0;
+        $('.total').each(function(){ totalFacturas += parseFloat($(this).val())||0; });
+        let descuento = parseFloat($('#descuento').val())||0;
         let subtotal = totalFacturas - descuento;
-        let iva = subtotal * 0.16;
-        let totalCompleto = subtotal + iva;
+        let iva = subtotal*0.16;
+        let totalCompleto = subtotal+iva;
 
         $('#total').val(totalFacturas.toFixed(2));
         $('#subtotal').val(subtotal.toFixed(2));
@@ -364,20 +357,23 @@ $(document).ready(function(){
         $('#total_completo').val(totalCompleto.toFixed(2));
     }
 
-    // ===== Validación final antes de enviar =====
+    // ===== Validación final =====
     $('#form-soluciones').on('submit', function(e){
+        if(!$('#cliente').val().trim() || !$('#cliente_id').val()){
+            e.preventDefault();
+            $('#modalClienteAlert').modal('show'); 
+            return;
+        }
         let valid = true;
         $('.factura-item').each(function(){
             if(!$(this).find('.catalogo_idcatalogo').val()){
                 valid = false;
                 $(this).addClass('border border-danger');
-            } else {
-                $(this).removeClass('border border-danger');
-            }
+            } else $(this).removeClass('border border-danger');
         });
-        if(!valid){
-            e.preventDefault();
-            alert('Selecciona un ICOD válido para todas las facturas antes de guardar.');
+        if(!valid){ 
+            e.preventDefault(); 
+            alert('Selecciona un ICOD válido para todas las facturas antes de guardar.'); 
         }
     });
 

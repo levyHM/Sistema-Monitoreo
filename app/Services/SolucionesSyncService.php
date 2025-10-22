@@ -18,6 +18,7 @@ class SolucionesSyncService
 
             $registros = DB::connection('mysql2')->select("
                 SELECT 
+                    fdoc_0.DSEQ,
                     fdoc_0.DITIPMV,
                     fdoc_0.DNUM,
                     fdoc_0.DPAR1,
@@ -54,6 +55,7 @@ class SolucionesSyncService
             foreach ($registros as $solucion) {
                 try {
                     $resultado = DB::connection('mysql')->table('catalogo_soluciones_clientes')->insertOrIgnore([
+                        'dseq'        => $solucion->DSEQ,
                         'ditipmv'     => $solucion->DITIPMV,
                         'dnum'        => $solucion->DNUM,
                         'dpar1'       => $solucion->DPAR1,

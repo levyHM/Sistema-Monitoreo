@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card mb-4">
-                <h1 class="text-center">Reporte De Error Checado</h1>
+                <h1 class="text-center">Soluciónes a clientes</h1>
 
                 {{-- Alertas --}}
                 @if (session('success'))
@@ -93,9 +93,11 @@
                             <tbody>
                                 @foreach($reportes as $reporte)
                                 <tr>
-                                    <td>{{ str_pad($reporte->idreporte_soluciones_clientes, 5, '0', STR_PAD_LEFT) }}
+                                    <td>
+                                        {{ str_pad($reporte->idreporte_soluciones_clientes, 4, '0', STR_PAD_LEFT) }}{{ $reporte->cliente->clipar1 ?? '' }}
                                     </td>
-                                    <td>{{ $reporte->fecha }}</td>
+                                    </td>
+                                    <td>{{ $reporte->fecha  }}</td>
                                     <td>{{ $reporte->cliente->clicod ?? 'Sin nombre' }}</td>
                                     <td>{{ $reporte->cliente->clinom ?? 'Sin nombre' }}</td>
                                     <td>

@@ -1,12 +1,16 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\CatalogoSolucionesCliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class SolucionesController extends Controller
 {
+    /**
+     * Buscar facturas/ICOD del catálogo por cliente.
+     */
     public function buscarCatalogo(Request $request)
     {
         $query = $request->get('query', '');
@@ -17,7 +21,8 @@ class SolucionesController extends Controller
             return response()->json([]);
         }
 
-        $consulta = CatalogoSolucionesCliente::where('dnum', 'like', "%{$query}%")
+        $consulta = CatalogoSolucionesCliente::query()
+            ->where('dnum', 'like', "%{$query}%")
             ->where('clicod', $clicod)
             ->orderBy('dnum')
             ->take(10);
@@ -31,11 +36,12 @@ class SolucionesController extends Controller
             'observaciones'
         ]);
 
+        // Log para depuración (opcional, se puede comentar en producción)
         Log::info('Resultados de búsqueda de catálogo', [
             'query' => $query,
             'clicod' => $clicod,
             'total_resultados' => $resultados->count(),
-            'sql' => $consulta->toSql(), // ✅ ahora sí se puede usar
+            'sql' => $consulta->toSql(),
             'bindings' => $consulta->getBindings()
         ]);
 

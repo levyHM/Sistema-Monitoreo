@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Services\ProveedorSyncService;
 
+//php artisan sync:proveedores
 class SyncProveedoresCommand extends Command
 {
     protected $signature = 'sync:proveedores';

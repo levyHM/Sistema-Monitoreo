@@ -14,6 +14,7 @@ class CatalogoSolucionesCliente extends Model
     protected $primaryKey = 'idCatalogoSolucionesClientes';
 
     protected $fillable = [
+        'dseq',
         'ditipmv',
         'dnum',
         'dpar1',

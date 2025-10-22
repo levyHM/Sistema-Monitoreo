@@ -173,7 +173,7 @@
     <!-- Header -->
     <div class="header">
         <div class="logo">
-            <img src="{{ public_path('img/logos/reporte_error-checado_cdmx.jpg') }}" alt="Logo">
+            <img src="{{ public_path('img/logos/soluciones_clientes.jpg') }}" alt="Logo">
         </div>
         <div class="folio-fecha">
             <strong>Folio:</strong> <span class="folio">{{ str_pad($folio, 5, '0', STR_PAD_LEFT) }}</span><br>
