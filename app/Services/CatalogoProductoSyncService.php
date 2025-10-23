@@ -12,14 +12,22 @@ class CatalogoProductoSyncService
      */
     public function sync()
     {
-        Log::info('Iniciando sincronización de catalogo_producto...');
+        Log::info('===============================================================');
+        Log::info('🔄 Iniciando sincronización incremental de catalogo_producto...');
 
-        // Procesar en lotes de 500 registros
+        // 1. Obtener el último dhora registrado
+        $ultimaHora = DB::connection('mysql')
+            ->table('catalogo_producto')
+            ->max('dhora');
+
+        Log::info("🕒 Última hora registrada: {$ultimaHora}");
+
+        // 2. Procesar en lotes de 500 registros desde mysql2
         DB::connection('mysql2')->table('db152jigafra.fdoc as fdoc_0')
             ->join('db152jigafra.fcli as fcli_0', 'fdoc_0.CLISEQ', '=', 'fcli_0.CLISEQ')
-            ->join('db152jigafra.faxinv as faxinv_0', function($join){
+            ->join('db152jigafra.faxinv as faxinv_0', function ($join) {
                 $join->on('faxinv_0.CLISEQ', '=', 'fcli_0.CLISEQ')
-                     ->on('faxinv_0.DSEQ', '=', 'fdoc_0.DSEQ');
+                    ->on('faxinv_0.DSEQ', '=', 'fdoc_0.DSEQ');
             })
             ->join('db152jigafra.finv as finv_0', 'finv_0.ISEQ', '=', 'faxinv_0.ISEQ')
             ->join('db152jigafra.falm as falm_0', 'falm_0.ISEQ', '=', 'finv_0.ISEQ')
@@ -36,10 +44,10 @@ class CatalogoProductoSyncService
                 'finv_0.IDESCR'
             )
             ->where('fdoc_0.DITIPMV', 'FE')
-            ->where('fdoc_0.DFECHA', '>=', '2025-08-19')
+            ->where('fdoc_0.DHORA', '>', $ultimaHora)
             ->where('falm_0.ALMNUM', '001')
             ->orderBy('fdoc_0.DHORA')
-            ->chunk(500, function($productos) {
+            ->chunk(500, function ($productos) {
                 foreach ($productos as $prod) {
                     $data = [
                         'ditipmv'      => $prod->DITIPMV,
@@ -62,9 +70,10 @@ class CatalogoProductoSyncService
                     );
                 }
 
-                Log::info('Procesados ' . count($productos) . ' productos en este lote.');
+                Log::info('📦 Procesados ' . count($productos) . ' productos en este lote.');
             });
 
-        Log::info('Sincronización de catalogo_producto completada exitosamente.');
+        Log::info('✅ Sincronización incremental de catalogo_producto completada.');
+        Log::info('===============================================================');
     }
 }
