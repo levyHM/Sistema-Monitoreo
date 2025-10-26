@@ -21,7 +21,7 @@
                 {{-- Botón para crear --}}
                 @can('Reporte Soluciones.crear')
                 <div class="text-center mt-4">
-                    <a href="{{ route('soluciones.create') }}" class="btn btn-success">Crear Solución</a>
+                    <a href="{{ route('soluciones.create') }}" class="btn btn-success">Eliminar</a>
                 </div>
                 @endcan
 

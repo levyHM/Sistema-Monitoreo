@@ -105,6 +105,13 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::put('/soluciones/{id}/estatus', [ReporteSolucionesClienteController::class, 'cambiarEstatusSolucionesClientes'])->name('soluciones.cambiar.estatus');
 	Route::get('/buscar-catalogo', [SolucionesController::class, 'buscarCatalogo'])->name('soluciones.buscar.catalogo');
 	Route::post('/soluciones/{id}/firmar', [ReporteSolucionesClienteController::class, 'firmar'])->name('soluciones.firmas');
+	// Crear nueva solución según tipo
+	Route::get('/soluciones-garantia', [ReporteSolucionesClienteController::class, 'create'])
+		->defaults('tipo', 1)
+		->name('soluciones.garantia');
+	Route::get('/soluciones-devolucion', [ReporteSolucionesClienteController::class, 'create'])
+		->defaults('tipo', 2)
+		->name('soluciones.devolucion');
 
 
 
@@ -177,6 +184,16 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/{id}/edit', [RolesPermissionsController::class, 'edit'])->name('edit');
 		Route::put('/{id}', [RolesPermissionsController::class, 'update'])->name('update');
 		Route::delete('/{id}', [RolesPermissionsController::class, 'destroy'])->name('destroy');
+	});
+
+	// Rutas para permisos
+	Route::prefix('permissions')->name('permissions.')->group(function () {
+		Route::get('/', [RolesPermissionsController::class, 'permissionsIndex'])->name('index');
+		Route::get('/create', [RolesPermissionsController::class, 'permissionsCreate'])->name('create');
+		Route::post('/', [RolesPermissionsController::class, 'permissionsStore'])->name('store');
+		Route::get('/{id}/edit', [RolesPermissionsController::class, 'permissionsEdit'])->name('edit');
+		Route::put('/{id}', [RolesPermissionsController::class, 'permissionsUpdate'])->name('update');
+		Route::delete('/{id}', [RolesPermissionsController::class, 'permissionsDestroy'])->name('destroy');
 	});
 
 

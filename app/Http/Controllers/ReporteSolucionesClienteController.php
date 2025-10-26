@@ -43,10 +43,10 @@ class ReporteSolucionesClienteController extends Controller
     }
 
     // Mostrar formulario de creación
-    public function create()
+    public function create(Request $request)
     {
-        Log::info('Accediendo al formulario de creación de reporte de soluciones para cliente.');
-        return view('soluciones.create');
+        $tipo = $request->tipo ?? 1; // Por defecto Garantía
+        return view('soluciones.create', compact('tipo'));
     }
 
     // Guardar nuevo reporte
@@ -156,8 +156,7 @@ class ReporteSolucionesClienteController extends Controller
         // Actualizar campos del reporte
         $reporte->update([
             'catalogo_clientes_idcatalogo_clientes' => $request->catalogo_clientes_idcatalogo_clientes,
-            'devolucion' => $request->has('devolucion') ? 1 : 0,
-            'catalogo_tipo_id' => $request->catalogo_tipo_id, // ← Aquí se define si es Garantía (1) o Devolución (2)            
+            'devolucion' => $request->has('devolucion') ? 1 : 0,           
             'observaciones' => $request->observaciones,
             'total' => $request->total,
             'descuento' => $request->descuento,

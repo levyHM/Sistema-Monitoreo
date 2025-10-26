@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\CatalogoSolucionesCliente;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class SolucionesController extends Controller
 {
@@ -16,35 +15,20 @@ class SolucionesController extends Controller
         $query = $request->get('query', '');
         $clicod = $request->get('clicod', '');
 
-        // Validación básica
         if (!$query || !$clicod) {
-            return response()->json([]);
+            return response()->json(['data' => [], 'links' => '']);
         }
 
-        $consulta = CatalogoSolucionesCliente::query()
-            ->where('dnum', 'like', "%{$query}%")
-            ->where('clicod', $clicod)
-            ->orderBy('dnum')
-            ->take(10);
+        $facturas = CatalogoSolucionesCliente::where('clicod', $clicod)
+            ->where(function ($q) use ($query) {
+                $q->where('dnum', 'like', "%{$query}%")
+                    ->orWhere('icod', 'like', "%{$query}%");
+            })
+            ->paginate(50);
 
-        $resultados = $consulta->get([
-            'idCatalogoSolucionesClientes',
-            'dnum',
-            'icod',
-            'idescr',
-            'aiprecio',
-            'observaciones'
+        return response()->json([
+            'data' => $facturas->items(),
+            'links' => (string) $facturas->links('pagination::bootstrap-4'),
         ]);
-
-        // Log para depuración (opcional, se puede comentar en producción)
-        Log::info('Resultados de búsqueda de catálogo', [
-            'query' => $query,
-            'clicod' => $clicod,
-            'total_resultados' => $resultados->count(),
-            'sql' => $consulta->toSql(),
-            'bindings' => $consulta->getBindings()
-        ]);
-
-        return response()->json($resultados);
     }
 }

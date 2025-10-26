@@ -7,7 +7,7 @@
         <div class="col-12">
             <div class="card shadow mb-4">
                 <div class="card-body">
-                    <h1 class="text-center mb-4">🛠️ Editar Soluciones a clientes</h1>
+                    <h1 class="text-center mb-4">🛠️ Editar Soluciones a clientes  {{ $reporte->catalogoTipo->nombre }}</h1>
 
                     @if ($errors->any())
                     <div class="alert alert-danger">
@@ -45,26 +45,6 @@
                                     value="{{ old('colaborador', $reporte->cliente->clipar1 ?? '') }}" readonly>
                             </div>
                         </div>
-
-                        {{-- Devolución y Garantía --}}
-                        <div class="row mb-3 align-items-center">
-                            <label class="form-label">Tipo</label>
-                            <div class="col-md-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="radio" id="tipo_garantia"
-                                        name="catalogo_tipo_id" value="1" {{ old('catalogo_tipo_id', $reporte->catalogo_tipo_id ?? '') == 1 ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="tipo_garantia">Garantía</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="radio" id="tipo_devolucion"
-                                        name="catalogo_tipo_id" value="2" {{ old('catalogo_tipo_id', $reporte->catalogo_tipo_id ?? '') == 2 ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="tipo_devolucion">Devolución</label>
-                                </div>
-                            </div>
-                        </div>
-
                         {{-- Tabla Facturas --}}
                         <h5 class="mt-4">🧾 Detalle de productos</h5>
                         <div id="factura-wrapper">

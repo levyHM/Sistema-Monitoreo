@@ -7,7 +7,14 @@
         <div class="col-12">
             <div class="card shadow mb-4">
                 <div class="card-body">
-                    <h1 class="text-center mb-4">🛠️ Nueva Solución a clientes</h1>
+                    {{-- Tipo --}}
+                    @php
+                    $tipo = request('tipo', 1); // Por defecto Garantía
+                    $tipoTexto = $tipo == 2 ? 'Devolución' : 'Garantía';
+                    @endphp
+
+                    
+                    <h1 class="text-center mb-4">🛠️ Nueva Solución a clientes {{ $tipoTexto }}</h1>
 
                     @if ($errors->any())
                     <div class="alert alert-danger">
@@ -46,46 +53,27 @@
                             </div>
                         </div>
 
-                        {{-- Tipo --}}
-                        <div class="row mb-3 align-items-center">
-                            <label class="form-label">Tipo</label>
-                            <div class="col-md-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="radio" id="tipo_garantia"
-                                        name="catalogo_tipo_id" value="1">
-                                    <label class="form-check-label" for="tipo_garantia">Garantía</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="radio" id="tipo_devolucion"
-                                        name="catalogo_tipo_id" value="2">
-                                    <label class="form-check-label" for="tipo_devolucion">Devolución</label>
-                                </div>
-                            </div>
-                        </div>
-
                         {{-- Tabla Facturas --}}
                         <h5 class="mt-4">🧾 Detalle de productos</h5>
                         <div id="factura-wrapper">
                             <div
                                 class="factura-item card shadow-sm mb-3 border-start border-3 border-secondary position-relative bg-light p-3">
                                 <div class="row g-3 align-items-end">
+                                    <input type="hidden" name="catalogo_tipo_id" value="{{ $tipo }}">
                                     <div class="col-md-2">
                                         <label class="form-label">Factura</label>
                                         <div class="input-group">
-                                            <input type="text"  name="facturas[0][factura]" class="form-control factura" placeholder="Buscar factura"
-                                                readonly>
+                                            <input type="text" name="facturas[0][factura]" class="form-control factura"
+                                                placeholder="Buscar factura" readonly>
                                             <span class="input-group-text buscar-factura">
                                                 <i class="ni ni-zoom-split-in"></i>
                                             </span>
                                         </div>
                                     </div>
-
                                     <div class="col-md-1">
                                         <label class="form-label">Cantidad</label>
                                         <input type="number" name="facturas[0][cantidad]" class="form-control cantidad"
-                                            value="1" min="1" step="1" >
+                                            value="1" min="1" step="1">
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Código (ICOD)</label>
@@ -127,7 +115,8 @@
                         {{-- Estatus --}}
                         <h5 class="mt-4">📋 Estatus de Nota</h5>
                         <div class="row mb-3 align-items-center">
-                            @foreach([1=>'Aprobado',2=>'No aprobado',3=>'En Recolección',4=>'En Almacén',5=>'En Dictamen'] as $val => $label)
+                            @foreach([1=>'Aprobado',2=>'No aprobado',3=>'En Recolección',4=>'En Almacén',5=>'En
+                            Dictamen'] as $val => $label)
                             <div class="col-md-2">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="radio" id="estatus_{{ $val }}" name="estatus"
@@ -147,7 +136,8 @@
                             </div>
                             <div class="col-md-2 mb-2">
                                 <label class="form-label">Descuento</label>
-                                <input type="number" name="descuento" id="descuento" class="form-control" value="0" readonly>
+                                <input type="number" name="descuento" id="descuento" class="form-control" value="0"
+                                    readonly>
                             </div>
                             <div class="col-md-2 mb-2">
                                 <label class="form-label">Subtotal</label>
@@ -234,7 +224,7 @@
 @push('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function(){
+    $(document).ready(function(){
 
     let filaActual = null;
     let facturaIndex = $('#factura-wrapper .factura-item').length;
@@ -300,26 +290,52 @@ $(document).ready(function(){
     });
 
     // ===== Buscar facturas en modal =====
-    $('#searchFacturaModal').on('input', function(){
-        let query = $(this).val().trim();
-        let clicod = $('#cliente').val().trim();
-        if(!clicod || query.length < 1){ $('#tablaFacturas tbody').html(''); return; }
-        $.get('{{ route("soluciones.buscar.catalogo") }}', { query, clicod }, function(data){
-            let html = data.length ? data.map(f =>
+    $(document).on('input', '#searchFacturaModal', function() {
+    buscarFacturas(1);
+});
+
+// Maneja clics en los botones del paginador
+$(document).on('click', '.pagination a', function(e) {
+    e.preventDefault();
+    let page = $(this).attr('href').split('page=')[1];
+    buscarFacturas(page);
+});
+
+function buscarFacturas(page = 1) {
+    let query = $('#searchFacturaModal').val().trim();
+    let clicod = $('#cliente').val().trim();
+
+    if (!clicod || query.length < 1) {
+        $('#tablaFacturas tbody').html('');
+        $('.pagination').remove();
+        return;
+    }
+
+    $.get('{{ route("soluciones.buscar.catalogo") }}', { query, clicod, page }, function(response) {
+        let html = response.data.length
+            ? response.data.map(f =>
                 `<tr>
                     <td>${f.dnum}</td>
                     <td>${f.icod}</td>
-                    <td><a href="#!" class="text-black font-weight-bold text-xs seleccionar-factura"
-                        data-factura="${f.dnum}"
-                        data-icod="${f.icod}"
-                        data-descripcion="${f.idescr}"
-                        data-punit="${f.aiprecio}"
-                        data-id="${f.idCatalogoSolucionesClientes}">Seleccionar</a></td>
-                </tr>`).join('') 
-                : '<tr><td colspan="3" class="text-center">No se encontraron facturas</td></tr>';
-            $('#tablaFacturas tbody').html(html);
-        });
+                    <td>
+                        <a href="#!" class="text-black font-weight-bold text-xs seleccionar-factura"
+                            data-factura="${f.dnum}"
+                            data-icod="${f.icod}"
+                            data-descripcion="${f.idescr}"
+                            data-punit="${f.aiprecio}"
+                            data-id="${f.idCatalogoSolucionesClientes}">
+                            Seleccionar
+                        </a>
+                    </td>
+                </tr>`
+              ).join('')
+            : '<tr><td colspan="3" class="text-center">No se encontraron facturas</td></tr>';
+
+        $('#tablaFacturas tbody').html(html);
+        $('.pagination').remove(); // elimina la anterior
+        $('#tablaFacturas').after(response.links); // agrega la nueva
     });
+}
 
     // ===== Seleccionar factura =====
     $(document).on('click', '.seleccionar-factura', function(){
