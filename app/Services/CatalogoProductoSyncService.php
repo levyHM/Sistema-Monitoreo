@@ -7,23 +7,19 @@ use Illuminate\Support\Facades\Log;
 
 class CatalogoProductoSyncService
 {
-    /**
-     * Sincroniza los productos desde la base externa hacia catalogo_producto en lotes.
-     */
     public function sync()
     {
         Log::info('===============================================================');
         Log::info('🔄 Iniciando sincronización incremental de catalogo_producto...');
 
-        // 1. Obtener el último dhora registrado
         $ultimaHora = DB::connection('mysql')
             ->table('catalogo_producto')
             ->max('dhora');
 
         Log::info("🕒 Última hora registrada: {$ultimaHora}");
 
-        // 2. Procesar en lotes de 500 registros desde mysql2
-        DB::connection('mysql2')->table('db152jigafra.fdoc as fdoc_0')
+        // Obtener todos los registros nuevos desde mysql2
+        $productos = DB::connection('mysql2')->table('db152jigafra.fdoc as fdoc_0')
             ->join('db152jigafra.fcli as fcli_0', 'fdoc_0.CLISEQ', '=', 'fcli_0.CLISEQ')
             ->join('db152jigafra.faxinv as faxinv_0', function ($join) {
                 $join->on('faxinv_0.CLISEQ', '=', 'fcli_0.CLISEQ')
@@ -47,33 +43,47 @@ class CatalogoProductoSyncService
             ->where('fdoc_0.DHORA', '>', $ultimaHora)
             ->where('falm_0.ALMNUM', '001')
             ->orderBy('fdoc_0.DHORA')
-            ->chunk(500, function ($productos) {
-                foreach ($productos as $prod) {
-                    $data = [
-                        'ditipmv'      => $prod->DITIPMV,
-                        'dnum'         => $prod->DNUM,
-                        'dpar1'        => $prod->DPAR1,
-                        'dhora'        => $prod->DHORA,
-                        'icod'         => $prod->ICOD,
-                        'clicod'       => $prod->CLICOD,
-                        'clidesc10'    => $prod->CLIDESC10,
-                        'aiprecio'     => $prod->AIPRECIO,
-                        'aicant'       => $prod->AICANT,
-                        'idescr'       => $prod->IDESCR,
-                        'updated_at'   => now(),
-                        'created_at'   => now(),
-                    ];
+            ->get();
 
-                    DB::connection('mysql')->table('catalogo_producto')->updateOrInsert(
-                        ['icod' => $prod->ICOD, 'clicod' => $prod->CLICOD],
-                        $data
-                    );
-                }
+        $total = $productos->count();
+        Log::info("📊 Total registros a sincronizar: {$total}");
 
-                Log::info('📦 Procesados ' . count($productos) . ' productos en este lote.');
-            });
+        if ($total === 0) {
+            Log::info('⚠️ No hay nuevos registros para sincronizar.');
+            Log::info('===============================================================');
+            return;
+        }
 
-        Log::info('✅ Sincronización incremental de catalogo_producto completada.');
+        // Dividir en bloques de 200 para evitar el error 1390
+        $bloques = array_chunk($productos->toArray(), 200);
+
+        foreach ($bloques as $index => $bloque) {
+            foreach ($bloque as $prod) {
+                $data = [
+                    'ditipmv'      => $prod->DITIPMV,
+                    'dnum'         => $prod->DNUM,
+                    'dpar1'        => $prod->DPAR1,
+                    'dhora'        => $prod->DHORA,
+                    'icod'         => $prod->ICOD,
+                    'clicod'       => $prod->CLICOD,
+                    'clidesc10'    => $prod->CLIDESC10,
+                    'aiprecio'     => $prod->AIPRECIO,
+                    'aicant'       => $prod->AICANT,
+                    'idescr'       => $prod->IDESCR,
+                    'updated_at'   => now(),
+                    'created_at'   => now(),
+                ];
+
+                DB::connection('mysql')->table('catalogo_producto')->updateOrInsert(
+                    ['icod' => $prod->ICOD, 'clicod' => $prod->CLICOD],
+                    $data
+                );
+            }
+
+            Log::info("📦 Procesado bloque #" . ($index + 1) . " de " . count($bloque) . " productos.");
+        }
+
+        Log::info('✅ Sincronización incremental completada sin errores.');
         Log::info('===============================================================');
     }
 }

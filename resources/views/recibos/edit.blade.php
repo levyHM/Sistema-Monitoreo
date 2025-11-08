@@ -1,13 +1,13 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
-@include('layouts.navbars.auth.topnav', ['title' => 'Editar Recibo de Devolución'])
+@include('layouts.navbars.auth.topnav', ['title' => 'Editar Folio de Devolución'])
 
 <div class="container-fluid py-4">
   <div class="row">
     <div class="col-12">
       <div class="card mb-4 shadow">
-        <h1 class="text-center">✏️ Editar Recibo de Devolución</h1>
+        <h1 class="text-center">✏️ Editar Folio de Devolución</h1>
         @if(session('success'))
           <div class="alert alert-success text-center">{{ session('success') }}</div>
         @endif

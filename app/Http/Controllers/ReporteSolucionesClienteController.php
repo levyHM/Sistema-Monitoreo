@@ -91,10 +91,7 @@ class ReporteSolucionesClienteController extends Controller
          * 0 => 'N/A'   // N/A
          * 1 => 'Aprobado'   // El elemento se encuentra en proceso de recolección.
          * 2 => 'No aprobado'       // El elemento está almacenado.
-         * 3 => 'En Recolección'      // El elemento está en proceso de dictamen.
-         * 4 => 'En Almacén'      // El elemento no fue aprobado.
-         * 5 => 'En Dictamen'      // El elemento fue aprobado y está listo para ser entregado.
-         * 6 => 'Cancelado'        // El elemento fue cancelado.
+         * 3 => 'Cancelado'      // El elemento fue cancelado
          */
 
         ]);
@@ -209,7 +206,7 @@ class ReporteSolucionesClienteController extends Controller
     public function cambiarEstatusSolucionesClientes(Request $request, $id)
     {
         $reporte = ReporteSolucionesCliente::findOrFail($id);
-        $reporte->estatus = $request->input('estatus', 6); // 6 = Cancelado
+        $reporte->estatus = $request->input('estatus', 3); // 3 = Cancelado
         $reporte->observaciones = $request->input('observaciones', $reporte->observaciones);
         $reporte->save();
         return redirect()->route('soluciones.index', $reporte->idreporte_soluciones_clientes)

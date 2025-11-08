@@ -85,9 +85,25 @@ class UserProfileController extends Controller
 
         // Firma (si se subió)
         if ($request->hasFile('signature')) {
+            try {
             $path = $request->file('signature')->store('signature/' . $user->id, 'public');
+            $oldSignature = $user->signature ?? null;
             $user->signature = $path;
             $user->save();
+
+            Log::info('Firma subida y usuario actualizado', [
+                'user_id' => $user->id,
+                'actor_id' => auth()->id(),
+                'old_signature' => $oldSignature,
+                'new_signature' => $path,
+            ]);
+            } catch (\Exception $e) {
+            Log::error('Error al subir la firma', [
+                'user_id' => $user->id,
+                'actor_id' => auth()->id(),
+                'error' => $e->getMessage(),
+            ]);
+            }
         }
 
         // Roles

@@ -75,6 +75,7 @@
                                 <th>Cantidad</th>
                                 <th>Código</th>
                                 <th>Descripción</th>
+                                <th>Piramidal</th>
                                 <th>P. Unitario</th>
                                 <th>Total</th>
                                 <th>Observaciones</th>
@@ -86,15 +87,18 @@
                             @php
                             $catalogo = $solucion->catalogo;
                             $cantidad = $solucion->cantidad ?? 1;
+                            $total = $solucion->total ?? 0;
                             $precio = $catalogo->aiprecio ?? 0;
                             $totalLinea = $cantidad * $precio;
-                            $totalFacturas += $totalLinea;
+                            $totalFacturas += $solucion->total
+
                             @endphp
                             <tr>
                                 <td>{{ $solucion->factura ?? '-' }}</td>
                                 <td>{{ $cantidad }}</td>
                                 <td>{{ $catalogo->icod ?? '-' }}</td>
                                 <td>{{ $catalogo->idescr ?? '-' }}</td>
+                                <td>{{ number_format($total, 2) }}</td>
                                 <td>${{ number_format($precio,2) }}</td>
                                 <td>${{ number_format($totalLinea,2) }}</td>
                                 <td>{{ $solucion->observaciones ?? '-' }}</td>

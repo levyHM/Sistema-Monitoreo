@@ -1,13 +1,13 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
-@include('layouts.navbars.auth.topnav', ['title' => 'Detalle del Recibo'])
+@include('layouts.navbars.auth.topnav', ['title' => 'Detalle del Folio'])
 
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
             <div class="card p-4 mb-4 shadow rounded-3">
-                <h3 class="text-center mb-4 text-success">Recibo de Devolución</h3>
+                <h3 class="text-center mb-4 text-success">Folio de Devolución</h3>
                 {{-- Alertas --}}
                 @if (session('success'))
                 <div class="alert alert-success text-center">{{ session('success') }}</div>

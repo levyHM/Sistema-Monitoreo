@@ -35,6 +35,8 @@ use App\Http\Controllers\RolesPermissionsController;
 use App\Http\Controllers\ReporteSolucionesClienteController;
 use App\Http\Controllers\CatalogoClienteController;
 use App\Http\Controllers\SolucionesController;
+use App\Http\Controllers\PermissionsController;
+
 
 
 
@@ -186,16 +188,14 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::delete('/{id}', [RolesPermissionsController::class, 'destroy'])->name('destroy');
 	});
 
-	// Rutas para permisos
 	Route::prefix('permissions')->name('permissions.')->group(function () {
-		Route::get('/', [RolesPermissionsController::class, 'permissionsIndex'])->name('index');
-		Route::get('/create', [RolesPermissionsController::class, 'permissionsCreate'])->name('create');
-		Route::post('/', [RolesPermissionsController::class, 'permissionsStore'])->name('store');
-		Route::get('/{id}/edit', [RolesPermissionsController::class, 'permissionsEdit'])->name('edit');
-		Route::put('/{id}', [RolesPermissionsController::class, 'permissionsUpdate'])->name('update');
-		Route::delete('/{id}', [RolesPermissionsController::class, 'permissionsDestroy'])->name('destroy');
+		Route::get('/', [PermissionsController::class, 'index'])->name('index');
+		Route::get('/create', [PermissionsController::class, 'create'])->name('create');
+		Route::post('/', [PermissionsController::class, 'store'])->name('store');
+		Route::get('/{id}/edit', [PermissionsController::class, 'edit'])->name('edit');
+		Route::put('/{id}', [PermissionsController::class, 'update'])->name('update');
+		Route::delete('/{id}', [PermissionsController::class, 'destroy'])->name('destroy');
 	});
-
 
 	Route::get('/{page}', [PageController::class, 'index'])->name('page');
 	Route::post('logout', [LoginController::class, 'logout'])->name('logout');

@@ -162,7 +162,7 @@ class PDFController extends Controller
                 'razon_social' => $reporte->cliente->clinom ?? '',
                 'colaborador' => $reporte->cliente->clipar1 ?? '',
             ],
-            'estatus' => ($reporte->estatus == 2) ? 'cancelado' : $reporte->estatus,
+            'estatus' => ($reporte->estatus == 3) ? 'cancelado' : $reporte->estatus,
             'devolucion' => $reporte->catalogo_tipo_id == 2 ? 'Sí' : 'No',
             'garantia' => $reporte->catalogo_tipo_id == 1 ? 'Sí' : 'No',
             'observaciones' => $reporte->observaciones ?? '',

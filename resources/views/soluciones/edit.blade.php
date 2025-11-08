@@ -100,7 +100,7 @@
                         {{-- Estatus --}}
                         <h5 class="mt-4">📋 Estatus de Nota</h5>
                         <div class="row mb-3 align-items-center">
-                            @foreach([1=>'Aprobado',2=>'No aprobado',3=>'En Recolección',4=>'En Almacén',5=>'En Dictamen'] as $val => $label)
+                            @foreach([1=>'Aprobado',2=>'No aprobado'] as $val => $label)
                             <div class="col-md-2">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="radio" id="estatus_{{ $val }}" name="estatus" value="{{ $val }}" {{ old('estatus',$reporte->estatus)==$val ? 'checked' : '' }}>

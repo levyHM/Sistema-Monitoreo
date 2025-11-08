@@ -5,7 +5,10 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Services\ClienteSyncService;
 
-//php artisan sync:clientes
+//
+
+
+
 class SyncClientes extends Command
 {
     protected $signature = 'sync:clientes';

@@ -13,7 +13,7 @@
                     $tipoTexto = $tipo == 2 ? 'Devolución' : 'Garantía';
                     @endphp
 
-                    
+
                     <h1 class="text-center mb-4">🛠️ Nueva Solución a clientes {{ $tipoTexto }}</h1>
 
                     @if ($errors->any())
@@ -115,12 +115,11 @@
                         {{-- Estatus --}}
                         <h5 class="mt-4">📋 Estatus de Nota</h5>
                         <div class="row mb-3 align-items-center">
-                            @foreach([1=>'Aprobado',2=>'No aprobado',3=>'En Recolección',4=>'En Almacén',5=>'En
-                            Dictamen'] as $val => $label)
+                            @foreach([1=>'Aprobado',2=>'No aprobado'] as $val => $label)
                             <div class="col-md-2">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="radio" id="estatus_{{ $val }}" name="estatus"
-                                        value="{{ $val }}">
+                                        value="{{ $val }}" {{ $val==2 ? 'checked' : '' }} required>
                                     <label class="form-check-label" for="estatus_{{ $val }}">{{ $label }}</label>
                                 </div>
                             </div>
@@ -263,8 +262,16 @@
         let clone = $('.factura-item').first().clone();
         clone.find('input').each(function(){
             let name = $(this).attr('name');
-            if(name) $(this).attr('name', name.replace(/\d+/, facturaIndex));
-            if(!$(this).hasClass('catalogo_idcatalogo')) $(this).val('');
+            if(name){
+                // actualiza índice para inputs tipo facturas[0][...]
+                $(this).attr('name', name.replace(/\d+/, facturaIndex));
+            }
+            // conservar el input hidden catalogo_tipo_id con su valor
+            if(name === 'catalogo_tipo_id'){
+                $(this).val('{{ $tipo }}');
+            } else if(!$(this).hasClass('catalogo_idcatalogo')){
+                $(this).val('');
+            }
         });
         clone.find('.descripcion, .p_unitario, .total').prop('readonly', true);
         clone.find('.remove-factura').show();
@@ -343,7 +350,12 @@ function buscarFacturas(page = 1) {
         filaActual.find('.icod').val($(this).data('icod'));
         filaActual.find('.descripcion').val($(this).data('descripcion'));
         filaActual.find('.p_unitario').val($(this).data('punit'));
-        filaActual.find('.total').val((parseFloat(filaActual.find('.cantidad').val()||1)*parseFloat($(this).data('punit')||0)).toFixed(2));
+        let cantidad = parseFloat(filaActual.find('.cantidad').val()) || 1;
+        let punit = parseFloat($(this).data('punit')) || 0;
+        let descuento = parseFloat($('#descuento').val()) || 0;
+        let totalRaw = cantidad * punit;
+        let adjustedTotal = descuento >= 100 ? 0 : totalRaw / ((100 - descuento) / 100);
+        filaActual.find('.total').val(adjustedTotal.toFixed(2));
         filaActual.find('.catalogo_idcatalogo').val($(this).data('id'));
         $('#modalFacturas').modal('hide');
         calcularTotales();
@@ -354,7 +366,10 @@ function buscarFacturas(page = 1) {
         $('.factura-item').each(function(){
             let cantidad = parseFloat($(this).find('.cantidad').val()) || 0;
             let p_unitario = parseFloat($(this).find('.p_unitario').val()) || 0;
-            $(this).find('.total').val((cantidad*p_unitario).toFixed(2));
+            let descuento = parseFloat($('#descuento').val()) || 0;
+            let totalRaw = cantidad * p_unitario;
+            let adjustedTotal = descuento >= 100 ? 0 : totalRaw / ((100 - descuento) / 100);
+            $(this).find('.total').val(adjustedTotal.toFixed(2));
         });
         calcularTotales();
     });

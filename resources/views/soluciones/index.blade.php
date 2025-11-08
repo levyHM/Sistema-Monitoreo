@@ -18,12 +18,12 @@
                 <div class="alert alert-danger text-center">{{ session('error') }}</div>
                 @endif
 
-                {{-- Botón para crear --}}
+                {{-- Botón para crear 
                 @can('Reporte Soluciones.crear')
                 <div class="text-center mt-4">
                     <a href="{{ route('soluciones.create') }}" class="btn btn-success">Eliminar</a>
                 </div>
-                @endcan
+                @endcan --}}
 
                 {{-- Filtros --}}
                 <div class="p-4 border-bottom">
@@ -58,11 +58,7 @@
                                 <option value="">Todos</option>
                                 <option value="1" {{ request('estatus')=='1' ? 'selected' : '' }}>Aprobado</option>
                                 <option value="2" {{ request('estatus')=='2' ? 'selected' : '' }}>No aprobado</option>
-                                <option value="3" {{ request('estatus')=='3' ? 'selected' : '' }}>En Recolección
-                                </option>
-                                <option value="4" {{ request('estatus')=='4' ? 'selected' : '' }}>En Almacén</option>
-                                <option value="5" {{ request('estatus')=='5' ? 'selected' : '' }}>En Dictamen</option>
-                                <option value="6" {{ request('estatus')=='6' ? 'selected' : '' }}>Cancelado</option>
+                                <option value="3" {{ request('estatus')=='3' ? 'selected' : '' }}>Cancelado</option>
                             </select>
                         </div>
 
@@ -172,26 +168,10 @@
                                     <td>
                                         @if($reporte->estatus == 1)
                                             <span class="badge bg-success text-white">Aprobado</span>
-                                        @elseif($reporte->estatus == 6 || $reporte->estatus == 2)
-                                            <span class="badge bg-danger text-white">
-                                                {{ $reporte->estatus == 6 ? 'Cancelado' : 'No aprobado' }}
-                                            </span>
+                                        @elseif($reporte->estatus == 2)
+                                            <span class="badge bg-danger text-white">No aprobado</span>
                                         @else
-                                            <span class="badge" style="background-color: #FFD600; color: #333;">
-                                                @switch($reporte->estatus)
-                                                    @case(3)
-                                                        En Recolección
-                                                        @break
-                                                    @case(4)
-                                                        En Almacén
-                                                        @break
-                                                    @case(5)
-                                                        En Dictamen
-                                                        @break
-                                                    @default
-                                                        N/A
-                                                @endswitch
-                                            </span>
+                                            <span class="badge bg-danger text-white">Cancelado</span>
                                         @endif
                                     </td>
                                     <td class="align-middle text-center">
