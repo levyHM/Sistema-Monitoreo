@@ -269,6 +269,9 @@
             // conservar el input hidden catalogo_tipo_id con su valor
             if(name === 'catalogo_tipo_id'){
                 $(this).val('{{ $tipo }}');
+            } else if($(this).hasClass('cantidad')){
+                // cargar 1 por defecto en cantidad
+                $(this).val('1');
             } else if(!$(this).hasClass('catalogo_idcatalogo')){
                 $(this).val('');
             }
@@ -374,19 +377,36 @@ function buscarFacturas(page = 1) {
         calcularTotales();
     });
 
-    function calcularTotales(){
+    function calcularTotales() {
         let totalFacturas = 0;
-        $('.total').each(function(){ totalFacturas += parseFloat($(this).val())||0; });
-        let descuento = parseFloat($('#descuento').val())||0;
-        let subtotal = totalFacturas - descuento;
-        let iva = subtotal*0.16;
-        let totalCompleto = subtotal+iva;
+        let p_unitario = 0;
 
+        $('.total').each(function () {
+            totalFacturas += parseFloat($(this).val()) || 0;
+        });
+
+        $('.p_unitario').each(function () {
+            p_unitario += parseFloat($(this).val()) || 0;
+        });
+
+        let descuento = parseFloat($('#descuento').val()) || 0;
+
+        // Aplicar descuento como porcentaje
+        let descuentoCalculado = totalFacturas * (descuento / 100);
+        let subtotal = totalFacturas - descuentoCalculado;
+
+        // Redondeo a 2 decimales en cada paso
+        subtotal = Math.round(subtotal * 100) / 100;
+        let iva = Math.round(subtotal * 0.16 * 100) / 100;
+        let totalCompleto = Math.round((subtotal + iva) * 100) / 100;
+
+        // Mostrar valores redondeados
         $('#total').val(totalFacturas.toFixed(2));
         $('#subtotal').val(subtotal.toFixed(2));
         $('#iva').val(iva.toFixed(2));
         $('#total_completo').val(totalCompleto.toFixed(2));
     }
+
 
     // ===== Validación final =====
     $('#form-soluciones').on('submit', function(e){

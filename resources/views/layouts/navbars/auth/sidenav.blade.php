@@ -204,7 +204,7 @@
             <li class="nav-item mt-3 d-flex align-items-center">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6" data-bs-toggle="collapse"
                     data-bs-target="#account-solutions-clientes">
-                    Solusciones a Clientes
+                    Soluciones a Clientes
                 </h6>
             </li>
             <div class="collapse {{ str_contains(request()->url(), 'soluciones-') ? 'show' : '' }}"

@@ -57,10 +57,16 @@
                             @endphp
                             <div class="factura-item card shadow-sm mb-3 border-start border-3 border-secondary position-relative bg-light p-3">
                                 <div class="row g-3 align-items-end">
-                                    <div class="col-md-2 position-relative">
-                                        <label class="form-label">No. Factura</label>
-                                        <input type="text" name="facturas[{{ $index }}][factura]" class="form-control factura" autocomplete="off" value="{{ old("facturas.$index.factura", $solucion->factura) }}">
-                                        <div class="list-group position-absolute w-100 icod-suggestions" style="z-index:1000;"></div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Factura</label>
+                                        <div class="input-group">
+                                            <input type="text" name="facturas[{{ $index }}][factura]" class="form-control factura"
+                                                placeholder="Buscar factura" readonly
+                                                value="{{ old('facturas.'.$index.'.factura', $solucion->factura ?? $catalogo->dnum ?? '') }}">
+                                            <span class="input-group-text buscar-factura">
+                                                <i class="ni ni-zoom-split-in"></i>
+                                            </span>
+                                        </div>
                                     </div>
                                     <div class="col-md-1">
                                         <label class="form-label">Cantidad</label>
@@ -146,16 +152,65 @@
         </div>
     </div>
 </div>
+{{-- Modal Facturas --}}
+<div class="modal fade" id="modalFacturas" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Seleccionar Factura</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="searchFacturaModal" class="form-control mb-3" placeholder="Buscar factura">
+                <div class="card">
+                    <div class="table-responsive">
+                        <table id="tablaFacturas" class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Factura</th>
+                                    <th>ICOD</th>
+                                    <th>Seleccionar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Se llena dinámicamente con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Cliente Alert --}}
+<div class="modal fade" id="modalClienteAlert" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-warning">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">⚠️ Atención</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Debes seleccionar un cliente antes de continuar.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function(){
+    $(document).ready(function(){
 
-    calcularTotales();
+    let filaActual = null;
+    let facturaIndex = $('#factura-wrapper .factura-item').length;
 
-    // Autocompletado Cliente
+    // ===== Cliente =====
     $('#cliente').on('input', function(){
         let q = $(this).val().trim();
         if(q.length < 2){ $('#suggestions_cliente').empty().hide(); return; }
@@ -176,7 +231,6 @@ $(document).ready(function(){
         $('#cliente_id').val(id);
         $('#descuento').val(clidesc10);
         $('#suggestions_cliente').empty().hide();
-        calcularTotales();
     };
 
     $(document).on('click', function(e){
@@ -185,98 +239,136 @@ $(document).ready(function(){
         }
     });
 
-    // Agregar/remover facturas
-    let facturaIndex = $('#factura-wrapper .factura-item').length;
-    $('#add-factura').click(function(){
+    // ===== Agregar / remover factura =====
+    $('#add-factura').click(function() {
         let clone = $('.factura-item').first().clone();
-        clone.find('input').each(function(){
+
+        clone.find('input').each(function() {
             let name = $(this).attr('name');
-            if(name) $(this).attr('name', name.replace(/\d+/, facturaIndex));
-            if(!$(this).hasClass('catalogo_idcatalogo')) $(this).val('');
+            if (name) {
+                // actualiza índice para inputs tipo facturas[0][...]
+                $(this).attr('name', name.replace(/\d+/, facturaIndex));
+            }
+
+            // ✅ limpia los valores excepto los que quieras conservar
+            if (!$(this).hasClass('catalogo_tipo_id')) {
+                $(this).val('');
+            }
         });
+
+        // mantiene la estructura limpia
         clone.find('.descripcion, .p_unitario, .total').prop('readonly', true);
         clone.find('.remove-factura').show();
-        clone.find('.catalogo_idcatalogo').val('');
+
+        // agrega la fila al contenedor
         $('#factura-wrapper').append(clone);
         facturaIndex++;
+
         calcularTotales();
     });
+
 
     $(document).on('click','.remove-factura',function(){
         $(this).closest('.factura-item').remove();
         calcularTotales();
     });
 
-    // Autocompletado ICOD
-    $(document).on('input', '.factura', function(){
-        let input = $(this);
-        let val = input.val().trim();
-        let row = input.closest('.factura-item');
-        let suggestions = row.find('.icod-suggestions');
-        let clicod = $('#cliente').val().trim();
-
-        if(!clicod){
-            suggestions.html('<div class="list-group-item text-danger">Selecciona un cliente primero</div>').show();
+    // ===== Abrir modal para seleccionar factura =====
+    $(document).on('click','.buscar-factura', function(){
+        if(!$('#cliente').val().trim() || !$('#cliente_id').val()){
+            $('#modalClienteAlert').modal('show'); 
             return;
         }
-        if(val.length < 2){ suggestions.empty().hide(); return; }
-
-        $.get('{{ route("soluciones.buscar.catalogo") }}', { query: val, clicod: clicod }, function(data){
-            let html = data.length
-                ? data.map(item => `<div class="list-group-item list-group-item-action" role="button"
-                    onclick='seleccionarCatalogo(${JSON.stringify(item)}, this)'>
-                    <strong>${item.dnum}</strong> - ${item.idescr}</div>`).join('')
-                : '<div class="list-group-item">Sin coincidencias</div>';
-            suggestions.html(html).show();
-        });
+        filaActual = $(this).closest('.factura-item');
+        $('#modalFacturas').modal('show');
+        $('#searchFacturaModal').val(filaActual.find('.factura').val()).trigger('input');
     });
 
-    window.seleccionarCatalogo = function(item, el){
-        let row = $(el).closest('.factura-item');
-        row.find('.factura').val(item.dnum);
-        row.find('.icod').val(item.icod);
-        row.find('.descripcion').val(item.idescr);
-        row.find('.p_unitario').val(item.aiprecio);
-        row.find('.observaciones').val(item.observaciones || '');
-        row.find('.total').val((parseFloat(row.find('.cantidad').val()||0) * parseFloat(item.aiprecio||0)).toFixed(2));
-        row.find('.catalogo_idcatalogo').val(item.idCatalogoSolucionesClientes);
-        row.find('.icod-suggestions').empty().hide();
+    // ===== Buscar facturas en modal =====
+    $(document).on('input', '#searchFacturaModal', function() {
+    buscarFacturas(1);
+});
+
+// Maneja clics en los botones del paginador
+$(document).on('click', '.pagination a', function(e) {
+    e.preventDefault();
+    let page = $(this).attr('href').split('page=')[1];
+    buscarFacturas(page);
+});
+
+function buscarFacturas(page = 1) {
+    let query = $('#searchFacturaModal').val().trim();
+    let clicod = $('#cliente').val().trim();
+
+    if (!clicod || query.length < 1) {
+        $('#tablaFacturas tbody').html('');
+        $('.pagination').remove();
+        return;
+    }
+
+    $.get('{{ route("soluciones.buscar.catalogo") }}', { query, clicod, page }, function(response) {
+        let html = response.data.length
+            ? response.data.map(f =>
+                `<tr>
+                    <td>${f.dnum}</td>
+                    <td>${f.icod}</td>
+                    <td>
+                        <a href="#!" class="text-black font-weight-bold text-xs seleccionar-factura"
+                            data-factura="${f.dnum}"
+                            data-icod="${f.icod}"
+                            data-descripcion="${f.idescr}"
+                            data-punit="${f.aiprecio}"
+                            data-id="${f.idCatalogoSolucionesClientes}">
+                            Seleccionar
+                        </a>
+                    </td>
+                </tr>`
+              ).join('')
+            : '<tr><td colspan="3" class="text-center">No se encontraron facturas</td></tr>';
+
+        $('#tablaFacturas tbody').html(html);
+        $('.pagination').remove(); // elimina la anterior
+        $('#tablaFacturas').after(response.links); // agrega la nueva
+    });
+}
+
+    // ===== Seleccionar factura =====
+    $(document).on('click', '.seleccionar-factura', function(){
+        filaActual.find('.factura').val($(this).data('factura'));
+        filaActual.find('.icod').val($(this).data('icod'));
+        filaActual.find('.descripcion').val($(this).data('descripcion'));
+        filaActual.find('.p_unitario').val($(this).data('punit'));
+        let cantidad = parseFloat(filaActual.find('.cantidad').val()) || 1;
+        let punit = parseFloat($(this).data('punit')) || 0;
+        let descuento = parseFloat($('#descuento').val()) || 0;
+        let totalRaw = cantidad * punit;
+        let adjustedTotal = descuento >= 100 ? 0 : totalRaw / ((100 - descuento) / 100);
+        filaActual.find('.total').val(adjustedTotal.toFixed(2));
+        filaActual.find('.catalogo_idcatalogo').val($(this).data('id'));
+        $('#modalFacturas').modal('hide');
         calcularTotales();
-    };
-
-    $(document).on('blur', '.factura', function(){
-        let row = $(this).closest('.factura-item');
-        if(!row.find('.catalogo_idcatalogo').val()){
-            row.find('.icod').val('');
-            row.find('.descripcion').val('');
-            row.find('.p_unitario').val('');
-            row.find('.total').val('');
-        }
     });
 
-    $(document).on('click', function(e){
-        if(!$(e.target).closest('.icod,.icod-suggestions').length){
-            $('.icod-suggestions').empty().hide();
-        }
-    });
-
-    // Calcular totales
+    // ===== Calcular totales =====
     $(document).on('input','.cantidad, #descuento', function(){
         $('.factura-item').each(function(){
             let cantidad = parseFloat($(this).find('.cantidad').val()) || 0;
             let p_unitario = parseFloat($(this).find('.p_unitario').val()) || 0;
-            $(this).find('.total').val((cantidad*p_unitario).toFixed(2));
+            let descuento = parseFloat($('#descuento').val()) || 0;
+            let totalRaw = cantidad * p_unitario;
+            let adjustedTotal = descuento >= 100 ? 0 : totalRaw / ((100 - descuento) / 100);
+            $(this).find('.total').val(adjustedTotal.toFixed(2));
         });
         calcularTotales();
     });
 
     function calcularTotales(){
         let totalFacturas = 0;
-        $('.total').each(function(){ totalFacturas += parseFloat($(this).val()) || 0; });
-        let descuento = parseInt($('#descuento').val()) || 0;
+        $('.total').each(function(){ totalFacturas += parseFloat($(this).val())||0; });
+        let descuento = parseFloat($('#descuento').val())||0;
         let subtotal = totalFacturas - descuento;
-        let iva = subtotal * 0.16;
-        let totalCompleto = subtotal + iva;
+        let iva = subtotal*0.16;
+        let totalCompleto = subtotal+iva;
 
         $('#total').val(totalFacturas.toFixed(2));
         $('#subtotal').val(subtotal.toFixed(2));
@@ -284,20 +376,23 @@ $(document).ready(function(){
         $('#total_completo').val(totalCompleto.toFixed(2));
     }
 
-    // Validación final
+    // ===== Validación final =====
     $('#form-soluciones').on('submit', function(e){
+        if(!$('#cliente').val().trim() || !$('#cliente_id').val()){
+            e.preventDefault();
+            $('#modalClienteAlert').modal('show'); 
+            return;
+        }
         let valid = true;
         $('.factura-item').each(function(){
             if(!$(this).find('.catalogo_idcatalogo').val()){
                 valid = false;
                 $(this).addClass('border border-danger');
-            } else {
-                $(this).removeClass('border border-danger');
-            }
+            } else $(this).removeClass('border border-danger');
         });
-        if(!valid){
-            e.preventDefault();
-            alert('Selecciona un ICOD válido para todas las facturas antes de guardar.');
+        if(!valid){ 
+            e.preventDefault(); 
+            alert('Selecciona un ICOD válido para todas las facturas antes de guardar.'); 
         }
     });
 
