@@ -25,7 +25,7 @@
                 @endif
 
                 {{-- Botón para crear --}}
-                @can('Faltante.crear')
+                @can('Faltante Sobrante.crear')
                 <div class="text-center mt-4">
                     <a href="{{ route('faltantes.cdmx.create') }}" class="btn btn-success">Crear nuevo
                         faltante/sobrante</a>
@@ -128,13 +128,13 @@
                                             }}</span>
                                     </td>
                                     <td class="align-middle text-center">
-                                        @can('Faltante.visualizar')
+                                        @can('Faltante Sobrante.visualizar')
                                         <a href="{{ route('faltantes.cdmx.show', $recibo->idrecibos) }}" class="me-2"
                                             title="Ver recibo">👁️</a>
                                         @endcan
                                         <a href="{{ route('pdf.faltantes', $recibo->idrecibos) }}" class="me-2"
                                             title="Descargar PDF">🧾</a>
-                                        @can('Faltante.eliminar')
+                                        @can('Faltante Sobrante.eliminar')
                                         <a href="#" class="text-danger me-2" data-bs-toggle="modal"
                                             data-bs-target="#cancelarDevolucionModal{{ $recibo->idrecibos }}"
                                             title="Cancelar devolución">

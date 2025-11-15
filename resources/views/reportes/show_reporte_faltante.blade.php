@@ -185,10 +185,13 @@
                     <a href="{{ route('reporte.faltante') }}" class="btn bg-gradient-info">
                         ⬅️ Volver al listado
                     </a>
-                    <a href="{{ route('reporte.faltante.edit', $reporte->idreporte_faltante) }}"
+                    @can('Reporte Faltantes.editar')
+                        <a href="{{ route('reporte.faltante.edit', $reporte->idreporte_faltante) }}"
                         class="btn bg-gradient-warning me-2">
                         ✏️ Editar Reporte
-                    </a>
+                    </a>  
+                    @endcan
+
                 </div>
 
             </div>

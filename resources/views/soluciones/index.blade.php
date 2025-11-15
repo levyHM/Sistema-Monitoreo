@@ -175,13 +175,13 @@
                                         @endif
                                     </td>
                                     <td class="align-middle text-center">
-                                        @can('Reporte Soluciones.visualizar')
+                                        @can('solucionescliente.visualizar')
                                         <a href="{{ route('soluciones.show', $reporte->idreporte_soluciones_clientes) }}"
                                             class="me-2" title="Ver reporte">👁️</a>
                                         @endcan
                                         <a href="{{ route('pdf.reporte_soluciones_cliente', $reporte->idreporte_soluciones_clientes) }}"
                                             target="_blank" class="me-2" title="Descargar PDF">🧾</a>
-                                        @can('Reporte Soluciones.eliminar')
+                                        @can('solucionescliente.eliminar')
                                         <a href="#" class="text-danger me-2" data-bs-toggle="modal"
                                             data-bs-target="#cancelarReporteModal{{ $reporte->idreporte_soluciones_clientes }}"
                                             title="Cancelar reporte">

@@ -155,7 +155,7 @@
                 {{-- Botón Volver --}}
                 <div class="text-end">
                     <a href="{{ route('faltantes.cdmx.index') }}" class="btn bg-gradient-info">⬅️ Volver</a>
-                    @can('Faltante.editar')
+                    @can('Faltante Sobrante.editar')
                     <a href="{{ route('faltantes.cdmx.edit', $recibo->idrecibos) }}" class="btn bg-gradient-warning">✏️ Editar</a>
                     @endcan
                 </div>

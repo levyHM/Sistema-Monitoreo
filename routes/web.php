@@ -98,7 +98,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/{id}/show', [ReporteFaltanteController::class, 'show'])->name('reporte.faltante.show');
 		Route::put('/{id}', [ReporteFaltanteController::class, 'update'])->name('reporte.faltante.update');
 		Route::put('/{id}/cancelar', [ReporteFaltanteController::class, 'cambiarEstatus'])->name('reporte.faltante.cancelar');
-		Route::get('/{id}/edit', [ReporteFaltanteController::class, 'edit'])->name('reporte.faltante.edit');
+		Route::get('/{id}/edit', [ReporteFaltanteController::class, 'edit'])  ->middleware('can:Reporte Faltantes.editar')->name('reporte.faltante.edit');
 		Route::put('/{id}/autorizacion', [ReporteFaltanteController::class, 'autorizacionFirma'])->name('reporte.faltante.autorizacion');
 	});
 
@@ -155,9 +155,9 @@ Route::group(['middleware' => 'auth'], function () {
 
 	Route::prefix('faltantes/cdmx')->name('faltantes.cdmx.')->group(function () {
 		Route::get('/', [FaltanteController::class, 'index'])->name('index');
-		Route::get('/create', [FaltanteController::class, 'create'])->name('create');
+		Route::get('/create', [FaltanteController::class, 'create'])->middleware('can:Faltante Sobrante.crear')->name('create');
 		Route::post('/', [FaltanteController::class, 'store'])->name('store');
-		Route::get('/{recibo}/edit', [FaltanteController::class, 'edit'])->name('edit');
+		Route::get('/{recibo}/edit', [FaltanteController::class, 'edit'])->middleware('can:Faltante Sobrante.editar')->name('edit');
 		Route::put('/{recibo}', [FaltanteController::class, 'update'])->name('update');
 		Route::get('/{recibo}', [FaltanteController::class, 'show'])->name('show');
 		Route::put('/{recibo}/cancelar-devolucion', [FaltanteController::class, 'cancelar'])->name('faltantes.cancelar');

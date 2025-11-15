@@ -201,6 +201,7 @@
                 </li>
             </div>
             @endcan
+            @can('dashboard.solucionescliente')
             <li class="nav-item mt-3 d-flex align-items-center">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6" data-bs-toggle="collapse"
                     data-bs-target="#account-solutions-clientes">
@@ -209,10 +210,10 @@
             </li>
             <div class="collapse {{ str_contains(request()->url(), 'soluciones-') ? 'show' : '' }}"
                 id="account-solutions-clientes">
-                @can('dashboard.recibos')
+                @can("solucionescliente.crear")
                 <li class="nav-item">
                     <a class="nav-link {{ str_contains(request()->url(), 'soluciones-garantia') ? 'active' : '' }}"
-                        href="{{ route('page', ['page' => 'soluciones-garantia','tipo' => '1']) }}">
+                        href="{{ route('page', ['page' => 'soluciones-garantia','tipo' => '2']) }}">
                         <div
                             class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="ni ni-curved-next text-dark text-sm opacity-10"></i>
@@ -222,7 +223,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ str_contains(request()->url(), 'soluciones-devolucion') ? 'active' : '' }}"
-                        href="{{ route('page', ['page' => 'soluciones-devolucion','tipo' => '2']) }}">
+                        href="{{ route('page', ['page' => 'soluciones-devolucion','tipo' => '1']) }}">
                         <div
                             class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="ni ni-single-02 text-success text-sm opacity-10"></i>
@@ -230,6 +231,7 @@
                         <span class="nav-link-text ms-1">Devolución</span>
                     </a>
                 </li>
+                 @endcan
                 <li class="nav-item">
                     <a class="nav-link {{ str_contains(request()->url(), 'soluciones') ? 'active' : '' }}"
                         href="{{ route('page', ['page' => 'soluciones']) }}">
@@ -240,8 +242,9 @@
                         <span class="nav-link-text ms-1">Lista</span>
                     </a>
                 </li>
-                @endcan
             </div>
+            @endcan
+            @can("dashboard.recibos")
             <li class="nav-item mt-3 d-flex align-items-center">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6" data-bs-toggle="collapse"
                     data-bs-target="#account-administrador-recibos">
@@ -250,7 +253,6 @@
             </li>
             <div class="collapse {{ str_contains(request()->url(), 'recibos-') ? 'show' : '' }}"
                 id="account-administrador-recibos">
-                @can('dashboard.recibos')
                 <li class="nav-item">
                     <a class="nav-link {{ str_contains(request()->url(), 'recibos') ? 'active' : '' }}"
                         href="{{ route('page', ['page' => 'recibos']) }}">
@@ -281,8 +283,8 @@
                         <span class="nav-link-text ms-1">Reporte Faltantes</span>
                     </a>
                 </li>
-                @endcan
             </div>
+            @endcan
             <li class="nav-item mt-3 d-flex align-items-center">
                 <div class="ps-4">
                     <i class="fab fa-laravel" style="color: #00953a"></i>

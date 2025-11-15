@@ -61,7 +61,7 @@
                         @endforeach
                     </select>
 
-                    {{-- Roles --}}
+                    {{-- Roles 
                     <hr>
                     <h5 class="mb-3 text-dark">🛡️ Roles</h5>
                     @foreach($rolesGrouped as $groupName => $roles)
@@ -77,7 +77,7 @@
                         </div>
                         @endforeach
                     </div>
-                    @endforeach
+                    @endforeach--}}
 
                     {{-- Permisos Dinámicos --}}
                     <hr>

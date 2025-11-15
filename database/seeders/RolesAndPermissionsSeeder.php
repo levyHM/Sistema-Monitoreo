@@ -33,6 +33,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'Devoluciones' => ['crear', 'editar', 'visualizar', 'eliminar'],
             'Faltante Sobrante' => ['crear', 'editar', 'visualizar', 'eliminar'],
             'Usuarios' => ['crear', 'editar', 'visualizar', 'eliminar'],
+            'Recibos' => ['crear', 'editar', 'visualizar', 'eliminar'],
+            'sucursales' => ['cdmx', 'xalapa', 'oaxaca'],
+            'solucionescliente' => ['crear', 'editar', 'visualizar', 'eliminar'],
             'dashboard' => [
                 'facturas',
                 'pedidos',
@@ -40,9 +43,12 @@ class RolesAndPermissionsSeeder extends Seeder
                 'embarques admin',
                 'recibos',
                 'Reporte faltantes',
-                'usuarios'
+                'usuarios',
+                'Recibos',
+                'solucionescliente'
+                
             ],
-            'sucursales' => ['cdmx', 'xalapa', 'oaxaca'],
+            
         ];
 
         // Crear permisos
@@ -102,7 +108,24 @@ class RolesAndPermissionsSeeder extends Seeder
                 'Usuarios.visualizar',
                 'Usuarios.eliminar',
             ],
-            'Dashboard Admin' => [
+            'Recibos' => [
+                'Recibos.crear',
+                'Recibos.editar',
+                'Recibos.visualizar',
+                'Recibos.eliminar',
+            ],
+            'Sucursales' => [
+                'sucursales.cdmx',
+                'sucursales.xalapa',
+                'sucursales.oaxaca',
+            ],
+            'SolucionesCliente' => [
+                'solucionescliente.crear',
+                'solucionescliente.editar',
+                'solucionescliente.visualizar',
+                'solucionescliente.eliminar',
+            ],
+            'Dashboard' => [
                 'dashboard.facturas',
                 'dashboard.pedidos',
                 'dashboard.embarques',
@@ -110,12 +133,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'dashboard.recibos',
                 'dashboard.Reporte faltantes',
                 'dashboard.usuarios',
-            ],
-            'Sucursales' => [
-                'sucursales.cdmx',
-                'sucursales.xalapa',
-                'sucursales.oaxaca',
-            ],
+            ]
+
         ];
 
         // Crear roles y asignar permisos

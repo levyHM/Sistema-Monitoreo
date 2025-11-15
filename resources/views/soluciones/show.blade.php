@@ -216,8 +216,10 @@
                 {{-- Botón volver y editar --}}
                 <div class="mt-4 text-center">
                     <a href="{{ route('soluciones.index') }}" class="btn bg-gradient-info">⬅️ Volver al listado</a>
+                    @can('solucionescliente.editar')
                     <a href="{{ route('soluciones.edit', $reporte->idreporte_soluciones_clientes) }}"
                         class="btn bg-gradient-warning ms-2">✏️ Editar</a>
+                    @endcan
                 </div>
             </div>
         </div>
