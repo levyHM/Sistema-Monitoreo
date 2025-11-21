@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\CatalogoTipo;
+use App\Models\Conductor;
 use App\Models\ReporteSolucionesCliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Models\ListaSolucionesCliente;
 
 class ReporteSolucionesClienteController extends Controller
 {
@@ -45,14 +47,17 @@ class ReporteSolucionesClienteController extends Controller
     // Mostrar formulario de creación
     public function create(Request $request)
     {
+        $operadores = Conductor::orderBy('operador')->get();
         $tipo = $request->tipo ?? 1; // Por defecto Garantía
-        return view('soluciones.create', compact('tipo'));
+        return view('soluciones.create', compact('tipo', 'operadores'));
     }
 
     // Guardar nuevo reporte
     public function store(Request $request)
     {
-        Log::info('Guardando nuevo reporte de soluciones para cliente.');
+        Log::info('**********************************************************************');
+        Log::info('Iniciando creación de nuevo reporte de soluciones');
+        
         $request->validate([
             'catalogo_clientes_idcatalogo_clientes' => 'required|integer',
             'catalogo_tipo_id' => 'required|in:1,2',
@@ -70,7 +75,10 @@ class ReporteSolucionesClienteController extends Controller
             'facturas.*.total' => 'required|numeric|min:0',
 
         ]);
+        
+        Log::info('Validación completada exitosamente');
         Log::info('Datos del reporte:', $request->all());
+        
         // Crear el reporte principal
         $reporte = ReporteSolucionesCliente::create([
             'fecha' => now(),
@@ -95,9 +103,26 @@ class ReporteSolucionesClienteController extends Controller
          */
 
         ]);
+        
+        Log::info('Reporte principal creado exitosamente', [
+            'id' => $reporte->idreporte_soluciones_clientes,
+            'cliente_id' => $reporte->catalogo_clientes_idcatalogo_clientes,
+            'tipo' => $reporte->catalogo_tipo_id,
+            'estatus' => $reporte->estatus
+        ]);
+        
         // Guardar las facturas en lista_soluciones_clientes
-        foreach ($request->facturas as $factura) {
+        $facturasProcesadas = 0;
+        foreach ($request->facturas as $index => $factura) {
             if (!empty($factura['catalogo_idcatalogo'])) { // <- valida que exista
+                Log::info('Creando solución', [
+                    'index' => $index,
+                    'catalogo_id' => $factura['catalogo_idcatalogo'],
+                    'factura' => $factura['factura'],
+                    'cantidad' => $factura['cantidad'],
+                    'total' => $factura['total']
+                ]);
+                
                 $reporte->soluciones()->create([
                     'catalogo_soluciones_clientes_idCatalogoSolucionesClientes' => $factura['catalogo_idcatalogo'],
                     'factura' => $factura['factura'],
@@ -106,8 +131,19 @@ class ReporteSolucionesClienteController extends Controller
                     'observaciones' => $factura['observaciones'] ?? null,
                     'estatus' => 1, // Por defecto activo
                 ]);
+                
+                $facturasProcesadas++;
+            } else {
+                Log::warning('Factura sin catálogo_idcatalogo omitida', ['index' => $index]);
             }
         }
+        
+        Log::info('Todas las soluciones han sido procesadas', [
+            'total_procesadas' => $facturasProcesadas,
+            'total_enviadas' => count($request->facturas)
+        ]);
+        Log::info('Creación de reporte completada exitosamente', ['id' => $reporte->idreporte_soluciones_clientes]);
+        Log::info('**********************************************************************');
 
         return redirect()->route('soluciones.index')->with('success', 'Reporte creado correctamente.');
     }
@@ -116,8 +152,8 @@ class ReporteSolucionesClienteController extends Controller
     public function show($id)
     {
         $reporte = ReporteSolucionesCliente::with(['cliente', 'soluciones.catalogo'])->findOrFail($id);
-
-        return view('soluciones.show', compact('reporte'));
+        $operadores = Conductor::orderBy('operador')->get();
+        return view('soluciones.show', compact('reporte', 'operadores'));
     }
 
     // Mostrar formulario de edición
@@ -127,80 +163,103 @@ class ReporteSolucionesClienteController extends Controller
         return view('soluciones.edit', compact('reporte'));
     }
 
+
+
     public function update(Request $request, $id)
     {
+        Log::info("**********************************************************************");
+        Log::info('Iniciando actualización de reporte de soluciones', ['id' => $id]);
+
         $reporte = ReporteSolucionesCliente::with('soluciones')->findOrFail($id);
 
-        // Validación
+        // Validación principal
         $request->validate([
             'catalogo_clientes_idcatalogo_clientes' => 'required|integer',
-            'devolucion' => 'nullable|boolean',
-            'garantia' => 'nullable|boolean',
             'observaciones' => 'nullable|string|max:255',
-            'total' => 'nullable|numeric',
-            'descuento' => 'nullable|numeric',
-            'subtotal' => 'nullable|numeric',
-            'iva' => 'nullable|numeric',
-            'total_completo' => 'nullable|numeric',
-            'estatus' => 'required|in:1,2,3,4,5,6',
+            'estatus' => 'required|in:1,2,3,4,5,6,7',
             'facturas' => 'required|array|min:1',
+
+            // Validación por cada fila
+            'facturas.*.id' => 'nullable|integer',
             'facturas.*.catalogo_soluciones_clientes_idCatalogoSolucionesClientes' => 'required|integer',
             'facturas.*.factura' => 'required|string|max:100',
             'facturas.*.cantidad' => 'required|integer|min:1',
             'facturas.*.total' => 'required|numeric|min:0',
         ]);
 
-        // Actualizar campos del reporte
+        Log::info('Datos del reporte a actualizar:', $request->all());
+
+        // Actualizar campos principales
         $reporte->update([
             'catalogo_clientes_idcatalogo_clientes' => $request->catalogo_clientes_idcatalogo_clientes,
-            'devolucion' => $request->has('devolucion') ? 1 : 0,           
             'observaciones' => $request->observaciones,
             'total' => $request->total,
             'descuento' => $request->descuento,
             'subtotal' => $request->subtotal,
             'iva' => $request->iva,
             'total_completo' => $request->total_completo,
-            'estatus' => $request->input('estatus'),
-
+            'estatus' => $request->estatus,
         ]);
 
-        // PK real de la relación soluciones
-        $pk = $reporte->soluciones()->getRelated()->getKeyName();
+        Log::info('Reporte actualizado correctamente', ['id' => $id]);
 
-        // Sincronizar facturas
-        $facturasInput = $request->input('facturas', []);
-        $facturaIds = [];
+        // ==== ACTUALIZAR LISTA DE SOLUCIONES ====
 
-        foreach ($facturasInput as $facturaData) {
-            if (isset($facturaData['catalogo_soluciones_clientes_idCatalogoSolucionesClientes']) && $facturaData['catalogo_soluciones_clientes_idCatalogoSolucionesClientes']) {
+        // IDs enviados por el formulario
+        $idsEnviados = collect($request->facturas)
+            ->pluck('id')
+            ->filter()
+            ->toArray();
 
-                if (!empty($facturaData[$pk])) {
-                    $factura = $reporte->soluciones()->find($facturaData[$pk]);
-                    if ($factura) {
-                        $factura->update($facturaData);
-                        $facturaIds[] = $factura->{$pk};
-                    }
-                } else {
-                    $nueva = $reporte->soluciones()->create($facturaData);
-                    $facturaIds[] = $nueva->{$pk};
+        // IDs actuales en BD
+        $idsBD = $reporte->soluciones->pluck('idlista_soluciones_clientes')->toArray();
+
+        Log::info('IDs de soluciones', ['enviados' => $idsEnviados, 'en_bd' => $idsBD]);
+
+        // Eliminar los que desaparecieron
+        $eliminar = array_diff($idsBD, $idsEnviados);
+        if (!empty($eliminar)) {
+            Log::info('Eliminando soluciones', ['ids' => $eliminar]);
+            ListaSolucionesCliente::whereIn('idlista_soluciones_clientes', $eliminar)->delete();
+        }
+
+        // Recorrer filas enviadas
+        foreach ($request->facturas as $index => $fila) {
+
+            // === Actualizar existente ===
+            if (!empty($fila['id'])) {
+                $sol = ListaSolucionesCliente::find($fila['id']);
+                if ($sol) {
+                    Log::info('Actualizando solución existente', ['id' => $fila['id'], 'datos' => $fila]);
+                    $sol->update([
+                        'factura' => $fila['factura'],
+                        'cantidad' => $fila['cantidad'],
+                        'total' => $fila['total'],
+                        'observaciones' => $fila['observaciones'] ?? null,
+                        'catalogo_soluciones_clientes_idCatalogoSolucionesClientes' =>
+                        $fila['catalogo_soluciones_clientes_idCatalogoSolucionesClientes'],
+                    ]);
                 }
             } else {
-                throw \Illuminate\Validation\ValidationException::withMessages([
-                    'facturas' => 'Selecciona un ICOD válido para todas las facturas.'
+                // === Crear nueva ===
+                Log::info('Creando nueva solución', ['index' => $index, 'datos' => $fila]);
+                $reporte->soluciones()->create([
+                    'factura' => $fila['factura'],
+                    'cantidad' => $fila['cantidad'],
+                    'total' => $fila['total'],
+                    'observaciones' => $fila['observaciones'] ?? null,
+                    'catalogo_soluciones_clientes_idCatalogoSolucionesClientes' =>
+                    $fila['catalogo_soluciones_clientes_idCatalogoSolucionesClientes'],
                 ]);
             }
         }
 
-        // Eliminar facturas removidas
-        if (count($facturaIds)) {
-            $reporte->soluciones()->whereNotIn($pk, $facturaIds)->delete();
-        } else {
-            $reporte->soluciones()->delete();
-        }
-
+        Log::info('Actualización de reporte completada exitosamente', ['id' => $id]);
+        Log::info("**********************************************************************");
         return redirect()->route('soluciones.show', $reporte->idreporte_soluciones_clientes)
             ->with('success', 'Reporte actualizado correctamente.');
     }
+
 
     // Cambiar estatus del reporte
     public function cambiarEstatusSolucionesClientes(Request $request, $id)
@@ -251,4 +310,6 @@ class ReporteSolucionesClienteController extends Controller
 
         return back()->with('success', 'Firma registrada correctamente.');
     }
+
+    
 }

@@ -59,6 +59,10 @@
                                 <option value="1" {{ request('estatus')=='1' ? 'selected' : '' }}>Aprobado</option>
                                 <option value="2" {{ request('estatus')=='2' ? 'selected' : '' }}>No aprobado</option>
                                 <option value="3" {{ request('estatus')=='3' ? 'selected' : '' }}>Cancelado</option>
+                                <option value="4" {{ request('estatus')=='4' ? 'selected' : '' }}>En Ruta</option>
+                                <option value="5" {{ request('estatus')=='5' ? 'selected' : '' }}>Almacen</option>
+                                <option value="6" {{ request('estatus')=='6' ? 'selected' : '' }}>Pendiente</option>
+                                <option value="7" {{ request('estatus')=='7' ? 'selected' : '' }}>En Dictamen</option>
                             </select>
                         </div>
 
@@ -167,11 +171,21 @@
                                     </td>
                                     <td>
                                         @if($reporte->estatus == 1)
-                                            <span class="badge bg-success text-white">Aprobado</span>
+                                            <span class="badge bg-gradient-success text-white">Aprobado</span>
                                         @elseif($reporte->estatus == 2)
-                                            <span class="badge bg-danger text-white">No aprobado</span>
+                                            <span class="badge bg-gradient-danger text-white">No aprobado</span>
+                                        @elseif($reporte->estatus == 3)
+                                            <span class="badge bg-gradient-warning text-white">Cancelado</span>
+                                        @elseif($reporte->estatus == 4)
+                                            <span class="badge bg-gradient-info text-white">En Ruta</span>
+                                        @elseif($reporte->estatus == 5)
+                                            <span class="badge bg-gradient-primary text-white">Almacen</span>
+                                        @elseif($reporte->estatus == 6)
+                                            <span class="badge bg-gradient-secondary text-white">Pendiente</span>
+                                        @elseif($reporte->estatus == 7)
+                                            <span class="badge bg-gradient-dark text-white">En Dictamen</span>
                                         @else
-                                            <span class="badge bg-danger text-white">Cancelado</span>
+                                            <span class="badge bg-secondary text-white">Desconocido</span>
                                         @endif
                                     </td>
                                     <td class="align-middle text-center">

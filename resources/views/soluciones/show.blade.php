@@ -6,12 +6,18 @@
     <div class="row justify-content-center">
         <div class="col-12">
             <div class="card shadow-lg border-0 p-4">
+
                 {{-- Mensaje de éxito --}}
                 @if (session('success'))
                 <div class="alert alert-success text-center">
                     {{ session('success') }}
                 </div>
                 @endif
+
+                @if (session('error'))
+                <div class="alert alert-danger text-center">{{ session('error') }}</div>
+                @endif
+
                 {{-- Encabezado --}}
                 <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
                     <div>
@@ -28,14 +34,16 @@
                             \Carbon\Carbon::parse($reporte->fecha)->format('d/m/Y') : '-' }}</h5>
                     </div>
                 </div>
+
                 {{-- Reporte Cancelado --}}
-                @if($reporte->estatus == '6')
+                @if($reporte->estatus == '3')
                 <div class="border border-danger rounded bg-white p-4 mb-4">
                     <h5 class="mb-3 text-uppercase text-danger fw-bold">❌ Reporte Cancelado</h5>
                     <p class="mb-0"><strong>Observaciones:</strong> {{ $reporte->observaciones ?? 'Sin observaciones
                         registradas.' }}</p>
                 </div>
                 @endif
+
                 {{-- Datos del cliente --}}
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
@@ -61,7 +69,21 @@
                             @else
                             <span class="badge bg-secondary">No</span>
                             @endif
+                            <div>
+                                @php
+                                $estatusMap = [
+                                1 => 'Aprobado',
+                                2 => 'No aprobado',
+                                4 => 'En Ruta',
+                                5 => 'Almacén',
+                                6 => 'Pendiente',
+                                7 => 'En Dictamen'
+                                ];
+                                @endphp
+                                <strong>Estatus:</strong> {{ $estatusMap[$reporte->estatus] ?? '-' }}<br>
+                            </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -79,10 +101,12 @@
                                 <th>P. Unitario</th>
                                 <th>Total</th>
                                 <th>Observaciones</th>
+                                <th>Evidencias</th>
                             </tr>
                         </thead>
                         <tbody>
                             @php $totalFacturas = 0; @endphp
+
                             @forelse($reporte->soluciones as $solucion)
                             @php
                             $catalogo = $solucion->catalogo;
@@ -90,19 +114,38 @@
                             $total = $solucion->total ?? 0;
                             $precio = $catalogo->aiprecio ?? 0;
                             $totalLinea = $cantidad * $precio;
-                            $totalFacturas += $solucion->total
-
+                            $totalFacturas += $solucion->total;
                             @endphp
-                            <tr>
+
+                            <tr data-id="{{ $solucion->id }}">
                                 <td>{{ $solucion->factura ?? '-' }}</td>
                                 <td>{{ $cantidad }}</td>
                                 <td>{{ $catalogo->icod ?? '-' }}</td>
                                 <td>{{ $catalogo->idescr ?? '-' }}</td>
                                 <td>{{ number_format($total, 2) }}</td>
-                                <td>${{ number_format($precio,2) }}</td>
-                                <td>${{ number_format($totalLinea,2) }}</td>
+                                <td>${{ number_format($precio, 2) }}</td>
+                                <td>${{ number_format($totalLinea, 2) }}</td>
                                 <td>{{ $solucion->observaciones ?? '-' }}</td>
+
+                                <td>
+
+                                    @if($solucion->evidencias->isEmpty())
+                                    {{-- Caso: no hay evidencias, se permite subir --}}
+                                    <button class="btn btn-success btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#modalEvidencias-{{ $solucion->idlista_soluciones_clientes }}">
+                                        📤
+                                    </button>
+                                    @else
+                                    {{-- Caso: ya existen evidencias, solo visualizar --}}
+                                    <button class="btn btn-dark btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#modalEvidencias-{{ $solucion->idlista_soluciones_clientes }}">
+                                        👁️
+                                    </button>
+                                    @endif
+                                </td>
                             </tr>
+                            {{-- Incluimos el modal desde el parcial --}}
+                            @include('partials.modal-evidencias', ['solucion' => $solucion])
                             @empty
                             <tr>
                                 <td colspan="7">No hay productos registrados en este reporte.</td>
@@ -135,13 +178,12 @@
                         </tbody>
                     </table>
                 </div>
-                {{-- Firmas separadas: Cliente y Cobrador --}}
+                {{-- Firmas --}}
                 <div class="row mt-5">
+
                     {{-- Cliente --}}
                     <div class="col-6 text-center">
-                        <strong></strong><br>
                         <hr class="border border-success" style="height: 2px;">
-                        <strong></strong><br>
                         <small class="text-muted">Cliente Nombre y Firma</small>
                     </div>
 
@@ -153,76 +195,105 @@
                         <small class="text-muted">Cobrador Nombre y Firma</small>
                     </div>
                 </div>
-                {{-- Firmas: Soluciones y Crédito --}}
-                <div class="row text-center mt-5">
-                    @php
-                    $firmas = [
-                    'firma_soluciones' => [
-                    'label' => 'Soluciones',
-                    'usuario' => $reporte->firmanteSoluciones,
-                    'permiso' => 'firmas.Reporte Soluciones',
-                    ],
-                    'firma_credito' => [
-                    'label' => 'Crédito y Cobranza',
-                    'usuario' => $reporte->firmanteCredito,
-                    'permiso' => 'firmas.Soluciones Credito',
-                    ],
-                    ];
 
-                    @endphp
 
-                    @foreach ($firmas as $campo => $config)
-                    @php
-                    $usuarioFirma = $config['usuario'];
-                    $yaFirmado = !empty($usuarioFirma);
-                    $permiso = $config['permiso'];
-                    @endphp
 
-                    <div class="col-12 col-md-6 mb-4 d-flex flex-column align-items-center">
-                        {{-- Mostrar firma si existe --}}
-                        @if($yaFirmado && $usuarioFirma->signature)
-                        <img src="{{ asset('storage/' . $usuarioFirma->signature) }}" alt="Firma {{ $config['label'] }}"
-                            class="img-fluid rounded-circle mb-2" style="max-width: 80px; max-height: 80px;">
-                        @endif
+                <div class="mt-4 text-center">
 
-                        {{-- Línea de firma simulada --}}
-                        <hr class="border border-success w-75" style="height: 2px;">
-
-                        {{-- Nombre del firmante o estado --}}
-                        <strong class="mb-1">
-                            {{ $yaFirmado ? $usuarioFirma->firstname . ' ' . $usuarioFirma->lastname : 'Pendiente' }}
-                        </strong>
-
-                        {{-- Área de firma --}}
-                        <small class="text-muted mb-2">{{ $config['label'] }}</small>
-
-                        {{-- Botón firmar --}}
-                        @if(auth()->user()->can($permiso) && !$yaFirmado)
-                        <form method="POST"
-                            action="{{ route('soluciones.firmas', ['id' => $reporte->idreporte_soluciones_clientes]) }}">
-                            @csrf
-                            <input type="hidden" name="campo" value="{{ $campo }}">
-                            <button type="submit" class="btn bg-gradient-success btn-sm">Firmar</button>
-                        </form>
-                        @else
-                        <button class="btn bg-gradient-success btn-sm" disabled>
-                            {{ $yaFirmado ? 'Firmado' : 'Firmar' }}
+                    {{-- Botón para firmar como Soluciones --}}
+                    <form action="{{ route('soluciones.firmas', $reporte->idreporte_soluciones_clientes) }}"
+                        method="POST" class="d-inline">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="campo" value="firma_soluciones">
+                        <button type="submit" class="btn btn-primary" @cannot('firmas.Reporte Soluciones') disabled
+                            @endcannot @if($reporte->firma_soluciones) disabled @endif>
+                            ✍️ Firmar como Soluciones
                         </button>
-                        @endif
-                    </div>
-                    @endforeach
+                    </form>
+
+                    {{-- Botón para firmar como Crédito --}}
+                    <form action="{{ route('soluciones.firmas', $reporte->idreporte_soluciones_clientes) }}"
+                        method="POST" class="d-inline ms-2">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="campo" value="firma_credito">
+                        <button type="submit" class="btn btn-primary" @cannot('firmas.Soluciones Credito') disabled
+                            @endcannot @if($reporte->firma_credito) disabled @endif>
+                            ✍️ Firmar como Crédito
+                        </button>
+                    </form>
                 </div>
 
-                {{-- Botón volver y editar --}}
+
+
+                {{-- Botones --}}
                 <div class="mt-4 text-center">
                     <a href="{{ route('soluciones.index') }}" class="btn bg-gradient-info">⬅️ Volver al listado</a>
+
                     @can('solucionescliente.editar')
                     <a href="{{ route('soluciones.edit', $reporte->idreporte_soluciones_clientes) }}"
                         class="btn bg-gradient-warning ms-2">✏️ Editar</a>
                     @endcan
                 </div>
+
             </div>
         </div>
     </div>
 </div>
+
+{{-- ============================================= --}}
+{{-- JAVASCRIPT PARA MANEJAR EL MODAL Y PREVIEW --}}
+{{-- ============================================= --}}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const modal = new bootstrap.Modal(document.getElementById("modalEvidencias"));
+    const form = document.getElementById("formEvidencias");
+    const inputID = document.getElementById("solucion_id");
+    const inputEvidencias = document.getElementById("inputEvidencias");
+    const preview = document.getElementById("preview");
+
+    // Abrir modal y cargar ID
+    document.querySelectorAll(".btnEvidencias").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const id = this.dataset.id;
+
+            inputID.value = id;
+
+            // Establecer ruta dinámicamente
+            form.action = `/soluciones/${id}/evidencias`;
+
+            // Limpiar preview
+            preview.innerHTML = "";
+            inputEvidencias.value = "";
+
+            modal.show();
+        });
+    });
+
+    // Previsualizar imágenes
+    inputEvidencias.addEventListener("change", function () {
+        preview.innerHTML = "";
+
+        if (this.files.length > 3) {
+            alert("Solo puedes subir máximo 3 imágenes.");
+            this.value = "";
+            return;
+        }
+
+        Array.from(this.files).forEach(file => {
+            const img = document.createElement("img");
+            img.src = URL.createObjectURL(file);
+            img.classList.add("rounded", "border");
+            img.style.width = "100px";
+            img.style.height = "100px";
+            img.style.objectFit = "cover";
+            preview.appendChild(img);
+        });
+    });
+
+});
+</script>
+
 @endsection

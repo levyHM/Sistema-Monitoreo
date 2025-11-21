@@ -36,6 +36,7 @@ use App\Http\Controllers\ReporteSolucionesClienteController;
 use App\Http\Controllers\CatalogoClienteController;
 use App\Http\Controllers\SolucionesController;
 use App\Http\Controllers\PermissionsController;
+use App\Http\Controllers\EvidenciaListaSolucionController;
 
 
 
@@ -98,7 +99,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('/{id}/show', [ReporteFaltanteController::class, 'show'])->name('reporte.faltante.show');
 		Route::put('/{id}', [ReporteFaltanteController::class, 'update'])->name('reporte.faltante.update');
 		Route::put('/{id}/cancelar', [ReporteFaltanteController::class, 'cambiarEstatus'])->name('reporte.faltante.cancelar');
-		Route::get('/{id}/edit', [ReporteFaltanteController::class, 'edit'])  ->middleware('can:Reporte Faltantes.editar')->name('reporte.faltante.edit');
+		Route::get('/{id}/edit', [ReporteFaltanteController::class, 'edit'])->middleware('can:Reporte Faltantes.editar')->name('reporte.faltante.edit');
 		Route::put('/{id}/autorizacion', [ReporteFaltanteController::class, 'autorizacionFirma'])->name('reporte.faltante.autorizacion');
 	});
 
@@ -114,6 +115,22 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('/soluciones-devolucion', [ReporteSolucionesClienteController::class, 'create'])
 		->defaults('tipo', 2)
 		->name('soluciones.devolucion');
+	//Rutas para soluciones a clientes
+	Route::resource('soluciones', ReporteSolucionesClienteController::class);
+	Route::put('/soluciones/{id}/estatus', [ReporteSolucionesClienteController::class, 'cambiarEstatusSolucionesClientes'])->name('soluciones.cambiar.estatus');
+	Route::get('/buscar-catalogo', [SolucionesController::class, 'buscarCatalogo'])->name('soluciones.buscar.catalogo');
+	Route::put('/soluciones/{id}/firmar', [ReporteSolucionesClienteController::class, 'firmar'])->name('soluciones.firmas');
+	
+	// Crear nueva solución según tipo
+	Route::get('/soluciones-garantia', [ReporteSolucionesClienteController::class, 'create'])->defaults('tipo', 1)->name('soluciones.garantia');
+	Route::get('/soluciones-devolucion', [ReporteSolucionesClienteController::class, 'create'])->defaults('tipo', 2)->name('soluciones.devolucion');
+
+
+	// Rutas para manejar evidencias de soluciones
+	Route::post('/soluciones/{solucion}/evidencias', [EvidenciaListaSolucionController::class, 'store'])->name('evidencias.store');
+	Route::put('/soluciones/{solucion}/evidencias', [EvidenciaListaSolucionController::class, 'update'])->name('evidencias.update');
+	Route::delete('/soluciones/{solucion}/evidencias/{evidencia}', [EvidenciaListaSolucionController::class, 'destroy'])->name('evidencias.destroy');
+
 
 
 

@@ -17,6 +17,8 @@ class ListaSolucionesCliente extends Model
         'factura',
         'cantidad',
         'total',
+        'fecha_operador',
+        'ruta',
         'observaciones',
         'estatus',
     ];
@@ -42,5 +44,16 @@ class ListaSolucionesCliente extends Model
             'catalogo_soluciones_clientes_idCatalogoSolucionesClientes',
             'idCatalogoSolucionesClientes'
         );
+    }
+
+    // Relación con operador
+    public function operador()
+    {
+        return $this->belongsTo(Conductor::class, 'conductor_id');
+    }
+
+    public function evidencias()
+    {
+        return $this->hasMany(EvidenciaListaSolucion::class, 'lista_soluciones_clientes_id', 'idlista_soluciones_clientes');
     }
 }

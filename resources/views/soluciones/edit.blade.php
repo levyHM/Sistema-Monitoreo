@@ -57,6 +57,7 @@
                             @endphp
                             <div class="factura-item card shadow-sm mb-3 border-start border-3 border-secondary position-relative bg-light p-3">
                                 <div class="row g-3 align-items-end">
+                                    <input type="hidden" name="facturas[{{ $index }}][id]" value="{{ $solucion->idlista_soluciones_clientes }}">
                                     <div class="col-md-2">
                                         <label class="form-label">Factura</label>
                                         <div class="input-group">
@@ -104,9 +105,23 @@
                         </div>
 
                         {{-- Estatus --}}
+                                                {{-- Estatus --}}
                         <h5 class="mt-4">📋 Estatus de Nota</h5>
                         <div class="row mb-3 align-items-center">
-                            @foreach([1=>'Aprobado',2=>'No aprobado'] as $val => $label)
+                            @php
+                            $estatusOptions = $reporte->catalogo_tipo_id == 1
+                            ? [1 => 'Aprobado', 2 => 'No aprobado']
+                            : [
+                            1 => 'Aprobado',
+                            2 => 'No aprobado',
+                            4 => 'En Ruta',
+                            5 => 'Almacén',
+                            6 => 'Pendiente',
+                            7 => 'En Dictamen'
+                            ];
+                            @endphp
+
+                            @foreach($estatusOptions as $val => $label)
                             <div class="col-md-2">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="radio" id="estatus_{{ $val }}" name="estatus" value="{{ $val }}" {{ old('estatus',$reporte->estatus)==$val ? 'checked' : '' }}>

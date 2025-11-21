@@ -10,7 +10,7 @@
                     {{-- Tipo --}}
                     @php
                     $tipo = request('tipo', 1); // Por defecto Garantía
-                    $tipoTexto = $tipo == 2 ? 'Devolución' : 'Garantía';
+                    $tipoTexto = $tipo == 1 ? 'Devolución' : 'Garantía';
                     @endphp
 
 
@@ -59,7 +59,7 @@
                             <div
                                 class="factura-item card shadow-sm mb-3 border-start border-3 border-secondary position-relative bg-light p-3">
                                 <div class="row g-3 align-items-end">
-                                    <input type="hidden" name="catalogo_tipo_id" value="{{ $tipo }}">
+                                <input type="hidden" name="catalogo_tipo_id" value="{{ $tipo }}">
                                     <div class="col-md-2">
                                         <label class="form-label">Factura</label>
                                         <div class="input-group">
@@ -75,6 +75,8 @@
                                         <input type="number" name="facturas[0][cantidad]" class="form-control cantidad"
                                             value="1" min="1" step="1">
                                     </div>
+
+                                    {{-- ICOD --}}
                                     <div class="col-md-2">
                                         <label class="form-label">Código (ICOD)</label>
                                         <input type="text" name="facturas[0][icod]" class="form-control icod" readonly>
@@ -84,16 +86,22 @@
                                         <input type="text" name="facturas[0][descripcion]"
                                             class="form-control descripcion" readonly>
                                     </div>
+
+                                    {{-- Precio unitario --}}
                                     <div class="col-md-2">
                                         <label class="form-label">P. Unitario</label>
                                         <input type="number" step="0.01" name="facturas[0][p_unitario]"
                                             class="form-control p_unitario" readonly>
                                     </div>
+
+                                    {{-- Total --}}
                                     <div class="col-md-2">
                                         <label class="form-label">Total</label>
                                         <input type="number" step="0.01" name="facturas[0][total]"
                                             class="form-control total" readonly>
                                     </div>
+
+                                    {{-- Observaciones --}}
                                     <div class="col-md-8">
                                         <label class="form-label">Observaciones</label>
                                         <input type="text" name="facturas[0][observaciones]"
@@ -101,21 +109,31 @@
                                     </div>
                                     <input type="hidden" name="facturas[0][catalogo_idcatalogo]"
                                         class="catalogo_idcatalogo">
+
                                 </div>
                                 <div class="remove-factura text-danger position-absolute top-0 end-0 p-2" role="button"
                                     style="cursor:pointer; display:none;">🗑️</div>
                             </div>
+
                         </div>
 
+                        {{-- Botón agregar factura --}}
                         <div class="text-end mb-3">
                             <button type="button" class="btn btn-outline-primary btn-sm" id="add-factura">➕ Agregar
                                 Factura</button>
                         </div>
 
+
                         {{-- Estatus --}}
                         <h5 class="mt-4">📋 Estatus de Nota</h5>
                         <div class="row mb-3 align-items-center">
-                            @foreach([1=>'Aprobado',2=>'No aprobado'] as $val => $label)
+                            @php
+                            $estatusOptions = $tipo == 1
+                            ? [1 => 'Aprobado', 2 => 'No aprobado']
+                            : [1 => 'Aprobado', 2 => 'No aprobado', 4 => 'En Ruta' , 5=> 'Almacen', 6 => 'Pendiente', 7 => 'En Dictamen'];
+                            @endphp
+
+                            @foreach($estatusOptions as $val => $label)
                             <div class="col-md-2">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="radio" id="estatus_{{ $val }}" name="estatus"

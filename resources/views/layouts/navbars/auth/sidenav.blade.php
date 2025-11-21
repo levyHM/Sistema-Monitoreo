@@ -212,23 +212,23 @@
                 id="account-solutions-clientes">
                 @can("solucionescliente.crear")
                 <li class="nav-item">
-                    <a class="nav-link {{ str_contains(request()->url(), 'soluciones-garantia') ? 'active' : '' }}"
-                        href="{{ route('page', ['page' => 'soluciones-garantia','tipo' => '2']) }}">
-                        <div
-                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="ni ni-curved-next text-dark text-sm opacity-10"></i>
-                        </div>
-                        <span class="nav-link-text ms-1">Garantía</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link {{ str_contains(request()->url(), 'soluciones-devolucion') ? 'active' : '' }}"
                         href="{{ route('page', ['page' => 'soluciones-devolucion','tipo' => '1']) }}">
                         <div
                             class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="ni ni-single-02 text-success text-sm opacity-10"></i>
+                            <i class="ni ni-curved-next text-dark text-sm opacity-10"></i>
                         </div>
                         <span class="nav-link-text ms-1">Devolución</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ str_contains(request()->url(), 'soluciones-garantia') ? 'active' : '' }}"
+                        href="{{ route('page', ['page' => 'soluciones-garantia','tipo' => '2']) }}">
+                        <div
+                            class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-single-02 text-success text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Garantía</span>
                     </a>
                 </li>
                  @endcan
