@@ -9,7 +9,7 @@ class RegisterController extends Controller
 {
     public function create()
     {
-        return view('auth.register');
+        return view('usuarios.create');
     }
 
     public function store()
@@ -21,8 +21,8 @@ class RegisterController extends Controller
             'terms' => 'required'
         ]);
         $user = User::create($attributes);
-        auth()->login($user);
+        //auth()->login($user);
 
-        return redirect('/dashboard');
+        return view('pages.user-management', compact('user'));
     }
 }

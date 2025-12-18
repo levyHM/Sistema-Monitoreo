@@ -2,25 +2,17 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-
-
+use Spatie\Permission\Models\Permission;
+//$ php artisan db:seed --class=DatabaseSeeder 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     *
-     * @return void
-     */
     public function run()
     {
-        DB::table('users')->insert([
-            'username' => 'admin',
-            'firstname' => 'Admin',
-            'lastname' => 'Admin',
-            'email' => 'admin@argon.com',
-            'password' => bcrypt('secret')
-        ]);
+        $user = User::find(1);
+        if ($user) {
+            $user->syncPermissions(Permission::all());
+        }
     }
 }

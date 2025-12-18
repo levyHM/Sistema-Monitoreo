@@ -28,31 +28,39 @@ class DataService
             AND fdoc_0.DITIPMV in ('FE','FO','FV')
             AND fdoc_0.DHORA > ?
         ", [$lastDateTime]);
-        
     }
 
     public function copyOrUpdateData()
     {
+        Log::info('Inicio copyOrUpdateData');
         $lastDateTime = $this->getLastDateFromFirstDatabase();
         $data = $this->getFilteredData($lastDateTime);
         Log::info('Filtered Data:', ['data' => $lastDateTime]);
-        
+
         foreach ($data as $row) {
-            DB::connection('mysql')->table('facturas')->updateOrInsert(
-                [
-                    'DITIPMV' => $row->DITIPMV,
-                    'DNUM' => $row->DNUM,
-                ],
-                [
-                    'DFECHA' => $row->DFECHA,
-                    'CLICOD' => $row->CLICOD,
-                    'DPAR1' => $row->DPAR1,
-                    'DHORA' => $row->DHORA,
-                    'SERIE' => $row->DNUM.$row->CLICOD,
-                    'ESTATUS' => '0',
-                ]
-            );
+            // Verificar si DNUM ya existe
+            $exists = DB::connection('mysql')->table('facturas')
+                ->where('DNUM', $row->DNUM)
+                ->exists();
+
+            if ($exists) {
+                continue; // Si ya existe, omitir esta iteración
+            }
+
+            // Insertar nuevo registro
+            DB::connection('mysql')->table('facturas')->insert([
+                'DITIPMV' => $row->DITIPMV,
+                'DNUM' => $row->DNUM,
+                'DFECHA' => $row->DFECHA,
+                'CLICOD' => $row->CLICOD,
+                'DPAR1' => $row->DPAR1,
+                'DHORA' => $row->DHORA,
+                'SERIE' => $row->DNUM . $row->CLICOD,
+                'ESTATUS' => '0',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            Log::info('Registro insertado exitosamente', ['DNUM' => $row->DNUM]);
         }
     }
-
 }

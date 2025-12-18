@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Pedido; // Asegúrate de que el modelo Pedido esté creado
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class PedidosController extends Controller
@@ -55,17 +54,23 @@ class PedidosController extends Controller
         Log::info('Pedido encontrado:', ['data' => $pedido]);
 
         if ($pedido) {
-            // Actualizar el campo CAPTURA y cambiar el ESTATUS
-            $pedido->update([
-                'CAPTURA' => substr($request->captura, 0, 20),
-                'ESTATUS' => 1
-            ]);
 
-            return $this->redirectBackWithMessage('success', 'Los datos se actualizaron correctamente.');
+            if ($pedido->ESTATUS == 1) {
+                return $this->redirectBackWithMessage('warning', 'El pedido ya ha sido actualizado previamente.');
+            } else {
+                // Actualizar el campo CAPTURA y cambiar el ESTATUS
+                $pedido->update([
+                    'CAPTURA' => substr($request->captura, 0, 20),
+                    'ESTATUS' => 1
+                ]);
+
+                return $this->redirectBackWithMessage('success', 'Los datos se actualizaron correctamente.');
+            }
         } else {
             return $this->redirectBackWithMessage('error', 'No se encontró un registro con el número de captura proporcionado.');
         }
     }
+
     // Método auxiliar para manejar la redirección dinámica
     private function redirectBackWithMessage($type, $message)
     {

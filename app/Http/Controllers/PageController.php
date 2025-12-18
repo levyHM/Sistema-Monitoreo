@@ -21,9 +21,9 @@ class PageController extends Controller
         return abort(404);
     }
 
-    public function vr()
+    public function embarqueCDMX()
     {
-        return view("pages.virtual-reality");
+        return view("embarque-cdmx");
     }
 
     public function rtl()
@@ -45,4 +45,5 @@ class PageController extends Controller
     {
         return view("pages.sign-up-static");
     }
+
 }

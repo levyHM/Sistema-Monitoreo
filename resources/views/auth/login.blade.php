@@ -1,13 +1,5 @@
 @extends('layouts.app')
-
 @section('content')
-    <div class="container position-sticky z-index-sticky top-0">
-        <div class="row">
-            <div class="col-12">
-                @include('layouts.navbars.guest.navbar')
-            </div>
-        </div>
-    </div>
     <main class="main-content  mt-0">
         <section>
             <div class="page-header min-vh-100">
@@ -39,12 +31,6 @@
                                             <button type="submit" class="btn btn-lg btn-success btn-lg w-100 mt-4 mb-0">Sign in</button>
                                         </div>
                                     </form>
-                                </div>
-                                <div class="card-footer text-center pt-0 px-lg-2 px-1">
-                                    <p class="mb-1 text-sm mx-auto">
-                                        ¿Olvidaste tu contraseña? Restablece tu contraseña aquí
-                                        <a href="{{ route('reset-password') }}" class="text-success text-gradient font-weight-bold">here</a>
-                                    </p>
                                 </div>
                                 <div class="card-footer text-center pt-0 px-lg-2 px-1">
                                     <!--<p class="mb-4 text-sm mx-auto">
