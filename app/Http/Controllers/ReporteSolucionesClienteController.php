@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NotificacionTest;
 use App\Models\CatalogoTipo;
 use App\Models\Conductor;
+use App\Models\ListaSolucionesCliente;
 use App\Models\ReporteSolucionesCliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Models\ListaSolucionesCliente;
+use Illuminate\Support\Facades\Mail;
 
 class ReporteSolucionesClienteController extends Controller
 {
@@ -18,6 +20,10 @@ class ReporteSolucionesClienteController extends Controller
             ->orderBy('idreporte_soluciones_clientes', 'desc');
 
         // Filtros dinámicos
+        if ($request->filled('folio')) {
+            $query->where('idreporte_soluciones_clientes', $request->folio);
+            Log::info('Filtrando por Folio: ' . $request->folio);
+        }
         if ($request->filled('fecha')) {
             $query->whereDate('fecha', $request->fecha);
             Log::info('Filtrando por fecha: ' . $request->fecha);
@@ -57,7 +63,8 @@ class ReporteSolucionesClienteController extends Controller
     {
         Log::info('**********************************************************************');
         Log::info('Iniciando creación de nuevo reporte de soluciones');
-        
+
+        // Validación general
         $request->validate([
             'catalogo_clientes_idcatalogo_clientes' => 'required|integer',
             'catalogo_tipo_id' => 'required|in:1,2',
@@ -72,14 +79,32 @@ class ReporteSolucionesClienteController extends Controller
             'facturas.*.catalogo_idcatalogo' => 'required|integer',
             'facturas.*.factura' => 'required|string|max:100',
             'facturas.*.cantidad' => 'required|integer|min:1',
+            'facturas.*.maxcant' => 'required|integer|min:1',
             'facturas.*.total' => 'required|numeric|min:0',
-
         ]);
-        
-        Log::info('Validación completada exitosamente');
-        Log::info('Datos del reporte:', $request->all());
-        
-        // Crear el reporte principal
+
+        Log::info('Validación principal completada, iniciando validaciones de cantidades');
+
+        // === VALIDACIÓN DE CANTIDADES (un solo recorrido) ===
+        foreach ($request->facturas as $i => $factura) {
+            if ($factura['cantidad'] > $factura['maxcant']) {
+                Log::warning("Cantidad excedida en factura index $i", [
+                    'cantidad' => $factura['cantidad'],
+                    'maxcant' => $factura['maxcant']
+                ]);
+
+                return back()
+                    ->withErrors([
+                        "facturas.$i.cantidad" =>
+                        "La cantidad ({$factura['cantidad']}) no puede ser mayor que el máximo permitido ({$factura['maxcant']})."
+                    ])
+                    ->withInput();
+            }
+        }
+
+        Log::info("Validaciones de cantidad completadas con éxito.");
+
+        // === CREAR REPORTE PRINCIPAL ===
         $reporte = ReporteSolucionesCliente::create([
             'fecha' => now(),
             'catalogo_clientes_idcatalogo_clientes' => $request->catalogo_clientes_idcatalogo_clientes,
@@ -87,66 +112,44 @@ class ReporteSolucionesClienteController extends Controller
             'razon_social' => $request->razon_social,
             'colaborador' => $request->colaborador,
             'devolucion' => $request->has('devolucion') ? 1 : 0,
-            'catalogo_tipo_id' => $request->catalogo_tipo_id, // ← Aquí se define si es Garantía (1) o Devolución (2)            
+            'catalogo_tipo_id' => $request->catalogo_tipo_id,
             'descuento' => $request->descuento,
             'total' => $request->total,
             'subtotal' => $request->subtotal,
             'iva' => $request->iva,
             'total_completo' => $request->total_completo,
             'estatus' => $request->estatus,
-            /**
-         * Estatus posibles para el campo 'estatus':
-         * 0 => 'N/A'   // N/A
-         * 1 => 'Aprobado'   // El elemento se encuentra en proceso de recolección.
-         * 2 => 'No aprobado'       // El elemento está almacenado.
-         * 3 => 'Cancelado'      // El elemento fue cancelado
-         */
+        ]);
 
-        ]);
-        
-        Log::info('Reporte principal creado exitosamente', [
-            'id' => $reporte->idreporte_soluciones_clientes,
-            'cliente_id' => $reporte->catalogo_clientes_idcatalogo_clientes,
-            'tipo' => $reporte->catalogo_tipo_id,
-            'estatus' => $reporte->estatus
-        ]);
-        
-        // Guardar las facturas en lista_soluciones_clientes
-        $facturasProcesadas = 0;
-        foreach ($request->facturas as $index => $factura) {
-            if (!empty($factura['catalogo_idcatalogo'])) { // <- valida que exista
-                Log::info('Creando solución', [
-                    'index' => $index,
-                    'catalogo_id' => $factura['catalogo_idcatalogo'],
-                    'factura' => $factura['factura'],
-                    'cantidad' => $factura['cantidad'],
-                    'total' => $factura['total']
-                ]);
-                
-                $reporte->soluciones()->create([
-                    'catalogo_soluciones_clientes_idCatalogoSolucionesClientes' => $factura['catalogo_idcatalogo'],
-                    'factura' => $factura['factura'],
-                    'cantidad' => $factura['cantidad'],
-                    'total' => $factura['total'],
-                    'observaciones' => $factura['observaciones'] ?? null,
-                    'estatus' => 1, // Por defecto activo
-                ]);
-                
-                $facturasProcesadas++;
-            } else {
-                Log::warning('Factura sin catálogo_idcatalogo omitida', ['index' => $index]);
-            }
+        Log::info('Reporte principal creado exitosamente', ['id' => $reporte->idreporte_soluciones_clientes]);
+
+        // === CREAR SOLUCIONES (un solo recorrido también) ===
+        foreach ($request->facturas as $i => $factura) {
+            $reporte->soluciones()->create([
+                'catalogo_soluciones_clientes_idCatalogoSolucionesClientes' => $factura['catalogo_idcatalogo'],
+                'factura' => $factura['factura'],
+                'cantidad' => $factura['cantidad'],
+                'total' => $factura['total'],
+                'observaciones' => $factura['observaciones'] ?? null,
+                'estatus' => 1,
+            ]);
+
+            Log::info("Factura procesada correctamente: index $i");
         }
-        
-        Log::info('Todas las soluciones han sido procesadas', [
-            'total_procesadas' => $facturasProcesadas,
-            'total_enviadas' => count($request->facturas)
-        ]);
-        Log::info('Creación de reporte completada exitosamente', ['id' => $reporte->idreporte_soluciones_clientes]);
+
+        Mail::to('levihm@codigolevi.com.mx')
+            ->cc([
+                'sistemas1@jigafra.com.mx',
+                'sistemas@jigafra.com.mx'
+            ])
+            ->send(new NotificacionTest($reporte));
+        Log::info('Reporte creado correctamente con todas las soluciones');
         Log::info('**********************************************************************');
 
         return redirect()->route('soluciones.index')->with('success', 'Reporte creado correctamente.');
     }
+
+
 
     // Mostrar un reporte específico
     public function show($id)
@@ -310,6 +313,4 @@ class ReporteSolucionesClienteController extends Controller
 
         return back()->with('success', 'Firma registrada correctamente.');
     }
-
-    
 }

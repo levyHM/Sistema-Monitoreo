@@ -7,7 +7,8 @@
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            font-size: 12px; /* letra un poco más pequeña */
+            font-size: 12px;
+            /* letra un poco más pequeña */
             margin: 10px 30px 30px 30px;
             color: #2c3e50;
             position: relative;
@@ -45,13 +46,14 @@
         .header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 2px solid #ccc;
+            align-items: center;
+            border-bottom: 3px solid #00953A;
             padding-bottom: 8px;
+            margin-bottom: 15px;
         }
 
         .logo img {
-            height: 50px;
+            height: 100px;
         }
 
         .info {
@@ -167,7 +169,7 @@
 
     @php
     function casillaCheckbox($valor) {
-        return $valor === 'Si' ? '✓' : '';
+    return $valor === 'Si' ? '✓' : '';
     }
     $evidencias = $evidencias ?? [];
     $count = count($evidencias);
@@ -183,19 +185,15 @@
 
     <div class="header">
         <div class="logo">
-            <img src="{{ public_path('img/jigafra.png') }}" alt="JIGAFRA Logo" />
+            <img src="{{ public_path('img/logos/almacen_recibo_cdmx-01.jpg') }}" alt="JIGAFRA Logo" />
         </div>
         <div class="info">
-            <strong>Folio:</strong> <span style="color: red;">{{ $folio ?? '0878' }}</span><br />
+            <strong>Folio:</strong> <span style="color: red;">{{ $folio ?? '0000' }}</span><br />
             <strong>Fecha:</strong> {{ \Carbon\Carbon::now()->format('d/m/Y') }}
         </div>
     </div>
-
-    <h1>Dpto Almacen Recibo</h1>
-    <h1>{{ $sucursal == 'F' ? 'CDMX' : $sucursal }}</h1>
-
     <div class="section">
-        <div class="section-title">Datos del Proveedor</div>
+        <div class="section-title">Datos del Proveedor </div>
         <p>
             <strong>Codigo de Proveedor:</strong> {{ $proveedor['nombre'] ?? 'PRVNOM' }}<br />
             <strong>Razon Social:</strong> {{ $proveedor['razon_social'] ?? 'PRVRAZ' }}
@@ -256,11 +254,11 @@
 
     @php
     $areas = [
-        1 => 'Recibo',
-        2 => 'Soluciones',
-        3 => 'Almacen',
-        4 => 'Compras',
-        5 => 'Proveedor'
+    1 => 'Recibo',
+    2 => 'Soluciones',
+    3 => 'Almacen',
+    4 => 'Compras',
+    5 => 'Proveedor'
     ];
     @endphp
 

@@ -206,21 +206,9 @@
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="campo" value="firma_soluciones">
-                        <button type="submit" class="btn btn-primary" @cannot('firmas.Reporte Soluciones') disabled
+                        <button type="submit" class="btn btn-success" @cannot('firmas.Reporte Soluciones') disabled
                             @endcannot @if($reporte->firma_soluciones) disabled @endif>
                             ✍️ Firmar como Soluciones
-                        </button>
-                    </form>
-
-                    {{-- Botón para firmar como Crédito --}}
-                    <form action="{{ route('soluciones.firmas', $reporte->idreporte_soluciones_clientes) }}"
-                        method="POST" class="d-inline ms-2">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" name="campo" value="firma_credito">
-                        <button type="submit" class="btn btn-primary" @cannot('firmas.Soluciones Credito') disabled
-                            @endcannot @if($reporte->firma_credito) disabled @endif>
-                            ✍️ Firmar como Crédito
                         </button>
                     </form>
                 </div>

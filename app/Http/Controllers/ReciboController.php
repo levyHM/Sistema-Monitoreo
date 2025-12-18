@@ -36,7 +36,7 @@ class ReciboController extends Controller
     {
         $request->validate([
             'tipo_recibo' => 'required|in:D,F',
-            'sucursal' => 'required|in:F,PO',
+            'sucursal' => 'required|in:P,PV,PO',
             'provedores_idprovedores' => 'required|exists:catalogo_provedores,idcatalogo_provedores',
             'facturas' => 'required|array|min:1',
             'facturas.*.factura' => 'required|string',

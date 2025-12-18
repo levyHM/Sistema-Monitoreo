@@ -59,7 +59,7 @@
                             <div
                                 class="factura-item card shadow-sm mb-3 border-start border-3 border-secondary position-relative bg-light p-3">
                                 <div class="row g-3 align-items-end">
-                                <input type="hidden" name="catalogo_tipo_id" value="{{ $tipo }}">
+                                    <input type="hidden" name="catalogo_tipo_id" value="{{ $tipo }}">
                                     <div class="col-md-2">
                                         <label class="form-label">Factura</label>
                                         <div class="input-group">
@@ -70,6 +70,9 @@
                                             </span>
                                         </div>
                                     </div>
+                                    {{-- Cantidad máxima --}}
+                                    <input type="hidden" name="facturas[0][maxcant]" class="maxcant">
+                                    {{-- Cantidad --}}
                                     <div class="col-md-1">
                                         <label class="form-label">Cantidad</label>
                                         <input type="number" name="facturas[0][cantidad]" class="form-control cantidad"
@@ -130,14 +133,17 @@
                             @php
                             $estatusOptions = $tipo == 1
                             ? [1 => 'Aprobado', 2 => 'No aprobado']
-                            : [1 => 'Aprobado', 2 => 'No aprobado', 4 => 'En Ruta' , 5=> 'Almacen', 6 => 'Pendiente', 7 => 'En Dictamen'];
+                            : [1 => 'Aprobado', 2 => 'No aprobado', 6 => 'Pendiente', 4 => 'En Ruta', 5 => 'Almacén', 7
+                            => 'En Dictamen'];
+
+                            $defaultStatus = $tipo == 1 ? 2 : 6;
                             @endphp
 
                             @foreach($estatusOptions as $val => $label)
                             <div class="col-md-2">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="radio" id="estatus_{{ $val }}" name="estatus"
-                                        value="{{ $val }}" {{ $val==2 ? 'checked' : '' }} required>
+                                        value="{{ $val }}" {{ $val==$defaultStatus ? 'checked' : '' }} required>
                                     <label class="form-check-label" for="estatus_{{ $val }}">{{ $label }}</label>
                                 </div>
                             </div>
@@ -204,6 +210,7 @@
                                 <tr>
                                     <th>Factura</th>
                                     <th>ICOD</th>
+                                    <th>Cantidad</th>
                                     <th>Seleccionar</th>
                                 </tr>
                             </thead>
@@ -345,12 +352,14 @@ function buscarFacturas(page = 1) {
                 `<tr>
                     <td>${f.dnum}</td>
                     <td>${f.icod}</td>
+                    <td>${f.aicant}</td>
                     <td>
                         <a href="#!" class="text-black font-weight-bold text-xs seleccionar-factura"
                             data-factura="${f.dnum}"
                             data-icod="${f.icod}"
                             data-descripcion="${f.idescr}"
                             data-punit="${f.aiprecio}"
+                            data-aicant="${f.aicant}"
                             data-id="${f.idCatalogoSolucionesClientes}">
                             Seleccionar
                         </a>
@@ -371,6 +380,9 @@ function buscarFacturas(page = 1) {
         filaActual.find('.icod').val($(this).data('icod'));
         filaActual.find('.descripcion').val($(this).data('descripcion'));
         filaActual.find('.p_unitario').val($(this).data('punit'));
+        filaActual.find('.maxcant').val($(this).data('aicant'));
+        // Obtener cantidad máxima permitida
+        let maxCant = parseFloat($(this).data('aicant')) || 0;
         let cantidad = parseFloat(filaActual.find('.cantidad').val()) || 1;
         let punit = parseFloat($(this).data('punit')) || 0;
         let descuento = parseFloat($('#descuento').val()) || 0;

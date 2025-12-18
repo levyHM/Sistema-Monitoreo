@@ -43,7 +43,7 @@
                                 <label class="form-check-label" for="devolucion">Devolución</label>
                             </div>
 
-                            <input type="hidden" name="sucursal" value="F">
+                            <input type="hidden" name="sucursal" value="P">
                             <input type="hidden" name="tipo_recibo" value="D">
                             <input type="hidden" name="usuario" value="{{ auth()->user()->id }}">
 

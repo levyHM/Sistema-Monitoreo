@@ -70,7 +70,7 @@ class SolucionesSyncService
                         'clicod'      => $solucion->CLICOD,
                         'clidesc10'   => $solucion->CLIDESC10,
                         'aiprecio'    => $solucion->AIPRECIO,
-                        'aicant'      => $solucion->AICANT,
+                        'aicant'      => abs($solucion->AICANT),
                         'idescr'      => $solucion->IDESCR,
                         'estatus'     => 1,
                         'created_at'  => now(),

@@ -120,7 +120,7 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::put('/soluciones/{id}/estatus', [ReporteSolucionesClienteController::class, 'cambiarEstatusSolucionesClientes'])->name('soluciones.cambiar.estatus');
 	Route::get('/buscar-catalogo', [SolucionesController::class, 'buscarCatalogo'])->name('soluciones.buscar.catalogo');
 	Route::put('/soluciones/{id}/firmar', [ReporteSolucionesClienteController::class, 'firmar'])->name('soluciones.firmas');
-	
+
 	// Crear nueva solución según tipo
 	Route::get('/soluciones-garantia', [ReporteSolucionesClienteController::class, 'create'])->defaults('tipo', 1)->name('soluciones.garantia');
 	Route::get('/soluciones-devolucion', [ReporteSolucionesClienteController::class, 'create'])->defaults('tipo', 2)->name('soluciones.devolucion');

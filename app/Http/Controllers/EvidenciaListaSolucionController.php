@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\EvidenciaListaSolucion;
 use App\Models\ListaSolucionesCliente;
+use App\Models\ReporteSolucionesCliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -21,78 +22,97 @@ class EvidenciaListaSolucionController extends Controller
             'request_data' => $request->all()
         ]);
 
-        $solucion = ListaSolucionesCliente::findOrFail($solucionId);
-        Log::info('Solución encontrada', ['solucion_id' => $solucion->idlista_soluciones_clientes]);
+        try {
+            $solucion = ListaSolucionesCliente::findOrFail($solucionId);
+            $reporte = ReporteSolucionesCliente::with('soluciones')->findOrFail($solucion->reporte_soluciones_clientes_idreporte_soluciones_clientes);
+            Log::info('Solución encontrada', [
+                'solucion_id' => $solucion->idlista_soluciones_clientes,
+                'idreporte_soluciones_clientes' => $solucion->reporte_soluciones_clientes_idreporte_soluciones_clientes
+            ]);
 
-        // Validar archivos
-        $request->validate([
-            'evidencias.*' => 'image|max:6144', // Máx 6MB por archivo
-            'facturas.0.fecha_operador' => 'required|date|after_or_equal:today',
-            'facturas.0.ruta' => 'required|string|max:255',
-        ]);
+            // Validar archivos
+            $request->validate([
+                'evidencias.*' => 'required|mimetypes:image/jpeg,image/png,image/webp,image/gif,application/pdf|max:5120',
+                'facturas.0.fecha_operador' => 'required|date|after_or_equal:today',
+                'facturas.0.ruta' => 'required|string|max:255',
+            ]);
+            Log::info('Validación de archivos exitosa');
 
-        Log::info('Validación de archivos exitosa');
+            // Actualizar campos de la solución
+            $solucion->update([
+                'fecha_operador' => $request->input('facturas.0.fecha_operador'),
+                'ruta'           => $request->input('facturas.0.ruta'),
+            ]);
+            Log::info('Solución actualizada', [
+                'fecha_operador' => $request->input('facturas.0.fecha_operador'),
+                'ruta'           => $request->input('facturas.0.ruta')
+            ]);
 
-        // Actualizar campos de la solución
-        $solucion->update([
-            'fecha_operador'  => $request->input('facturas.0.fecha_operador'),
-            'ruta'    => $request->input('facturas.0.ruta'),
-        ]);
-        Log::info('Solución actualizada', [
-            'fecha_operador' => $request->input('facturas.0.fecha_operador'),
-            'ruta' => $request->input('facturas.0.ruta')
-        ]);
+            // Contar evidencias actuales
+            $existentes = $solucion->evidencias()->count();
+            $nuevas = $request->file('evidencias') ?? [];
 
-        // Contar evidencias actuales
-        $existentes = $solucion->evidencias()->count();
-        $nuevas = $request->file('evidencias') ?? [];
-
-        Log::info('Conteo de evidencias', [
-            'existentes' => $existentes,
-            'nuevas' => count($nuevas)
-        ]);
-
-        if ($existentes + count($nuevas) > 3) {
-            Log::warning('Límite de evidencias excedido', [
+            Log::info('Conteo de evidencias', [
                 'existentes' => $existentes,
-                'nuevas' => count($nuevas)
+                'nuevas'     => count($nuevas)
             ]);
-            return back()->with('error', 'Solo se permiten 3 evidencias en total.');
+
+            if ($existentes + count($nuevas) > 3) {
+                Log::warning('Límite de evidencias excedido', [
+                    'existentes' => $existentes,
+                    'nuevas'     => count($nuevas)
+                ]);
+                return back()->with('error', 'Solo se permiten 3 evidencias en total.');
+            }
+
+            // Guardar una por una
+            foreach ($nuevas as $index => $archivo) {
+                Log::info('Procesando archivo', [
+                    'index'            => $index,
+                    'nombre_original'  => $archivo->getClientOriginalName(),
+                    'tamaño'           => $archivo->getSize()
+                ]);
+
+                $ruta = $archivo->store('evidencias_soluciones/' . $solucion->idlista_soluciones_clientes, 'public');
+
+                Log::info('Archivo guardado en storage', [
+                    'index'            => $index,
+                    'ruta'             => $ruta,
+                    'nombre_original'  => $archivo->getClientOriginalName()
+                ]);
+
+                $evidencia = $solucion->evidencias()->create([
+                    'lista_soluciones_clientes_id' => $solucion->idlista_soluciones_clientes,
+                    'archivo'                      => $ruta,
+                ]);
+
+                Log::info('Evidencia creada en base de datos', [
+                    'evidencia_id' => $evidencia->id,
+                    'archivo'      => $ruta
+                ]);
+            }
+
+            Log::info('Evidencias agregadas exitosamente', [
+                'total_agregadas'   => count($nuevas),
+                'total_evidencias'  => $solucion->evidencias()->count()
+            ]);
+            
+            $this->validacionEstatus($solucion->reporte_soluciones_clientes_idreporte_soluciones_clientes);
+
+            Log::info('**********************************************************************');
+
+            return back()->with('success', 'Evidencias agregadas correctamente.');
+        } catch (\Exception $e) {
+            Log::error('Error al guardar evidencias', [
+                'solucion_id' => $solucionId,
+                'error'       => $e->getMessage(),
+                'trace'       => $e->getTraceAsString()
+            ]);
+
+            return back()->with('error', 'Ocurrió un error al guardar las evidencias. Intenta nuevamente.');
         }
-
-        // Guardar una por una
-        foreach ($nuevas as $index => $archivo) {
-            Log::info('Procesando archivo', [
-                'index' => $index,
-                'nombre_original' => $archivo->getClientOriginalName(),
-                'tamaño' => $archivo->getSize()
-            ]);
-
-            $ruta = $archivo->store('evidencias_soluciones/' . $solucion->idlista_soluciones_clientes, 'public');
-
-            Log::info('Archivo guardado en storage', [
-                'index' => $index,
-                'ruta' => $ruta,
-                'nombre_original' => $archivo->getClientOriginalName()
-            ]);
-
-            $evidencia = $solucion->evidencias()->create([
-                'lista_soluciones_clientes_id' => $solucion->idlista_soluciones_clientes,
-                'archivo' => $ruta,
-            ]);
-
-            Log::info('Evidencia creada en base de datos', [
-                'evidencia_id' => $evidencia->id,
-                'archivo' => $ruta
-            ]);
-        }
-        Log::info('Evidencias agregadas exitosamente', [
-            'total_agregadas' => count($nuevas),
-            'total_evidencias' => $solucion->evidencias()->count()
-        ]);
-        Log::info('**********************************************************************');
-        return back()->with('success', 'Evidencias agregadas correctamente.');
     }
+
 
     /**
      * Actualizar metadatos y evidencias de una solución existente
@@ -112,7 +132,7 @@ class EvidenciaListaSolucionController extends Controller
         $request->validate([
             'facturas.0.fecha_operador' => 'required|date|after_or_equal:today',
             'facturas.0.ruta' => 'required|string|max:255',
-            'evidencias.*' => 'image|max:6144', // Opcional: nuevas evidencias
+            'evidencias.*' => 'nullable|mimetypes:image/jpeg,image/png,image/webp,image/gif,application/pdf|max:5120',
         ]);
 
         // Actualizar campos
@@ -205,5 +225,30 @@ class EvidenciaListaSolucionController extends Controller
 
         Log::info('**********************************************************************');
         return back()->with('success', 'Evidencia eliminada correctamente.');
+    }
+
+    public function validacionEstatus($idreporte_soluciones_clientes)
+    {
+        Log::info('Iniciando validación de estatus', [
+            'idreporte_soluciones_clientes' => $idreporte_soluciones_clientes
+        ]);
+
+        $reporte = ReporteSolucionesCliente::with('soluciones')->findOrFail($idreporte_soluciones_clientes);
+        
+        if ($reporte->catalogo_tipo_id == 2) {
+            $reporte->update([
+                'estatus' => 4,
+            ]);
+            
+            Log::info('Estatus actualizado', [
+                'reporte_id' => $reporte->id,
+                'estatus_nuevo' => 4
+            ]);
+        } else {
+            Log::info('No se requiere actualización de estatus', [
+                'reporte_id' => $reporte->id,
+                'catalogo_tipo_id' => $reporte->catalogo_tipo_id
+            ]);
+        }
     }
 }

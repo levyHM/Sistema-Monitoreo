@@ -52,8 +52,8 @@
                                 </div>
                             </div>
 
-                            <input type="hidden" name="sucursal" value="F">
-                            <input type="hidden" name="tipo_recibo" value="F">
+                            <input type="hidden" name="sucursal" value="P">
+                            <input type="hidden" name="tipo_recibo" value="FS">
                             <input type="hidden" name="usuario" value="{{ auth()->user()->id }}">
 
                             <!-- Bloque de facturas -->

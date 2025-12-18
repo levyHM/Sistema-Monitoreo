@@ -52,7 +52,7 @@
         }
 
         .logo img {
-            height: 100px;
+            height: 80px;
         }
 
         .info {
@@ -187,11 +187,10 @@
             <img src="{{ public_path('img/logos/recibo_faltante-sobrante_cdmx.jpg') }}" alt="JIGAFRA Logo" />
         </div>
         <div class="info">
-            <strong>Folio:</strong> <span style="color: red;">{{ $folio ?? '0878' }}</span><br />
+            <strong>Folio:</strong> <span style="color: red;">{{ $folio ?? '0000' }}</span><br />
             <strong>Fecha:</strong> {{ \Carbon\Carbon::now()->format('d/m/Y') }}
         </div>
     </div>
-    <h1>{{ $sucursal == 'F' ? 'CDMX' : $sucursal }}</h1>
 
     <div class="section">
         <div class="section-title">Datos del Proveedor</div>

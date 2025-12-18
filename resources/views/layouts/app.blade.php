@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('img/apple-icon.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
-    <title>Dashboard - Control Monitoreo</title>
+    <title>Jigafra</title>
 
     <!-- Fonts and Icons -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -36,11 +36,15 @@
     @else
     {{-- Fondo dinámico según ruta --}}
     @if (!in_array($routeName, ['profile', 'profile-static']))
-    <div class="min-height-300 bg-success position-absolute w-100"></div>
+
+    <div class="position-absolute w-100 min-height-300 top-0"
+        style="background-image: url('{{ asset('img/theme-fondo.jpeg') }}'); background-position-y: 50%;">
+        <span class="mask bg-dark opacity-6"></span>
+    </div>
     @elseif (in_array($routeName, ['profile-static', 'profile', 'dashboard']))
     <div class="position-absolute w-100 min-height-300 top-0"
-        style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/profile-layout-header.jpg'); background-position-y: 50%;">
-        <span class="mask bg-success opacity-6"></span>
+        style="background-image: url('{{ asset('img/theme-fondo.jpeg') }}'); background-position-y: 50%;">
+        <span class="mask bg-dark opacity-6"></span>
     </div>
     @endif
 

@@ -20,7 +20,7 @@ class FaltanteController extends Controller
         $proveedores = CatalogoProveedor::all();
 
         $query = Recibo::with('proveedor')
-            ->where('tipo_recibo', 'F')
+            ->where('tipo_recibo', 'FS')
             ->orderByDesc('idrecibos');
 
         // Filtros dinámicos
@@ -63,8 +63,8 @@ class FaltanteController extends Controller
         Log::info('Creando nuevo recibo...');
         Log::info('Request recibido:', $request->all());
         $request->validate([
-            'tipo_recibo' => 'required|in:D,F',
-            'sucursal' => 'required|in:F,PV,PO',
+            'tipo_recibo' => 'required|in:D,F,FS',
+            'sucursal' => 'required|in:P,PV,PO',
             'provedores_idprovedores' => 'required|exists:catalogo_provedores,idcatalogo_provedores',
             'facturas' => 'required|array|min:1',
             'facturas.*.factura' => 'required|string',

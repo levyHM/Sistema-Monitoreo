@@ -18,7 +18,7 @@
                 <div class="alert alert-danger text-center">{{ session('error') }}</div>
                 @endif
 
-                {{-- Botón para crear 
+                {{-- Botón para crear
                 @can('Reporte Soluciones.crear')
                 <div class="text-center mt-4">
                     <a href="{{ route('soluciones.create') }}" class="btn btn-success">Eliminar</a>
@@ -28,18 +28,23 @@
                 {{-- Filtros --}}
                 <div class="p-4 border-bottom">
                     <form method="GET" action="{{ route('soluciones.index') }}" class="row g-3 align-items-end">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
+                            <label for="folio" class="form-label text-sm">Folio</label>
+                            <input type="text" name="folio" id="folio" value="{{ request('folio') }}"
+                                class="form-control" placeholder="Ej. 123">
+                        </div>
+                        <div class="col-md-2">
                             <label for="fecha" class="form-label text-sm">Fecha</label>
                             <input type="date" name="fecha" id="fecha" value="{{ request('fecha') }}"
                                 class="form-control">
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label for="codigo" class="form-label text-sm">Código Cliente</label>
                             <input type="text" name="codigo" id="codigo" value="{{ request('codigo') }}"
                                 class="form-control" placeholder="Ej. C1234">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <select name="catalogo_tipo_id" id="catalogo_tipo_id" class="form-select">
                                 <option value="">Todos</option>
                                 @foreach($tipos as $tipo)
@@ -94,10 +99,11 @@
                                 @foreach($reportes as $reporte)
                                 <tr>
                                     <td>
-                                        {{ str_pad($reporte->idreporte_soluciones_clientes, 4, '0', STR_PAD_LEFT) }}{{ $reporte->cliente->clipar1 ?? '' }}
+                                        {{ str_pad($reporte->idreporte_soluciones_clientes, 4, '0', STR_PAD_LEFT) }}{{
+                                        $reporte->cliente->clipar1 ?? '' }}
                                     </td>
                                     </td>
-                                    <td>{{ $reporte->fecha  }}</td>
+                                    <td>{{ $reporte->fecha }}</td>
                                     <td>{{ $reporte->cliente->clicod ?? 'Sin nombre' }}</td>
                                     <td>{{ $reporte->cliente->clinom ?? 'Sin nombre' }}</td>
                                     <td>
@@ -171,21 +177,21 @@
                                     </td>
                                     <td>
                                         @if($reporte->estatus == 1)
-                                            <span class="badge bg-gradient-success text-white">Aprobado</span>
+                                        <span class="badge bg-gradient-success text-white">Aprobado</span>
                                         @elseif($reporte->estatus == 2)
-                                            <span class="badge bg-gradient-danger text-white">No aprobado</span>
+                                        <span class="badge bg-gradient-danger text-white">No aprobado</span>
                                         @elseif($reporte->estatus == 3)
-                                            <span class="badge bg-gradient-warning text-white">Cancelado</span>
+                                        <span class="badge bg-gradient-warning text-white">Cancelado</span>
                                         @elseif($reporte->estatus == 4)
-                                            <span class="badge bg-gradient-info text-white">En Ruta</span>
+                                        <span class="badge bg-gradient-info text-white">En Ruta</span>
                                         @elseif($reporte->estatus == 5)
-                                            <span class="badge bg-gradient-primary text-white">Almacen</span>
+                                        <span class="badge bg-gradient-primary text-white">Almacen</span>
                                         @elseif($reporte->estatus == 6)
-                                            <span class="badge bg-gradient-secondary text-white">Pendiente</span>
+                                        <span class="badge bg-gradient-secondary text-white">Pendiente</span>
                                         @elseif($reporte->estatus == 7)
-                                            <span class="badge bg-gradient-dark text-white">En Dictamen</span>
+                                        <span class="badge bg-gradient-dark text-white">En Dictamen</span>
                                         @else
-                                            <span class="badge bg-secondary text-white">Desconocido</span>
+                                        <span class="badge bg-secondary text-white">Desconocido</span>
                                         @endif
                                     </td>
                                     <td class="align-middle text-center">
